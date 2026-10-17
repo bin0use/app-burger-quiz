@@ -36,6 +36,10 @@ const $questionAnswer = $('#question-answer');
 const $screenControls = $('#screen-controls');
 const $buttonToggleScreenQuestion = $('#button-toggle-screen-question');
 const $buttonToggleRevealAnswer = $('#button-toggle-reveal-answer');
+const $mediaControls = $('#media-controls');
+const $buttonPlayQuestionMedia = $('#button-play-question-media');
+const $buttonPlayAnswerMedia = $('#button-play-answer-media');
+const $buttonStopMedia = $('#button-stop-media');
 
 const $buzzerStatus = $('#buzzer-status');
 const $connectionStatus = $('#connection-status');
@@ -56,7 +60,10 @@ const actions = {
     nextQuestion: function () { socket.emit(messages.messageNextQuestion); },
     previousQuestion: function () { socket.emit(messages.messagePreviousQuestion); },
     toggleScreenQuestion: function () { socket.emit(messages.messageToggleScreenQuestion); },
-    toggleRevealAnswer: function () { socket.emit(messages.messageToggleRevealAnswer); }
+    toggleRevealAnswer: function () { socket.emit(messages.messageToggleRevealAnswer); },
+    playQuestionMedia: function () { socket.emit(messages.messagePlayMedia, 'questionMedia'); },
+    playAnswerMedia: function () { socket.emit(messages.messagePlayMedia, 'answerMedia'); },
+    stopMedia: function () { socket.emit(messages.messageStopMedia); }
 };
 
 /**
@@ -73,7 +80,9 @@ const shortcuts = {
     'arrowright': [actions.nextQuestion],
     'arrowleft': [actions.previousQuestion],
     'e': [actions.toggleScreenQuestion],
-    'r': [actions.toggleRevealAnswer]
+    'r': [actions.toggleRevealAnswer],
+    'j': [actions.playQuestionMedia, actions.playAnswerMedia],
+    's': [actions.stopMedia]
 };
 
 const initEvents = function () {
@@ -94,6 +103,9 @@ const initEvents = function () {
     $buttonPreviousQuestion.on('click', actions.previousQuestion);
     $buttonToggleScreenQuestion.on('click', actions.toggleScreenQuestion);
     $buttonToggleRevealAnswer.on('click', actions.toggleRevealAnswer);
+    $buttonPlayQuestionMedia.on('click', actions.playQuestionMedia);
+    $buttonPlayAnswerMedia.on('click', actions.playAnswerMedia);
+    $buttonStopMedia.on('click', actions.stopMedia);
     $selectParty.on('change', function () {
         socket.emit(messages.messageSelectParty, $selectParty.val() || null);
     });
@@ -151,6 +163,20 @@ const displayTransitionState = function (state) {
 }
 
 /**
+ * Affiche le bouton de lecture d'un son / d'une vidéo (masqué si absent)
+ * @param {*} $button Le bouton
+ * @param {*} media { file, type, name } ou null
+ * @param {*} target 'de la question' / 'de la réponse'
+ */
+const displayMediaButton = function ($button, media, target) {
+    $button.prop('hidden', !media);
+    if (!media)
+        return;
+    $button.text('\u25B6 ' + (media.type === 'video' ? 'Vidéo ' : 'Son ') + target)
+        .attr('title', media.name || '');
+}
+
+/**
  * Affiche la partie sélectionnée et la question en cours (avec sa réponse)
  * @param {*} state { parties, activePartyId, round, index, total, question }
  */
@@ -189,6 +215,12 @@ const displayQuestionState = function (state) {
     $buttonToggleScreenQuestion.text(state.screenVisible ? "Masquer de l'écran" : "Afficher à l'écran");
     $buttonToggleRevealAnswer.text(state.answerRevealed ? "Cacher la réponse à l'écran" : "Révéler la réponse à l'écran")
         .prop('disabled', !state.screenVisible || !question || !question.answer);
+    // Son / vidéo : joué sur l'écran de jeu, quelle que soit la manche
+    const questionMedia = question ? question.questionMedia : null;
+    const answerMedia = question ? question.answerMedia : null;
+    $mediaControls.prop('hidden', !questionMedia && !answerMedia);
+    displayMediaButton($buttonPlayQuestionMedia, questionMedia, 'de la question');
+    displayMediaButton($buttonPlayAnswerMedia, answerMedia, 'de la réponse');
     $buttonPreviousQuestion.prop('disabled', !question || state.index <= 0);
     $buttonNextQuestion.prop('disabled', !question || state.index >= state.total - 1);
 }

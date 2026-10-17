@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const { createStateStore } = require('./state-store');
 const { rounds, isValidRound } = require('../models/rounds');
+const { isValidFileName, mediaTypes, maxSize } = require('./media-store');
 
 /**
  * Limites de saisie
@@ -11,8 +12,15 @@ const limits = {
     question: 500,
     answer: 500,
     choice: 200,
-    choices: 4
+    choices: 4,
+    mediaName: 200,
+    mediaSize: maxSize
 };
+
+/**
+ * Médias (son ou vidéo) possibles pour une question
+ */
+const mediaFields = ['questionMedia', 'answerMedia'];
 
 /**
  * Erreur de saisie (renvoyée en 400 par l'API)
@@ -56,9 +64,28 @@ const cleanChoices = function (choices) {
 }
 
 /**
- * Valide les champs d'une question (sans l'identifiant)
+ * Son ou vidéo envoyé au préalable : { file, type, name }
+ * Un fichier absent du serveur (partie importée d'ailleurs) est ignoré
  */
-const cleanQuestion = function (data) {
+const cleanMedia = function (media, mediaExists) {
+    if (media === undefined || media === null)
+        return null;
+    if (typeof media !== 'object' || !isValidFileName(media.file) || mediaTypes.indexOf(media.type) === -1)
+        throw new ValidationError('Média invalide');
+    if (!mediaExists(media.file))
+        return null;
+    return {
+        file: media.file,
+        type: media.type,
+        name: cleanText(media.name, 'Nom du média', limits.mediaName, false)
+    };
+}
+
+/**
+ * Valide les champs d'une question (sans l'identifiant)
+ * @param {*} mediaExists Indique si un fichier média existe sur le serveur
+ */
+const cleanQuestion = function (data, mediaExists) {
     data = data || {};
     if (!isValidRound(data.round))
         throw new ValidationError('Manche inconnue');
@@ -67,15 +94,19 @@ const cleanQuestion = function (data) {
         theme: cleanText(data.theme, 'Thème', limits.theme, false),
         question: cleanText(data.question, 'Question', limits.question, true),
         choices: cleanChoices(data.choices),
-        answer: cleanText(data.answer, 'Réponse', limits.answer, false)
+        answer: cleanText(data.answer, 'Réponse', limits.answer, false),
+        questionMedia: cleanMedia(data.questionMedia, mediaExists),
+        answerMedia: cleanMedia(data.answerMedia, mediaExists)
     };
 }
 
 /**
  * Se charge de stocker les parties (et leurs questions) dans un fichier JSON
  * @param {*} filePath Le chemin du fichier (si absent, les parties restent en mémoire)
+ * @param {*} options.mediaExists Indique si un fichier média existe (par défaut : toujours)
  */
-const createPartyStore = function (filePath) {
+const createPartyStore = function (filePath, options) {
+    const mediaExists = (options && options.mediaExists) || function () { return true; };
     const file = createStateStore(filePath);
     const saved = file.load();
     const parties = saved && Array.isArray(saved.parties) ? saved.parties : [];
@@ -137,7 +168,7 @@ const createPartyStore = function (filePath) {
             createdAt: date,
             updatedAt: date,
             questions: (questions || []).map(function (question) {
-                return Object.assign({ id: crypto.randomUUID() }, cleanQuestion(question));
+                return Object.assign({ id: crypto.randomUUID() }, cleanQuestion(question, mediaExists));
             })
         };
         parties.push(party);
@@ -201,7 +232,7 @@ const createPartyStore = function (filePath) {
             const party = find(id);
             if (!party)
                 return null;
-            const question = Object.assign({ id: crypto.randomUUID() }, cleanQuestion(data));
+            const question = Object.assign({ id: crypto.randomUUID() }, cleanQuestion(data, mediaExists));
             party.questions.push(question);
             commit(party);
             return copy(question);
@@ -211,7 +242,7 @@ const createPartyStore = function (filePath) {
             const question = findQuestion(party, questionId);
             if (!question)
                 return null;
-            const cleaned = cleanQuestion(data);
+            const cleaned = cleanQuestion(data, mediaExists);
             // Changement de manche : la question passe à la fin de sa nouvelle manche
             if (cleaned.round !== question.round) {
                 party.questions.splice(party.questions.indexOf(question), 1);
@@ -254,6 +285,21 @@ const createPartyStore = function (filePath) {
             return copy(party);
         },
         /**
+         * Fichiers médias utilisés par au moins une question
+         */
+        usedMedia: function () {
+            const files = new Set();
+            parties.forEach(function (party) {
+                party.questions.forEach(function (question) {
+                    mediaFields.forEach(function (field) {
+                        if (question[field])
+                            files.add(question[field].file);
+                    });
+                });
+            });
+            return files;
+        },
+        /**
          * Abonnement aux modifications des parties
          */
         onChange: function (listener) {
@@ -262,4 +308,4 @@ const createPartyStore = function (filePath) {
     };
 }
 
-module.exports = { createPartyStore, ValidationError, limits };
+module.exports = { createPartyStore, ValidationError, limits, mediaFields };

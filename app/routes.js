@@ -2,9 +2,11 @@ const QRCode = require('qrcode');
 const urlResolverService = require('./services/url-resolver');
 const { validTeamNames } = require('./game');
 const { rounds } = require('./models/rounds');
-const { ValidationError, limits } = require('./services/party-store');
+const express = require('express');
+const { ValidationError, limits, mediaFields } = require('./services/party-store');
+const { isAcceptedType } = require('./services/media-store');
 
-module.exports = function (app, passport, partyStore) {
+module.exports = function (app, passport, partyStore, mediaStore) {
   /**
    * Le chemin de base où se trouve les views
    */
@@ -116,13 +118,19 @@ module.exports = function (app, passport, partyStore) {
     res.send(JSON.stringify({
       name: party.name,
       questions: party.questions.map(function (question) {
-        return {
+        const exported = {
           round: question.round,
           theme: question.theme,
           question: question.question,
           choices: question.choices,
           answer: question.answer
         };
+        // Seule la référence est exportée : le fichier reste sur ce serveur
+        mediaFields.forEach(function (field) {
+          if (question[field])
+            exported[field] = question[field];
+        });
+        return exported;
       })
     }, null, 2));
   });
@@ -154,6 +162,26 @@ module.exports = function (app, passport, partyStore) {
   app.post(api + '/:id/questions/:questionId/move', isApiLoggedIn, requireJson, handle(function (req) {
     return [200, partyStore.moveQuestion(req.params.id, req.params.questionId, req.body.direction)];
   }));
+
+  /**
+   * Envoi d'un son ou d'une vidéo (contenu brut du fichier)
+   * Le type audio / vidéo ne peut pas être envoyé par un formulaire d'un autre site
+   */
+  app.post('/admin/api/media', isApiLoggedIn,
+    express.raw({ type: function (req) { return isAcceptedType(req.get('Content-Type')); }, limit: limits.mediaSize }),
+    function (req, res) {
+      const media = Buffer.isBuffer(req.body) ? mediaStore.save(req.body, req.get('Content-Type')) : null;
+      if (!media)
+        return res.status(415).json({ error: 'Format non pris en charge (mp3, wav, ogg, m4a, mp4, webm…)' });
+      let name = '';
+      try {
+        name = decodeURIComponent(req.get('X-File-Name') || '');
+      } catch {
+        // Nom illisible : le média reste utilisable sans nom
+      }
+      media.name = name.slice(0, limits.mediaName);
+      res.status(201).json(media);
+    });
 
   /**
    * Déconnexion de l'admin

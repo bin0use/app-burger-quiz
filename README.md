@@ -43,6 +43,7 @@ Par défaut le serveur écoute sur le port **3000**.
 | `SESSION_SECRET` | Secret de signature des sessions | généré aléatoirement à chaque démarrage |
 | `STATE_FILE` | Fichier de sauvegarde de la partie (scores, transition en cours), vide pour désactiver | `data/state.json` |
 | `PARTIES_FILE` | Fichier de stockage des parties et de leurs questions, vide pour les garder en mémoire | `data/parties.json` |
+| `MEDIA_DIR` | Dossier des sons et vidéos des questions | `data/media` |
 
 Exemple : `ADMIN_PASSWORD=monMotDePasse npm start`
 
@@ -100,6 +101,8 @@ La télécommande indique aussi la transition en cours et la suivante, permet de
 | `N` / `P` | Transition suivante / précédente |
 | `→` / `←` | Question suivante / précédente |
 | `E` / `R` | Afficher / masquer la question à l'écran, révéler la réponse |
+| `J` / `Maj+J` | Jouer le son / la vidéo de la question / de la réponse |
+| `S` | Arrêter le son / la vidéo |
 
 ### Gestion des parties et des questions
 
@@ -107,9 +110,12 @@ Depuis la télécommande, le lien **Gérer les parties et questions** (http://lo
 
 * créer, renommer, dupliquer et supprimer des parties ;
 * ajouter, modifier, supprimer et réordonner les questions de chaque manche (Nuggets, Sel ou Poivre, Les menus, L'addition, Burger de la mort), avec un thème optionnel (nom du menu…), jusqu'à 4 propositions (Nuggets) et la réponse ;
+* joindre un son ou une vidéo à la question et / ou à la réponse (mp3, wav, ogg, m4a, mp4, webm, 100 Mo maximum) : blind test, extrait de film, générique… ;
 * exporter une partie en JSON et la réimporter (sur un autre serveur par exemple).
 
 Choisissez ensuite la partie dans la télécommande : à chaque transition, la première question de la manche s'affiche avec sa réponse, et les boutons **Précédente / Suivante** (ou les flèches `←` / `→`) permettent de naviguer. Comme dans l'émission, les questions des **Nuggets** et des **menus** s'affichent aussi sur l'écran de jeu (question, nom du menu et propositions). Depuis la télécommande, **Masquer / Afficher à l'écran** (`E`) et **Révéler la réponse à l'écran** (`R`) : la bonne proposition est mise en avant, ou la réponse s'affiche sous la question. Tant qu'elle n'est pas révélée, la réponse n'est envoyée qu'aux télécommandes authentifiées, jamais aux buzzers ni à l'écran de jeu.
+
+Quand la question en cours a un son ou une vidéo, quelle que soit la manche, la télécommande affiche les boutons **▶ Son / Vidéo de la question**, **▶ Son / Vidéo de la réponse** et **Stop** (`J`, `Maj+J`, `S`) : le média est joué sur l'écran de jeu (les vidéos en plein écran). Comme dans l'émission, un buzz coupe le son ou la vidéo en cours ; changer de question ou de manche l'arrête aussi. Les fichiers sont stockés dans `MEDIA_DIR` et supprimés une fois qu'aucune question ne les utilise. L'export d'une partie ne contient que la référence des médias : réimportée sur un autre serveur, la partie perd ses sons et vidéos.
 
 Sur les téléphones, le buzzer vibre, empêche la mise en veille de l'écran et indique l'état de la partie (en attente, à vous, connexion perdue…).
 

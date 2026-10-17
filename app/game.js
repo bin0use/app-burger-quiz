@@ -2,7 +2,7 @@ const Team = require('./models/team');
 const { transitionsList } = require('./models/rounds');
 const messages = require('../config/messages-socket');
 const { createStateStore } = require('./services/state-store');
-const { createPartyStore } = require('./services/party-store');
+const { createPartyStore, mediaFields } = require('./services/party-store');
 
 /**
  * Noms d'équipes acceptés pour le buzz
@@ -184,11 +184,26 @@ module.exports = function (io, options) {
     }
 
     /**
-     * Nouvelle question : affichée à l'écran, réponse cachée
+     * Nouvelle question : affichée à l'écran, réponse cachée, son ou vidéo arrêté
      */
     const resetScreenQuestion = function () {
         screenQuestionVisible = true;
         answerRevealed = false;
+        io.emit(messages.messageToClientStopMedia);
+    }
+
+    /**
+     * Joue sur les écrans de jeu le son ou la vidéo de la question en cours
+     * @param {*} field 'questionMedia' ou 'answerMedia'
+     */
+    const playMedia = function (field) {
+        if (mediaFields.indexOf(field) === -1)
+            return;
+        const question = currentRoundQuestions()[questionIndex];
+        const media = question && question[field];
+        if (!media)
+            return;
+        io.emit(messages.messageToClientPlayMedia, { url: '/media/' + media.file, type: media.type });
     }
 
     /**
@@ -359,6 +374,13 @@ module.exports = function (io, options) {
         onAdminMessage(socket, messages.messageToggleRevealAnswer, function () {
             answerRevealed = !answerRevealed;
             emitQuestionState();
+        });
+        /**
+         * Son ou vidéo de la question / de la réponse sur les écrans de jeu
+         */
+        onAdminMessage(socket, messages.messagePlayMedia, playMedia);
+        onAdminMessage(socket, messages.messageStopMedia, function () {
+            io.emit(messages.messageToClientStopMedia);
         });
         socket.on(messages.messageClientNeedScreenQuestion, function () {
             socket.emit(messages.messageToClientReceiveScreenQuestion, screenQuestion());

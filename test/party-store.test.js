@@ -80,3 +80,30 @@ test('import et persistance dans un fichier', function () {
     assert.strictEqual(reloaded.get(party.id).questions.length, 1);
     fs.rmSync(dir, { recursive: true });
 });
+
+test('sons et vidéos des questions', function () {
+    const existing = '0f8fad5b-d9cb-469f-a165-70867728950e.mp3';
+    const missing = '7c9e6679-7425-40de-944b-e07fc1f90ae7.mp4';
+    const store = createPartyStore(null, { mediaExists: function (file) { return file === existing; } });
+    const party = store.create('Partie');
+    assert.throws(function () {
+        store.addQuestion(party.id, { round: 'menus', question: 'Q', questionMedia: { file: '../secret', type: 'audio' } });
+    }, ValidationError);
+    assert.throws(function () {
+        store.addQuestion(party.id, { round: 'menus', question: 'Q', questionMedia: { file: existing, type: 'image' } });
+    }, ValidationError);
+
+    const question = store.addQuestion(party.id, {
+        round: 'menus',
+        question: 'Quel est ce générique ?',
+        questionMedia: { file: existing, type: 'audio', name: ' generique.mp3 ', extra: 'ignoré' },
+        // Fichier absent du serveur (partie importée) : ignoré
+        answerMedia: { file: missing, type: 'video' }
+    });
+    assert.deepStrictEqual(question.questionMedia, { file: existing, type: 'audio', name: 'generique.mp3' });
+    assert.strictEqual(question.answerMedia, null);
+    assert.deepStrictEqual(Array.from(store.usedMedia()), [existing]);
+
+    store.updateQuestion(party.id, question.id, { round: 'menus', question: 'Q' });
+    assert.strictEqual(store.usedMedia().size, 0);
+});

@@ -29,6 +29,8 @@
         messagePreviousQuestion: 'event-previous-question',
         messageToggleScreenQuestion: 'event-toggle-screen-question',
         messageToggleRevealAnswer: 'event-toggle-reveal-answer',
+        messagePlayMedia: 'event-play-media',
+        messageStopMedia: 'event-stop-media',
         /**
          * Les messages que les clients envoies
          */
@@ -54,6 +56,8 @@
         messageToClientReceiveBadResponse: 'receive-buzz-bad-response',
         messageToClientReceiveStateQuestion: 'receive-state-question',
         messageToClientReceiveScreenQuestion: 'receive-screen-question',
+        messageToClientPlayMedia: 'receive-play-media',
+        messageToClientStopMedia: 'receive-stop-media',
     });
 
     if (typeof module !== 'undefined' && module.exports) {
