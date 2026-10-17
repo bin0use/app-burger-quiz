@@ -8,11 +8,13 @@ const session = require('express-session');
 const { Server } = require('socket.io');
 
 const confServer = require('../config/config-server');
+const { createPartyStore } = require('./services/party-store');
 
 /**
  * Se charge de créer le serveur http, express et socket.io
  * @param {*} options.stateFile Fichier de sauvegarde de la partie (optionnel)
  * @param {*} options.sessionSecret Secret de signature des sessions (optionnel)
+ * @param {*} options.partiesFile Fichier de stockage des parties et questions (optionnel)
  */
 const createServer = function (options) {
   options = options || {};
@@ -38,6 +40,8 @@ const createServer = function (options) {
   app.use(express.urlencoded({
     extended: true
   }));
+  // Corps JSON de l'API de gestion des parties (import compris)
+  app.use(express.json({ limit: '1mb' }));
 
   // Secret de session : à définir via SESSION_SECRET, sinon généré à chaque démarrage
   const sessionMiddleware = session({
@@ -56,11 +60,14 @@ const createServer = function (options) {
   // Configuration de passport
   require('../config/passport')(passport);
 
+  // Parties et questions, partagées entre l'API admin et le jeu
+  const partyStore = createPartyStore(options.partiesFile);
+
   // On l'inject dans le router
-  require('./routes')(app, passport);
+  require('./routes')(app, passport, partyStore);
 
   // On déclare le jeu ici
-  require('./game')(io, { stateFile: options.stateFile });
+  require('./game')(io, { stateFile: options.stateFile, partyStore: partyStore });
 
   return { app, httpServer, io };
 }

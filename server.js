@@ -9,8 +9,14 @@ const stateFile = process.env.STATE_FILE !== undefined
   ? process.env.STATE_FILE
   : path.join(confServer.rootDir, 'data/state.json');
 
+// Fichier de stockage des parties et questions (PARTIES_FILE vide : en mémoire uniquement)
+const partiesFile = process.env.PARTIES_FILE !== undefined
+  ? process.env.PARTIES_FILE
+  : path.join(confServer.rootDir, 'data/parties.json');
+
 const { httpServer } = createServer({
   stateFile: stateFile,
+  partiesFile: partiesFile,
   sessionSecret: process.env.SESSION_SECRET
 });
 

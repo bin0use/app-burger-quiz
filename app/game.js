@@ -1,7 +1,8 @@
 const Team = require('./models/team');
-const Transition = require('./models/transition');
+const { transitionsList } = require('./models/rounds');
 const messages = require('../config/messages-socket');
 const { createStateStore } = require('./services/state-store');
+const { createPartyStore } = require('./services/party-store');
 
 /**
  * Noms d'équipes acceptés pour le buzz
@@ -9,25 +10,20 @@ const { createStateStore } = require('./services/state-store');
 const validTeamNames = ['team-mayo', 'team-ketchup'];
 
 /**
- * Liste des transitions dans l'ordre de la partie
+ * Salle socket.io regroupant les télécommandes admin
+ * (les questions et réponses ne sont envoyées qu'à elles)
  */
-const transitionsList = [
-    new Transition('nuggets-transition.mp4', 'Nuggets', 1),
-    new Transition('selt-pepper-transition.mp4', 'Sel ou Poivre', 2),
-    new Transition('menus-transition.mp4', 'Les menus', 3),
-    new Transition('addition-transition.mp4', "L'addition", 4),
-    new Transition('death-burger-transition.mp4', 'Burger de la mort', 5),
-].sort(function (a, b) {
-    return a.order - b.order;
-});
+const adminRoom = 'admins';
 
 /**
  * @param {*} io Le serveur socket.io
  * @param {*} options.stateFile Fichier de sauvegarde de la partie (optionnel)
+ * @param {*} options.partyStore Stockage des parties et questions (optionnel)
  */
 module.exports = function (io, options) {
     options = options || {};
     const store = createStateStore(options.stateFile);
+    const partyStore = options.partyStore || createPartyStore(null);
 
     const teamMayo = new Team('mayo');
     const teamKetchup = new Team('ketchup');
@@ -43,6 +39,14 @@ module.exports = function (io, options) {
      * Index de la dernière transition jouée (-1 : aucune)
      */
     let transitionIndex = -1;
+    /**
+     * Partie (jeu de questions) sélectionnée par l'admin
+     */
+    let activePartyId = null;
+    /**
+     * Index de la question en cours dans la manche en cours
+     */
+    let questionIndex = 0;
 
     /**
      * Restaure la partie sauvegardée (le buzzer repart toujours bloqué)
@@ -57,13 +61,20 @@ module.exports = function (io, options) {
             && state.transitionIndex >= -1
             && state.transitionIndex < transitionsList.length)
             transitionIndex = state.transitionIndex;
+        if (typeof state.activePartyId === 'string' && partyStore.get(state.activePartyId))
+            activePartyId = state.activePartyId;
+        if (Number.isInteger(state.questionIndex) && state.questionIndex >= 0)
+            questionIndex = state.questionIndex;
+        clampQuestionIndex();
     }
 
     const saveState = function () {
         store.save({
             mayo: teamMayo.points,
             ketchup: teamKetchup.points,
-            transitionIndex: transitionIndex
+            transitionIndex: transitionIndex,
+            activePartyId: activePartyId,
+            questionIndex: questionIndex
         });
     }
 
@@ -101,6 +112,50 @@ module.exports = function (io, options) {
     }
 
     /**
+     * Questions de la manche en cours pour la partie active
+     */
+    const currentRoundQuestions = function () {
+        const transition = transitionsList[transitionIndex];
+        if (!activePartyId || !transition)
+            return [];
+        return partyStore.questionsOfRound(activePartyId, transition.round);
+    }
+
+    /**
+     * Garde l'index de question dans les bornes de la manche en cours
+     */
+    const clampQuestionIndex = function () {
+        const count = currentRoundQuestions().length;
+        questionIndex = Math.min(Math.max(questionIndex, 0), Math.max(count - 1, 0));
+    }
+
+    /**
+     * Informations sur les questions pour la télécommande (contient les réponses !)
+     */
+    const questionState = function () {
+        const party = activePartyId ? partyStore.get(activePartyId) : null;
+        const transition = transitionsList[transitionIndex];
+        const questions = currentRoundQuestions();
+        return {
+            parties: partyStore.list().map(function (summary) {
+                return { id: summary.id, name: summary.name, questionsCount: summary.questionsCount };
+            }),
+            activePartyId: party ? party.id : null,
+            round: transition ? transition.label : null,
+            index: questionIndex,
+            total: questions.length,
+            question: questions[questionIndex] || null
+        };
+    }
+
+    /**
+     * Envoie l'état des questions à toutes les télécommandes
+     */
+    const emitQuestionState = function () {
+        io.to(adminRoom).emit(messages.messageToClientReceiveStateQuestion, questionState());
+    }
+
+    /**
      * Joue la transition à l'index donné sur tous les écrans
      */
     const playTransition = function (index) {
@@ -108,10 +163,38 @@ module.exports = function (io, options) {
         if (!transition)
             return;
         transitionIndex = index;
+        // Nouvelle manche : on repart de la première question
+        questionIndex = 0;
         saveState();
         io.emit(messages.messageToClientNextTransition, transition.filename);
         io.emit(messages.messageToClientReceiveStateTransition, transitionState());
+        emitQuestionState();
     }
+
+    /**
+     * Passe à la question suivante (+1) ou précédente (-1) de la manche
+     */
+    const moveQuestion = function (direction) {
+        const index = questionIndex + direction;
+        if (index < 0 || index >= currentRoundQuestions().length)
+            return;
+        questionIndex = index;
+        saveState();
+        emitQuestionState();
+    }
+
+    /**
+     * Les parties ont été modifiées depuis la page de gestion
+     */
+    partyStore.onChange(function () {
+        if (activePartyId && !partyStore.get(activePartyId)) {
+            activePartyId = null;
+            questionIndex = 0;
+        }
+        clampQuestionIndex();
+        saveState();
+        emitQuestionState();
+    });
 
     /**
      * Se charge d'ajouter ou de retirer des points
@@ -130,6 +213,8 @@ module.exports = function (io, options) {
     }
 
     io.on(messages.messageConnection, function (socket) {
+        if (isAdmin(socket))
+            socket.join(adminRoom);
         /**
          *  On répond uniquement au client qui demande l'info des points
          */
@@ -175,10 +260,12 @@ module.exports = function (io, options) {
             teamMayo.points = 0;
             teamKetchup.points = 0;
             transitionIndex = -1;
+            questionIndex = 0;
             saveState();
             io.emit(messages.messageToClientReloadPart);
             io.emit(messages.messageToClientReceiveStateBuzzer, buzzerIsLock, firstBuzzTeam);
             io.emit(messages.messageToClientReceiveStateTransition, transitionState());
+            emitQuestionState();
         });
         /**
          * Se produit lorsqu'un client buzz
@@ -201,6 +288,26 @@ module.exports = function (io, options) {
         });
         onAdminMessage(socket, messages.messagePreviousTransition, function () {
             playTransition(transitionIndex - 1);
+        });
+        /**
+         * Questions : état (réservé à l'admin), choix de la partie, navigation
+         */
+        onAdminMessage(socket, messages.messageClientNeedStateQuestion, function () {
+            socket.emit(messages.messageToClientReceiveStateQuestion, questionState());
+        });
+        onAdminMessage(socket, messages.messageSelectParty, function (partyId) {
+            if (partyId !== null && !partyStore.get(partyId))
+                return;
+            activePartyId = partyId;
+            questionIndex = 0;
+            saveState();
+            emitQuestionState();
+        });
+        onAdminMessage(socket, messages.messageNextQuestion, function () {
+            moveQuestion(1);
+        });
+        onAdminMessage(socket, messages.messagePreviousQuestion, function () {
+            moveQuestion(-1);
         });
         /**
          * Se charge d'envoyer un message indiquant que l'équipe

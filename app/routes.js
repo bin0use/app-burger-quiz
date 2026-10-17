@@ -1,8 +1,10 @@
 const QRCode = require('qrcode');
 const urlResolverService = require('./services/url-resolver');
 const { validTeamNames } = require('./game');
+const { rounds } = require('./models/rounds');
+const { ValidationError, limits } = require('./services/party-store');
 
-module.exports = function (app, passport) {
+module.exports = function (app, passport, partyStore) {
   /**
    * Le chemin de base où se trouve les views
    */
@@ -73,6 +75,81 @@ module.exports = function (app, passport) {
   });
 
   /**
+   * Gestion des parties et des questions
+   */
+  app.get("/admin/parties", isLoggedIn, function (req, res) {
+    res.render(basePathViews + "admin-parties", {
+      rounds: rounds,
+      limits: limits
+    });
+  });
+
+  /** API de gestion des parties (JSON, réservée à l'admin) */
+
+  const api = '/admin/api/parties';
+
+  app.get(api, isApiLoggedIn, function (req, res) {
+    res.json(partyStore.list());
+  });
+
+  app.post(api, isApiLoggedIn, requireJson, handle(function (req) {
+    return [201, partyStore.create(req.body.name)];
+  }));
+
+  app.post(api + '/import', isApiLoggedIn, requireJson, handle(function (req) {
+    return [201, partyStore.importParty(req.body)];
+  }));
+
+  app.get(api + '/:id', isApiLoggedIn, handle(function (req) {
+    return [200, partyStore.get(req.params.id)];
+  }));
+
+  /**
+   * Export d'une partie (sans identifiants) pour la réimporter plus tard
+   */
+  app.get(api + '/:id/export', isApiLoggedIn, function (req, res) {
+    const party = partyStore.get(req.params.id);
+    if (!party)
+      return res.status(404).json({ error: 'Partie introuvable' });
+    const filename = party.name.replace(/[^a-z0-9_-]+/gi, '-').replace(/^-+|-+$/g, '') || 'partie';
+    res.attachment('burger-quiz-' + filename + '.json');
+    res.send(JSON.stringify({
+      name: party.name,
+      questions: party.questions.map(function (question) {
+        return { round: question.round, theme: question.theme, question: question.question, answer: question.answer };
+      })
+    }, null, 2));
+  });
+
+  app.put(api + '/:id', isApiLoggedIn, requireJson, handle(function (req) {
+    return [200, partyStore.rename(req.params.id, req.body.name)];
+  }));
+
+  app.delete(api + '/:id', isApiLoggedIn, handle(function (req) {
+    return [204, partyStore.remove(req.params.id)];
+  }));
+
+  app.post(api + '/:id/duplicate', isApiLoggedIn, requireJson, handle(function (req) {
+    return [201, partyStore.duplicate(req.params.id)];
+  }));
+
+  app.post(api + '/:id/questions', isApiLoggedIn, requireJson, handle(function (req) {
+    return [201, partyStore.addQuestion(req.params.id, req.body)];
+  }));
+
+  app.put(api + '/:id/questions/:questionId', isApiLoggedIn, requireJson, handle(function (req) {
+    return [200, partyStore.updateQuestion(req.params.id, req.params.questionId, req.body)];
+  }));
+
+  app.delete(api + '/:id/questions/:questionId', isApiLoggedIn, handle(function (req) {
+    return [204, partyStore.removeQuestion(req.params.id, req.params.questionId)];
+  }));
+
+  app.post(api + '/:id/questions/:questionId/move', isApiLoggedIn, requireJson, handle(function (req) {
+    return [200, partyStore.moveQuestion(req.params.id, req.params.questionId, req.body.direction)];
+  }));
+
+  /**
    * Déconnexion de l'admin
    */
   app.get("/logout", function (req, res, next) {
@@ -105,5 +182,45 @@ module.exports = function (app, passport) {
       return next();
     // Si c'est pas le cas on le redirige vers la page d'authentification
     res.redirect('/login');
+  }
+
+  /**
+   * Même chose pour l'API : on répond en 401 au lieu de rediriger
+   */
+  function isApiLoggedIn(req, res, next) {
+    if (req.isAuthenticated())
+      return next();
+    res.status(401).json({ error: 'Authentification requise' });
+  }
+
+  /**
+   * Les requêtes de modification de l'API doivent être en JSON
+   * (un formulaire d'un autre site ne peut pas en envoyer)
+   */
+  function requireJson(req, res, next) {
+    if (req.is('application/json') && req.body && typeof req.body === 'object')
+      return next();
+    res.status(415).json({ error: 'Le corps de la requête doit être en JSON' });
+  }
+
+  /**
+   * Exécute une action de l'API : [statut, résultat]
+   * Un résultat vide (null / false) signifie que l'élément est introuvable
+   */
+  function handle(action) {
+    return function (req, res) {
+      try {
+        const [status, result] = action(req);
+        if (!result)
+          return res.status(404).json({ error: 'Partie ou question introuvable' });
+        if (status === 204)
+          return res.status(204).end();
+        res.status(status).json(result);
+      } catch (error) {
+        if (!(error instanceof ValidationError))
+          throw error;
+        res.status(400).json({ error: error.message });
+      }
+    };
   }
 }

@@ -24,6 +24,9 @@
         messageNextTransition: 'event-next-transition',
         messagePreviousTransition: 'event-previous-transition',
         messageBuzzBadResponse: 'event-bad-response',
+        messageSelectParty: 'event-select-party',
+        messageNextQuestion: 'event-next-question',
+        messagePreviousQuestion: 'event-previous-question',
         /**
          * Les messages que les clients envoies
          */
@@ -31,6 +34,7 @@
         messageClientsNeedPointsInformations: 'need-information-points',
         messageClientNeedStateBuzzer: 'need-state-buzzer',
         messageClientNeedStateTransition: 'need-state-transition',
+        messageClientNeedStateQuestion: 'need-state-question',
         /**
          * Les messages à envoyer aux clients
          */
@@ -45,6 +49,7 @@
         messageToClientNextTransition: 'receive-next-transition',
         messageToClientReceiveStateTransition: 'receive-state-transition',
         messageToClientReceiveBadResponse: 'receive-buzz-bad-response',
+        messageToClientReceiveStateQuestion: 'receive-state-question',
     });
 
     if (typeof module !== 'undefined' && module.exports) {

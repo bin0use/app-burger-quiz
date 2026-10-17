@@ -115,6 +115,55 @@ test('routes http', async function (t) {
         assert.strictEqual((await get('/vendors/bootstrap/js/bootstrap.bundle.min.js')).status, 200);
         assert.match(await (await get('/js/messages-socket.js')).text(), /BQ_MESSAGES/);
     });
+
+    await t.test('gestion des parties réservée à l\'admin', async function () {
+        assert.strictEqual((await get('/admin/parties')).headers.get('location'), '/login');
+        assert.strictEqual((await get('/admin/api/parties')).status, 401);
+        const { cookie } = await loginAdmin(server.baseUrl);
+        const page = await (await get('/admin/parties', cookie)).text();
+        assert.match(page, /Gestion des parties/);
+        assert.match(page, /Burger de la mort/);
+    });
+
+    await t.test('API des parties et questions', async function () {
+        const { cookie } = await loginAdmin(server.baseUrl);
+        const call = async function (method, url, body, type) {
+            const response = await fetch(server.baseUrl + '/admin/api/parties' + url, {
+                method: method,
+                headers: { Cookie: cookie, 'Content-Type': type || 'application/json' },
+                body: body === undefined ? undefined : (typeof body === 'string' ? body : JSON.stringify(body))
+            });
+            return { status: response.status, body: response.status === 204 ? null : await response.json() };
+        }
+
+        // Un formulaire (non JSON) est refusé
+        assert.strictEqual((await call('POST', '', 'name=Pirate', 'application/x-www-form-urlencoded')).status, 415);
+        assert.strictEqual((await call('POST', '', { name: '' })).status, 400);
+
+        const party = (await call('POST', '', { name: 'Soirée' })).body;
+        let response = await call('POST', '/' + party.id + '/questions', { round: 'nuggets', question: 'Q1', answer: 'R1' });
+        assert.strictEqual(response.status, 201);
+        const question = response.body;
+        assert.strictEqual((await call('POST', '/' + party.id + '/questions', { round: 'x', question: 'Q' })).status, 400);
+
+        response = await call('PUT', '/' + party.id + '/questions/' + question.id, { round: 'nuggets', question: 'Q1 bis', answer: 'R' });
+        assert.strictEqual(response.body.question, 'Q1 bis');
+        assert.strictEqual((await call('PUT', '/' + party.id, { name: 'Soirée 2' })).body.name, 'Soirée 2');
+
+        const exported = await (await get('/admin/api/parties/' + party.id + '/export', cookie)).json();
+        assert.deepStrictEqual(exported, {
+            name: 'Soirée 2',
+            questions: [{ round: 'nuggets', theme: '', question: 'Q1 bis', answer: 'R' }]
+        });
+        const imported = (await call('POST', '/import', exported)).body;
+        assert.notStrictEqual(imported.id, party.id);
+        assert.strictEqual((await call('POST', '/' + party.id + '/duplicate', {})).status, 201);
+        assert.strictEqual((await call('GET', '')).body.length, 3);
+
+        assert.strictEqual((await call('DELETE', '/' + party.id + '/questions/' + question.id)).status, 204);
+        assert.strictEqual((await call('DELETE', '/' + party.id)).status, 204);
+        assert.strictEqual((await call('GET', '/' + party.id)).status, 404);
+    });
 });
 
 test('déroulement du jeu', async function (t) {
@@ -185,6 +234,66 @@ test('déroulement du jeu', async function (t) {
         assert.deepStrictEqual(await waitFor(player, messages.messageToClientReceiveStateTransition),
             [{ current: null, next: 'Nuggets', hasPrevious: false }]);
     });
+});
+
+test('questions sur la télécommande', async function (t) {
+    const server = await startServer(null);
+    t.after(server.close);
+    const { cookie } = await loginAdmin(server.baseUrl);
+    const admin = await server.connect(cookie);
+    const player = await server.connect();
+
+    const api = function (method, url, body) {
+        return fetch(server.baseUrl + '/admin/api/parties' + url, {
+            method: method,
+            headers: { Cookie: cookie, 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        }).then(function (response) { return response.json(); });
+    }
+    const party = await api('POST', '', { name: 'Soirée' });
+    await api('POST', '/' + party.id + '/questions', { round: 'nuggets', question: 'N1', answer: 'R1' });
+    await api('POST', '/' + party.id + '/questions', { round: 'nuggets', question: 'N2', answer: 'R2' });
+    await api('POST', '/' + party.id + '/questions', { round: 'sel-ou-poivre', question: 'S1', answer: 'Sel' });
+
+    // Les joueurs ne reçoivent jamais les questions (ni les réponses)
+    let playerReceived = false;
+    player.on(messages.messageToClientReceiveStateQuestion, function () { playerReceived = true; });
+    player.emit(messages.messageClientNeedStateQuestion);
+    player.emit(messages.messageSelectParty, party.id);
+
+    let state = waitFor(admin, messages.messageToClientReceiveStateQuestion);
+    admin.emit(messages.messageSelectParty, party.id);
+    assert.strictEqual((await state)[0].activePartyId, party.id);
+    assert.strictEqual((await state)[0].question, null);
+
+    state = waitFor(admin, messages.messageToClientReceiveStateQuestion);
+    admin.emit(messages.messageNextTransition);
+    let current = (await state)[0];
+    assert.strictEqual(current.round, 'Nuggets');
+    assert.strictEqual(current.total, 2);
+    assert.strictEqual(current.question.question, 'N1');
+    assert.strictEqual(current.question.answer, 'R1');
+
+    state = waitFor(admin, messages.messageToClientReceiveStateQuestion);
+    admin.emit(messages.messageNextQuestion);
+    assert.strictEqual((await state)[0].question.question, 'N2');
+
+    // Nouvelle manche : retour à la première question
+    state = waitFor(admin, messages.messageToClientReceiveStateQuestion);
+    admin.emit(messages.messageNextTransition);
+    current = (await state)[0];
+    assert.strictEqual(current.round, 'Sel ou Poivre');
+    assert.strictEqual(current.question.question, 'S1');
+
+    // Suppression de la partie active depuis la page de gestion
+    state = waitFor(admin, messages.messageToClientReceiveStateQuestion);
+    await fetch(server.baseUrl + '/admin/api/parties/' + party.id, { method: 'DELETE', headers: { Cookie: cookie } });
+    current = (await state)[0];
+    assert.strictEqual(current.activePartyId, null);
+    assert.deepStrictEqual(current.parties, []);
+
+    await pause(100);
+    assert.strictEqual(playerReceived, false);
 });
 
 test('la partie survit à un redémarrage du serveur', async function (t) {

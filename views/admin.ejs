@@ -44,6 +44,29 @@
       <div class="row justify-content-center mt-2">
         <small id="transition-status" class="text-muted"></small>
       </div>
+      <div class="card mt-4" id="question-panel">
+        <div class="card-header d-flex flex-wrap align-items-center">
+          <label class="mb-0 mr-2" for="select-party"><strong>Partie</strong></label>
+          <select class="form-control form-control-sm w-auto mr-2" id="select-party">
+            <option value="">— Aucune —</option>
+          </select>
+          <a class="btn btn-sm btn-outline-secondary ml-auto" href="/admin/parties">Gérer les parties et questions</a>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <small class="text-muted" id="question-status"></small>
+            <div class="btn-group">
+              <button type="button" class="btn btn-outline-secondary" id="button-previous-question" disabled>&larr; Précédente</button>
+              <button type="button" class="btn btn-outline-secondary" id="button-next-question" disabled>Suivante &rarr;</button>
+            </div>
+          </div>
+          <div id="question-content" hidden>
+            <small class="text-muted d-block" id="question-theme"></small>
+            <p class="h4" id="question-text"></p>
+            <p class="h5 text-success mb-0" id="question-answer"></p>
+          </div>
+        </div>
+      </div>
       <div class="row justify-content-center mt-4">
         <input class="btn btn-success btn-lg mr-2" type="button" value="Débloquer buzzer" id="button-unlock-buzz" />
         <input class="btn btn-secondary btn-lg" type="button" value="Bloquer buzzer" id="button-lock-buzz" />
@@ -56,7 +79,8 @@
           Raccourcis : <kbd>K</kbd> / <kbd>Maj+K</kbd> point Ketchup ±,
           <kbd>M</kbd> / <kbd>Maj+M</kbd> point Mayo ±, <kbd>X</kbd> mauvaise réponse,
           <kbd>D</kbd> débloquer, <kbd>B</kbd> bloquer,
-          <kbd>N</kbd> transition suivante, <kbd>P</kbd> précédente
+          <kbd>N</kbd> transition suivante, <kbd>P</kbd> précédente,
+          <kbd>&rarr;</kbd> / <kbd>&larr;</kbd> question suivante / précédente
         </small>
       </div>
       <div class="row justify-content-center mt-2">
