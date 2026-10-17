@@ -10,6 +10,12 @@ const $modalTransition = $('#modal-transition');
 const $sourceTransition = $('#source-transition');
 const $videoTransitionContainer = $('#video-transition-container');
 
+const $screenQuestion = $('#screen-question');
+const $screenQuestionRound = $('#screen-question-round');
+const $screenQuestionText = $('#screen-question-text');
+const $screenQuestionChoices = $('#screen-question-choices');
+const $screenQuestionAnswer = $('#screen-question-answer');
+
 const $modalTeamMayo = $('#modal-buzz-first-mayo');
 const $modalTeamKetchup = $('#modal-buzz-first-ketchup');
 
@@ -285,6 +291,34 @@ const playSound = function (sound) {
 }
 
 /**
+ * Affiche la question en cours (Nuggets, menus) ou la masque
+ * @param {*} question { round, theme, question, choices, answer } (answer seulement une fois révélée), null pour masquer
+ */
+const displayScreenQuestion = function (question) {
+    $screenQuestion.prop('hidden', !question);
+    if (!question)
+        return;
+    $screenQuestionRound.text(question.theme ? question.round + ' — ' + question.theme : question.round);
+    $screenQuestionText.text(question.question);
+
+    const revealed = question.answer !== null && question.answer !== '';
+    const normalize = function (text) { return text.trim().toLowerCase(); };
+    let answerInChoices = false;
+    $screenQuestionChoices.empty().toggleClass('revealed', revealed);
+    question.choices.forEach(function (choice, index) {
+        const isGood = revealed && normalize(choice) === normalize(question.answer);
+        answerInChoices = answerInChoices || isGood;
+        $screenQuestionChoices.append($('<div class="screen-question-choice"></div>')
+            .toggleClass('good', isGood)
+            .append($('<span class="screen-question-choice-letter"></span>').text(String.fromCharCode(65 + index)))
+            .append($('<span></span>').text(choice)));
+    });
+    // Réponse libre (menus) ou absente des propositions : affichée en dessous
+    $screenQuestionAnswer.prop('hidden', !revealed || answerInChoices)
+        .text(revealed ? question.answer : '');
+}
+
+/**
  * Se charge d'initialiser la modal de préparation (QR code d'accès au choix des équipes)
  */
 const initPrepareGame = function () {
@@ -362,11 +396,16 @@ const initSocketAndListenEvents = function () {
         launchBuzzSound();
     });
     /**
+     * Question à afficher à l'écran (Nuggets, menus)
+     */
+    socket.on(messages.messageToClientReceiveScreenQuestion, displayScreenQuestion);
+    /**
      * On souhaite connaitre le nombre de points
      * Dès que l'on se connecte (ou se reconnecte) sur la page
      */
     socket.on('connect', function () {
         socket.emit(messages.messageClientsNeedPointsInformations);
+        socket.emit(messages.messageClientNeedScreenQuestion);
     });
 }
 

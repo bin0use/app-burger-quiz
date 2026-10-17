@@ -24,6 +24,19 @@ const $buttonPreviousTransition = $('#button-previous-transition');
 const $transitionStatus = $('#transition-status');
 
 const $modalReloadPartWarn = $('#modal-reload-part');
+const $selectParty = $('#select-party');
+const $buttonNextQuestion = $('#button-next-question');
+const $buttonPreviousQuestion = $('#button-previous-question');
+const $questionStatus = $('#question-status');
+const $questionContent = $('#question-content');
+const $questionTheme = $('#question-theme');
+const $questionText = $('#question-text');
+const $questionChoices = $('#question-choices');
+const $questionAnswer = $('#question-answer');
+const $screenControls = $('#screen-controls');
+const $buttonToggleScreenQuestion = $('#button-toggle-screen-question');
+const $buttonToggleRevealAnswer = $('#button-toggle-reveal-answer');
+
 const $buzzerStatus = $('#buzzer-status');
 const $connectionStatus = $('#connection-status');
 
@@ -39,7 +52,11 @@ const actions = {
     lockBuzzer: function () { socket.emit(messages.messageLockBuzz); },
     unlockBuzzer: function () { socket.emit(messages.messageUnLockBuzz); },
     nextTransition: function () { socket.emit(messages.messageNextTransition); },
-    previousTransition: function () { socket.emit(messages.messagePreviousTransition); }
+    previousTransition: function () { socket.emit(messages.messagePreviousTransition); },
+    nextQuestion: function () { socket.emit(messages.messageNextQuestion); },
+    previousQuestion: function () { socket.emit(messages.messagePreviousQuestion); },
+    toggleScreenQuestion: function () { socket.emit(messages.messageToggleScreenQuestion); },
+    toggleRevealAnswer: function () { socket.emit(messages.messageToggleRevealAnswer); }
 };
 
 /**
@@ -52,7 +69,11 @@ const shortcuts = {
     'd': [actions.unlockBuzzer],
     'b': [actions.lockBuzzer],
     'n': [actions.nextTransition],
-    'p': [actions.previousTransition]
+    'p': [actions.previousTransition],
+    'arrowright': [actions.nextQuestion],
+    'arrowleft': [actions.previousQuestion],
+    'e': [actions.toggleScreenQuestion],
+    'r': [actions.toggleRevealAnswer]
 };
 
 const initEvents = function () {
@@ -69,6 +90,13 @@ const initEvents = function () {
     $buttonNextTransition.on('click', actions.nextTransition);
     $buttonPreviousTransition.on('click', actions.previousTransition);
     $buttonBuzzBadResponse.on('click', actions.badResponse);
+    $buttonNextQuestion.on('click', actions.nextQuestion);
+    $buttonPreviousQuestion.on('click', actions.previousQuestion);
+    $buttonToggleScreenQuestion.on('click', actions.toggleScreenQuestion);
+    $buttonToggleRevealAnswer.on('click', actions.toggleRevealAnswer);
+    $selectParty.on('change', function () {
+        socket.emit(messages.messageSelectParty, $selectParty.val() || null);
+    });
 }
 
 /**
@@ -79,7 +107,7 @@ const initShortcuts = function () {
         // On ne gêne pas les combinaisons système ni la saisie
         if (event.ctrlKey || event.metaKey || event.altKey || event.repeat)
             return;
-        if ($(event.target).is('input[type=text], input[type=password], textarea'))
+        if ($(event.target).is('input[type=text], input[type=password], textarea, select'))
             return;
         // Pas de raccourci tant que la modal de rechargement est ouverte
         if ($modalReloadPartWarn.hasClass('show'))
@@ -123,6 +151,49 @@ const displayTransitionState = function (state) {
 }
 
 /**
+ * Affiche la partie sélectionnée et la question en cours (avec sa réponse)
+ * @param {*} state { parties, activePartyId, round, index, total, question }
+ */
+const displayQuestionState = function (state) {
+    $selectParty.find('option:not([value=""])').remove();
+    state.parties.forEach(function (party) {
+        $selectParty.append($('<option></option>')
+            .val(party.id)
+            .text(party.name + ' (' + party.questionsCount + ')'));
+    });
+    $selectParty.val(state.activePartyId || '');
+
+    let status;
+    if (!state.activePartyId)
+        status = 'Choisissez une partie pour afficher les questions';
+    else if (!state.round)
+        status = 'Lancez une transition pour commencer la manche';
+    else if (!state.total)
+        status = state.round + ' : aucune question';
+    else
+        status = state.round + ' : question ' + (state.index + 1) + ' / ' + state.total;
+    $questionStatus.text(status);
+
+    const question = state.question;
+    $questionContent.prop('hidden', !question);
+    $questionTheme.text(question ? question.theme : '');
+    $questionText.text(question ? question.question : '');
+    $questionAnswer.text(question && question.answer ? 'Réponse : ' + question.answer : '');
+    $questionChoices.empty();
+    (question && question.choices ? question.choices : []).forEach(function (choice) {
+        $questionChoices.append($('<li></li>').text(choice));
+    });
+
+    // Nuggets et menus : la question s'affiche aussi sur l'écran de jeu
+    $screenControls.prop('hidden', !question || !state.questionsOnScreen);
+    $buttonToggleScreenQuestion.text(state.screenVisible ? "Masquer de l'écran" : "Afficher à l'écran");
+    $buttonToggleRevealAnswer.text(state.answerRevealed ? "Cacher la réponse à l'écran" : "Révéler la réponse à l'écran")
+        .prop('disabled', !state.screenVisible || !question || !question.answer);
+    $buttonPreviousQuestion.prop('disabled', !question || state.index <= 0);
+    $buttonNextQuestion.prop('disabled', !question || state.index >= state.total - 1);
+}
+
+/**
  * Affiche l'état de la connexion au serveur
  */
 const displayConnectionState = function (isConnected) {
@@ -152,6 +223,7 @@ const listenGameState = function () {
         displayBuzzerState(true, teamName);
     });
     socket.on(messages.messageToClientReceiveStateTransition, displayTransitionState);
+    socket.on(messages.messageToClientReceiveStateQuestion, displayQuestionState);
     socket.on('disconnect', function () {
         displayConnectionState(false);
     });
@@ -160,6 +232,7 @@ const listenGameState = function () {
         displayConnectionState(true);
         socket.emit(messages.messageClientNeedStateBuzzer);
         socket.emit(messages.messageClientNeedStateTransition);
+        socket.emit(messages.messageClientNeedStateQuestion);
     });
 }
 
