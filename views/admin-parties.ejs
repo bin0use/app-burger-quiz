@@ -90,17 +90,31 @@
             <label for="input-question-round">Manche</label>
             <select class="form-control" id="input-question-round" required>
               <% rounds.forEach(function (round) { %>
-              <option value="<%= round.key %>"><%= round.label %></option>
+              <option value="<%= round.key %>"><%= round.label %><%= round.questionsOnScreen ? ' (affichée à l\'écran)' : '' %></option>
               <% }) %>
             </select>
           </div>
           <div class="form-group">
-            <label for="input-question-theme">Thème <small class="text-muted">(optionnel : thème du menu, propositions sel / poivre…)</small></label>
+            <label for="input-question-theme">Thème <small class="text-muted">(optionnel : nom du menu, propositions sel / poivre…)</small></label>
             <input type="text" class="form-control" id="input-question-theme" maxlength="<%= limits.theme %>" />
           </div>
           <div class="form-group">
             <label for="input-question-text">Question</label>
             <textarea class="form-control" id="input-question-text" rows="3" maxlength="<%= limits.question %>" required></textarea>
+          </div>
+          <div class="form-group" id="question-choices">
+            <label>Propositions <small class="text-muted">(optionnel, affichées à l'écran : cochez la bonne réponse)</small></label>
+            <% for (let index = 0; index < limits.choices; index++) { %>
+            <div class="input-group mb-1">
+              <div class="input-group-prepend">
+                <div class="input-group-text">
+                  <input type="radio" name="question-good-choice" value="<%= index %>" aria-label="Bonne réponse" title="Bonne réponse" />
+                </div>
+                <span class="input-group-text"><%= String.fromCharCode(65 + index) %></span>
+              </div>
+              <input type="text" class="form-control" data-choice="<%= index %>" maxlength="<%= limits.choice %>" />
+            </div>
+            <% } %>
           </div>
           <div class="form-group mb-0">
             <label for="input-question-answer">Réponse</label>

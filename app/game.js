@@ -47,6 +47,11 @@ module.exports = function (io, options) {
      * Index de la question en cours dans la manche en cours
      */
     let questionIndex = 0;
+    /**
+     * Question affichée sur l'écran de jeu (Nuggets, menus) et réponse révélée
+     */
+    let screenQuestionVisible = true;
+    let answerRevealed = false;
 
     /**
      * Restaure la partie sauvegardée (le buzzer repart toujours bloqué)
@@ -144,15 +149,46 @@ module.exports = function (io, options) {
             round: transition ? transition.label : null,
             index: questionIndex,
             total: questions.length,
-            question: questions[questionIndex] || null
+            question: questions[questionIndex] || null,
+            questionsOnScreen: !!(transition && transition.questionsOnScreen),
+            screenVisible: screenQuestionVisible,
+            answerRevealed: answerRevealed
+        };
+    }
+
+    /**
+     * Question affichée sur l'écran de jeu (null : rien à afficher)
+     * La réponse n'est envoyée qu'une fois révélée par l'admin
+     */
+    const screenQuestion = function () {
+        const transition = transitionsList[transitionIndex];
+        const question = currentRoundQuestions()[questionIndex];
+        if (!question || !transition.questionsOnScreen || !screenQuestionVisible)
+            return null;
+        return {
+            round: transition.label,
+            theme: question.theme,
+            question: question.question,
+            choices: question.choices || [],
+            answer: answerRevealed ? question.answer : null
         };
     }
 
     /**
      * Envoie l'état des questions à toutes les télécommandes
+     * Et la question à afficher aux écrans de jeu
      */
     const emitQuestionState = function () {
         io.to(adminRoom).emit(messages.messageToClientReceiveStateQuestion, questionState());
+        io.emit(messages.messageToClientReceiveScreenQuestion, screenQuestion());
+    }
+
+    /**
+     * Nouvelle question : affichée à l'écran, réponse cachée
+     */
+    const resetScreenQuestion = function () {
+        screenQuestionVisible = true;
+        answerRevealed = false;
     }
 
     /**
@@ -165,6 +201,7 @@ module.exports = function (io, options) {
         transitionIndex = index;
         // Nouvelle manche : on repart de la première question
         questionIndex = 0;
+        resetScreenQuestion();
         saveState();
         io.emit(messages.messageToClientNextTransition, transition.filename);
         io.emit(messages.messageToClientReceiveStateTransition, transitionState());
@@ -179,6 +216,7 @@ module.exports = function (io, options) {
         if (index < 0 || index >= currentRoundQuestions().length)
             return;
         questionIndex = index;
+        resetScreenQuestion();
         saveState();
         emitQuestionState();
     }
@@ -261,6 +299,7 @@ module.exports = function (io, options) {
             teamKetchup.points = 0;
             transitionIndex = -1;
             questionIndex = 0;
+            resetScreenQuestion();
             saveState();
             io.emit(messages.messageToClientReloadPart);
             io.emit(messages.messageToClientReceiveStateBuzzer, buzzerIsLock, firstBuzzTeam);
@@ -300,6 +339,7 @@ module.exports = function (io, options) {
                 return;
             activePartyId = partyId;
             questionIndex = 0;
+            resetScreenQuestion();
             saveState();
             emitQuestionState();
         });
@@ -308,6 +348,20 @@ module.exports = function (io, options) {
         });
         onAdminMessage(socket, messages.messagePreviousQuestion, function () {
             moveQuestion(-1);
+        });
+        /**
+         * Affiche / masque la question sur l'écran de jeu, révèle la réponse
+         */
+        onAdminMessage(socket, messages.messageToggleScreenQuestion, function () {
+            screenQuestionVisible = !screenQuestionVisible;
+            emitQuestionState();
+        });
+        onAdminMessage(socket, messages.messageToggleRevealAnswer, function () {
+            answerRevealed = !answerRevealed;
+            emitQuestionState();
+        });
+        socket.on(messages.messageClientNeedScreenQuestion, function () {
+            socket.emit(messages.messageToClientReceiveScreenQuestion, screenQuestion());
         });
         /**
          * Se charge d'envoyer un message indiquant que l'équipe

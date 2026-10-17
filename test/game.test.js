@@ -67,6 +67,21 @@ const waitFor = function (client, message) {
     });
 }
 
+/**
+ * Attend un message sur une socket dont le premier argument vérifie le prédicat
+ */
+const waitForMatch = function (client, message, predicate) {
+    return new Promise(function (resolve) {
+        const listener = function (value) {
+            if (!predicate(value))
+                return;
+            client.off(message, listener);
+            resolve(value);
+        };
+        client.on(message, listener);
+    });
+}
+
 const pause = function (ms) {
     return new Promise(function (resolve) { setTimeout(resolve, ms); });
 }
@@ -153,7 +168,7 @@ test('routes http', async function (t) {
         const exported = await (await get('/admin/api/parties/' + party.id + '/export', cookie)).json();
         assert.deepStrictEqual(exported, {
             name: 'Soirée 2',
-            questions: [{ round: 'nuggets', theme: '', question: 'Q1 bis', answer: 'R' }]
+            questions: [{ round: 'nuggets', theme: '', question: 'Q1 bis', choices: [], answer: 'R' }]
         });
         const imported = (await call('POST', '/import', exported)).body;
         assert.notStrictEqual(imported.id, party.id);
@@ -251,7 +266,7 @@ test('questions sur la télécommande', async function (t) {
         }).then(function (response) { return response.json(); });
     }
     const party = await api('POST', '', { name: 'Soirée' });
-    await api('POST', '/' + party.id + '/questions', { round: 'nuggets', question: 'N1', answer: 'R1' });
+    await api('POST', '/' + party.id + '/questions', { round: 'nuggets', question: 'N1', choices: ['R1', 'Faux'], answer: 'R1' });
     await api('POST', '/' + party.id + '/questions', { round: 'nuggets', question: 'N2', answer: 'R2' });
     await api('POST', '/' + party.id + '/questions', { round: 'sel-ou-poivre', question: 'S1', answer: 'Sel' });
 
@@ -267,23 +282,52 @@ test('questions sur la télécommande', async function (t) {
     assert.strictEqual((await state)[0].question, null);
 
     state = waitFor(admin, messages.messageToClientReceiveStateQuestion);
+    const firstScreen = waitForMatch(player, messages.messageToClientReceiveScreenQuestion, Boolean);
     admin.emit(messages.messageNextTransition);
+    await firstScreen;
     let current = (await state)[0];
     assert.strictEqual(current.round, 'Nuggets');
     assert.strictEqual(current.total, 2);
     assert.strictEqual(current.question.question, 'N1');
     assert.strictEqual(current.question.answer, 'R1');
 
+    // Nuggets : la question et les propositions s'affichent à l'écran, sans la réponse
+    player.emit(messages.messageClientNeedScreenQuestion);
+    assert.deepStrictEqual(await waitFor(player, messages.messageToClientReceiveScreenQuestion), [{
+        round: 'Nuggets', theme: '', question: 'N1', choices: ['R1', 'Faux'], answer: null
+    }]);
+    let screen = waitForMatch(player, messages.messageToClientReceiveScreenQuestion, function (value) {
+        return value && value.answer;
+    });
+    admin.emit(messages.messageToggleRevealAnswer);
+    assert.strictEqual((await screen).answer, 'R1');
+    screen = waitFor(player, messages.messageToClientReceiveScreenQuestion);
+    admin.emit(messages.messageToggleScreenQuestion);
+    assert.deepStrictEqual(await screen, [null]);
+    // Un joueur ne peut ni afficher ni révéler
+    player.emit(messages.messageToggleScreenQuestion);
+    player.emit(messages.messageToggleRevealAnswer);
+    await pause(100);
+    player.emit(messages.messageClientNeedScreenQuestion);
+    assert.deepStrictEqual(await waitFor(player, messages.messageToClientReceiveScreenQuestion), [null]);
+
+    // Question suivante : de nouveau affichée, réponse cachée
     state = waitFor(admin, messages.messageToClientReceiveStateQuestion);
+    screen = waitFor(player, messages.messageToClientReceiveScreenQuestion);
     admin.emit(messages.messageNextQuestion);
     assert.strictEqual((await state)[0].question.question, 'N2');
+    assert.strictEqual((await screen)[0].question, 'N2');
+    assert.strictEqual((await screen)[0].answer, null);
 
-    // Nouvelle manche : retour à la première question
+    // Nouvelle manche : retour à la première question, Sel ou Poivre n'est pas affiché à l'écran
     state = waitFor(admin, messages.messageToClientReceiveStateQuestion);
+    screen = waitFor(player, messages.messageToClientReceiveScreenQuestion);
     admin.emit(messages.messageNextTransition);
     current = (await state)[0];
     assert.strictEqual(current.round, 'Sel ou Poivre');
     assert.strictEqual(current.question.question, 'S1');
+    assert.strictEqual(current.questionsOnScreen, false);
+    assert.deepStrictEqual(await screen, [null]);
 
     // Suppression de la partie active depuis la page de gestion
     state = waitFor(admin, messages.messageToClientReceiveStateQuestion);

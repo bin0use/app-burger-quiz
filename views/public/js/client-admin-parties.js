@@ -18,6 +18,9 @@ const $inputQuestionRound = $('#input-question-round');
 const $inputQuestionTheme = $('#input-question-theme');
 const $inputQuestionText = $('#input-question-text');
 const $inputQuestionAnswer = $('#input-question-answer');
+const $questionChoices = $('#question-choices');
+const $inputsChoice = $questionChoices.find('[data-choice]');
+const $radiosGoodChoice = $questionChoices.find('[name=question-good-choice]');
 
 /**
  * Etat de la page
@@ -126,6 +129,13 @@ const renderQuestionList = function () {
         if (question.theme)
             $content.append($('<small class="text-muted d-block"></small>').text(question.theme));
         $content.append($('<div class="font-weight-bold"></div>').text((index + 1) + '. ' + question.question));
+        if (question.choices && question.choices.length) {
+            const $choices = $('<ol type="A" class="mb-0 pl-4 small"></ol>');
+            question.choices.forEach(function (choice) {
+                $choices.append($('<li></li>').text(choice));
+            });
+            $content.append($choices);
+        }
         $content.append($('<div class="text-success"></div>').text(question.answer ? 'Réponse : ' + question.answer : ''));
 
         const $actions = $('<div class="btn-group btn-group-sm align-self-start"></div>')
@@ -169,6 +179,13 @@ const openQuestionModal = function (question) {
     $inputQuestionTheme.val(question ? question.theme : '');
     $inputQuestionText.val(question ? question.question : '');
     $inputQuestionAnswer.val(question ? question.answer : '');
+    const choices = question && question.choices ? question.choices : [];
+    $inputsChoice.each(function (index) {
+        $(this).val(choices[index] || '');
+    });
+    $radiosGoodChoice.each(function (index) {
+        $(this).prop('checked', !!choices[index] && choices[index] === $inputQuestionAnswer.val());
+    });
     $modalQuestion.modal('show');
 }
 
@@ -258,6 +275,7 @@ const initEvents = function () {
             round: $inputQuestionRound.val(),
             theme: $inputQuestionTheme.val(),
             question: $inputQuestionText.val(),
+            choices: $inputsChoice.map(function () { return $(this).val(); }).get(),
             answer: $inputQuestionAnswer.val()
         };
         const url = '/' + currentParty.id + '/questions';
@@ -270,6 +288,17 @@ const initEvents = function () {
         $modalQuestion.modal('hide');
         await refresh();
     }));
+
+    /**
+     * La bonne proposition cochée devient la réponse
+     */
+    const copyGoodChoiceToAnswer = function () {
+        const index = $radiosGoodChoice.filter(':checked').val();
+        if (index !== undefined)
+            $inputQuestionAnswer.val($inputsChoice.eq(index).val());
+    }
+    $radiosGoodChoice.on('change', copyGoodChoiceToAnswer);
+    $inputsChoice.on('input', copyGoodChoiceToAnswer);
 
     $modalQuestion.on('shown.bs.modal', function () {
         $inputQuestionText.trigger('focus');

@@ -63,7 +63,12 @@
           <div id="question-content" hidden>
             <small class="text-muted d-block" id="question-theme"></small>
             <p class="h4" id="question-text"></p>
+            <ol type="A" class="h5 font-weight-normal" id="question-choices"></ol>
             <p class="h5 text-success mb-0" id="question-answer"></p>
+            <div class="mt-3" id="screen-controls" hidden>
+              <button type="button" class="btn btn-outline-primary mr-2 mb-1" id="button-toggle-screen-question">Masquer de l'écran</button>
+              <button type="button" class="btn btn-outline-success mb-1" id="button-toggle-reveal-answer">Révéler la réponse à l'écran</button>
+            </div>
           </div>
         </div>
       </div>
@@ -80,7 +85,8 @@
           <kbd>M</kbd> / <kbd>Maj+M</kbd> point Mayo ±, <kbd>X</kbd> mauvaise réponse,
           <kbd>D</kbd> débloquer, <kbd>B</kbd> bloquer,
           <kbd>N</kbd> transition suivante, <kbd>P</kbd> précédente,
-          <kbd>&rarr;</kbd> / <kbd>&larr;</kbd> question suivante / précédente
+          <kbd>&rarr;</kbd> / <kbd>&larr;</kbd> question suivante / précédente,
+          <kbd>E</kbd> afficher / masquer la question à l'écran, <kbd>R</kbd> révéler la réponse
         </small>
       </div>
       <div class="row justify-content-center mt-2">

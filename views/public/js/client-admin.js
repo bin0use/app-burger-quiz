@@ -31,7 +31,11 @@ const $questionStatus = $('#question-status');
 const $questionContent = $('#question-content');
 const $questionTheme = $('#question-theme');
 const $questionText = $('#question-text');
+const $questionChoices = $('#question-choices');
 const $questionAnswer = $('#question-answer');
+const $screenControls = $('#screen-controls');
+const $buttonToggleScreenQuestion = $('#button-toggle-screen-question');
+const $buttonToggleRevealAnswer = $('#button-toggle-reveal-answer');
 
 const $buzzerStatus = $('#buzzer-status');
 const $connectionStatus = $('#connection-status');
@@ -50,7 +54,9 @@ const actions = {
     nextTransition: function () { socket.emit(messages.messageNextTransition); },
     previousTransition: function () { socket.emit(messages.messagePreviousTransition); },
     nextQuestion: function () { socket.emit(messages.messageNextQuestion); },
-    previousQuestion: function () { socket.emit(messages.messagePreviousQuestion); }
+    previousQuestion: function () { socket.emit(messages.messagePreviousQuestion); },
+    toggleScreenQuestion: function () { socket.emit(messages.messageToggleScreenQuestion); },
+    toggleRevealAnswer: function () { socket.emit(messages.messageToggleRevealAnswer); }
 };
 
 /**
@@ -65,7 +71,9 @@ const shortcuts = {
     'n': [actions.nextTransition],
     'p': [actions.previousTransition],
     'arrowright': [actions.nextQuestion],
-    'arrowleft': [actions.previousQuestion]
+    'arrowleft': [actions.previousQuestion],
+    'e': [actions.toggleScreenQuestion],
+    'r': [actions.toggleRevealAnswer]
 };
 
 const initEvents = function () {
@@ -84,6 +92,8 @@ const initEvents = function () {
     $buttonBuzzBadResponse.on('click', actions.badResponse);
     $buttonNextQuestion.on('click', actions.nextQuestion);
     $buttonPreviousQuestion.on('click', actions.previousQuestion);
+    $buttonToggleScreenQuestion.on('click', actions.toggleScreenQuestion);
+    $buttonToggleRevealAnswer.on('click', actions.toggleRevealAnswer);
     $selectParty.on('change', function () {
         socket.emit(messages.messageSelectParty, $selectParty.val() || null);
     });
@@ -169,6 +179,16 @@ const displayQuestionState = function (state) {
     $questionTheme.text(question ? question.theme : '');
     $questionText.text(question ? question.question : '');
     $questionAnswer.text(question && question.answer ? 'Réponse : ' + question.answer : '');
+    $questionChoices.empty();
+    (question && question.choices ? question.choices : []).forEach(function (choice) {
+        $questionChoices.append($('<li></li>').text(choice));
+    });
+
+    // Nuggets et menus : la question s'affiche aussi sur l'écran de jeu
+    $screenControls.prop('hidden', !question || !state.questionsOnScreen);
+    $buttonToggleScreenQuestion.text(state.screenVisible ? "Masquer de l'écran" : "Afficher à l'écran");
+    $buttonToggleRevealAnswer.text(state.answerRevealed ? "Cacher la réponse à l'écran" : "Révéler la réponse à l'écran")
+        .prop('disabled', !state.screenVisible || !question || !question.answer);
     $buttonPreviousQuestion.prop('disabled', !question || state.index <= 0);
     $buttonNextQuestion.prop('disabled', !question || state.index >= state.total - 1);
 }

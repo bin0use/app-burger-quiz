@@ -27,6 +27,8 @@
         messageSelectParty: 'event-select-party',
         messageNextQuestion: 'event-next-question',
         messagePreviousQuestion: 'event-previous-question',
+        messageToggleScreenQuestion: 'event-toggle-screen-question',
+        messageToggleRevealAnswer: 'event-toggle-reveal-answer',
         /**
          * Les messages que les clients envoies
          */
@@ -35,6 +37,7 @@
         messageClientNeedStateBuzzer: 'need-state-buzzer',
         messageClientNeedStateTransition: 'need-state-transition',
         messageClientNeedStateQuestion: 'need-state-question',
+        messageClientNeedScreenQuestion: 'need-screen-question',
         /**
          * Les messages à envoyer aux clients
          */
@@ -50,6 +53,7 @@
         messageToClientReceiveStateTransition: 'receive-state-transition',
         messageToClientReceiveBadResponse: 'receive-buzz-bad-response',
         messageToClientReceiveStateQuestion: 'receive-state-question',
+        messageToClientReceiveScreenQuestion: 'receive-screen-question',
     });
 
     if (typeof module !== 'undefined' && module.exports) {

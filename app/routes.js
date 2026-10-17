@@ -116,7 +116,13 @@ module.exports = function (app, passport, partyStore) {
     res.send(JSON.stringify({
       name: party.name,
       questions: party.questions.map(function (question) {
-        return { round: question.round, theme: question.theme, question: question.question, answer: question.answer };
+        return {
+          round: question.round,
+          theme: question.theme,
+          question: question.question,
+          choices: question.choices,
+          answer: question.answer
+        };
       })
     }, null, 2));
   });

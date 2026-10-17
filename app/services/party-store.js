@@ -9,7 +9,9 @@ const limits = {
     name: 100,
     theme: 100,
     question: 500,
-    answer: 500
+    answer: 500,
+    choice: 200,
+    choices: 4
 };
 
 /**
@@ -38,6 +40,22 @@ const cleanName = function (name) {
 }
 
 /**
+ * Propositions de réponse (Nuggets) : les propositions vides sont ignorées
+ */
+const cleanChoices = function (choices) {
+    if (choices === undefined || choices === null)
+        return [];
+    if (!Array.isArray(choices))
+        throw new ValidationError('Propositions invalides');
+    const cleaned = choices
+        .map(function (choice) { return cleanText(choice, 'Proposition', limits.choice, false); })
+        .filter(Boolean);
+    if (cleaned.length > limits.choices)
+        throw new ValidationError(`${limits.choices} propositions maximum`);
+    return cleaned;
+}
+
+/**
  * Valide les champs d'une question (sans l'identifiant)
  */
 const cleanQuestion = function (data) {
@@ -48,6 +66,7 @@ const cleanQuestion = function (data) {
         round: data.round,
         theme: cleanText(data.theme, 'Thème', limits.theme, false),
         question: cleanText(data.question, 'Question', limits.question, true),
+        choices: cleanChoices(data.choices),
         answer: cleanText(data.answer, 'Réponse', limits.answer, false)
     };
 }

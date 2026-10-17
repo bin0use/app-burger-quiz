@@ -31,7 +31,11 @@ test('questions : validation, modification et ordre au sein de la manche', funct
     assert.throws(function () { store.addQuestion(party.id, { round: 'inconnue', question: 'Q' }); }, ValidationError);
     assert.throws(function () { store.addQuestion(party.id, { round: 'menus', question: ' ' }); }, ValidationError);
     assert.throws(function () { store.addQuestion(party.id, { round: 'menus', question: 'x'.repeat(501) }); }, ValidationError);
+    assert.throws(function () { store.addQuestion(party.id, { round: 'nuggets', question: 'Q', choices: 'A' }); }, ValidationError);
+    assert.throws(function () { store.addQuestion(party.id, { round: 'nuggets', question: 'Q', choices: ['1', '2', '3', '4', '5'] }); }, ValidationError);
+    assert.deepStrictEqual(store.addQuestion(party.id, { round: 'nuggets', question: 'Q', choices: [' A ', '', 'B'] }).choices, ['A', 'B']);
 
+    store.removeQuestion(party.id, store.questionsOfRound(party.id, 'nuggets')[0].id);
     const q1 = store.addQuestion(party.id, { round: 'nuggets', question: 'Q1' });
     store.addQuestion(party.id, { round: 'menus', theme: 'Cinéma', question: 'M1', answer: 'R' });
     const q2 = store.addQuestion(party.id, { round: 'nuggets', question: 'Q2' });
