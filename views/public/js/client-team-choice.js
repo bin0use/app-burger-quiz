@@ -1,5 +1,5 @@
-$buttonMayo = $('#buzz-button-mayo');
-$buttonKetchup = $('#buzz-button-ketchup');
+const $buttonMayo = $('#buzz-button-mayo');
+const $buttonKetchup = $('#buzz-button-ketchup');
 
 // La base de l'url de redirection
 const baseRedirectUrl = '/buzzer';

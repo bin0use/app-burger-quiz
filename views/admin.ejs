@@ -18,7 +18,10 @@
     </div>
     <div class="jumbotron mt-4">
       <div class="row justify-content-center">
-        <h1>Télécommand Admin</h1>
+        <h1>Télécommande Admin</h1>
+      </div>
+      <div class="row justify-content-center mt-2">
+        <h3><span id="buzzer-status" class="badge badge-secondary p-2">Buzzer bloqué</span></h3>
       </div>
       <div class="row mt-4">
         <div class="col-lg-4 col-sm-6 text-center">
@@ -42,6 +45,9 @@
       </div>
       <div class="row justify-content-center mt-4">
         <input class="btn btn-success btn-lg" type="button" value="Recharger partie" data-toggle="modal" data-target="#modal-reload-part" />
+      </div>
+      <div class="row justify-content-center mt-4">
+        <a class="btn btn-link" href="/logout">Se déconnecter</a>
       </div>
     </div>
   </div>

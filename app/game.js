@@ -10,9 +10,37 @@ module.exports = function (io) {
     const teamMayo = new Team('mayo');
     const teamKetchup = new Team('ketchup');
     /**
+     * Noms d'équipes acceptés pour le buzz
+     */
+    const validTeamNames = ['team-mayo', 'team-ketchup'];
+    /**
      * Etat du buzzer
      */
     var buzzerIsLock = true;
+    /**
+     * Equipe ayant buzzé en premier depuis le dernier déblocage
+     */
+    var firstBuzzTeam = null;
+
+    /**
+     * Indique si la socket appartient à un admin authentifié
+     * (session express partagée avec socket.io)
+     */
+    const isAdmin = function (socket) {
+        const session = socket.request.session;
+        return !!(session && session.passport && session.passport.user);
+    }
+
+    /**
+     * Ecoute un message réservé à l'admin : ignoré pour les autres clients
+     */
+    const onAdminMessage = function (socket, message, handler) {
+        socket.on(message, function () {
+            if (!isAdmin(socket))
+                return;
+            handler.apply(null, arguments);
+        });
+    }
 
     const initGameSocket = function () {
         /**
@@ -27,61 +55,68 @@ module.exports = function (io) {
              *  On emet dès que le client se connecte et demande l'info des points
              */
             socket.on(messages.messageClientsNeedPointsInformations, function () {
-                io.emit(messages.messageToClientReceivePoints, teamMayo.points, teamKetchup.points);
+                socket.emit(messages.messageToClientReceivePoints, teamMayo.points, teamKetchup.points);
             });
             socket.on(messages.messageClientNeedStateBuzzer, function () {
-                io.emit(messages.messageToClientReceiveStateBuzzer, buzzerIsLock);
+                socket.emit(messages.messageToClientReceiveStateBuzzer, buzzerIsLock, firstBuzzTeam);
             });
             /**
              *  Manage les points de la team mayo
              */
-            socket.on(messages.messageMayoTeam, function (message) {
+            onAdminMessage(socket, messages.messageMayoTeam, function (message) {
                 receiveOrderModifyPoints(message, messages.messageToClientMayo, teamMayo);
             });
             /**
              *  Manage les points de la team ketchup
              */
-            socket.on(messages.messageKetchupTeam, function (message) {
+            onAdminMessage(socket, messages.messageKetchupTeam, function (message) {
                 receiveOrderModifyPoints(message, messages.messageToClientKetchup, teamKetchup);
             });
             /**
              * Se charge de bloquer les buzzers 
              */
-            socket.on(messages.messageLockBuzz, function () {
+            onAdminMessage(socket, messages.messageLockBuzz, function () {
                 buzzerIsLock = true;
                 io.emit(messages.messageToClientLockBuzz)
             });
             /**
              * Se charge de débloquer les buzzers 
              */
-            socket.on(messages.messageUnLockBuzz, function () {
+            onAdminMessage(socket, messages.messageUnLockBuzz, function () {
                 buzzerIsLock = false;
+                firstBuzzTeam = null;
                 io.emit(messages.messageToClientUnLockBuzz)
             });
             /**
              * Recharge la partie
              */
-            socket.on(messages.messageReloadPart, function () {
+            onAdminMessage(socket, messages.messageReloadPart, function () {
                 buzzerIsLock = true;
+                firstBuzzTeam = null;
                 teamMayo.points = 0;
                 teamKetchup.points = 0;
                 initTransitionList();
                 io.emit(messages.messageToClientReloadPart);
-                io.emit(messages.messageToClientReceiveStateBuzzer, buzzerIsLock);
+                io.emit(messages.messageToClientReceiveStateBuzzer, buzzerIsLock, firstBuzzTeam);
             });
             /**
              * Se produit lorsqu'un client buzz
+             * Le serveur arbitre : seul le premier buzz est pris en compte,
+             * les buzzers sont ensuite bloqués jusqu'au prochain déblocage
              */
             socket.on(messages.messageClientSendBuzz, function (teamName) {
-                if (buzzerIsLock)
+                if (buzzerIsLock || validTeamNames.indexOf(teamName) === -1)
                     return;
+                buzzerIsLock = true;
+                firstBuzzTeam = teamName;
+                io.emit(messages.messageToClientLockBuzz);
                 io.emit(messages.messageToClientReceiveBuzz, teamName);
             });
 
             /**
              * Se charge d'envoyer la prochaine transition
              */
-            socket.on(messages.messageNextTransition, function () {
+            onAdminMessage(socket, messages.messageNextTransition, function () {
                 var nextTransition = transitionsList.shift();
                 if (!nextTransition)
                     return;
@@ -92,7 +127,7 @@ module.exports = function (io) {
              * Se charge d'envoyer un message indiquant que l'équipe
              * A mal répondu à la question
              */
-            socket.on(messages.messageBuzzBadResponse, function () {
+            onAdminMessage(socket, messages.messageBuzzBadResponse, function () {
                 io.emit(messages.messageToClientReceiveBadResponse);
             });
 

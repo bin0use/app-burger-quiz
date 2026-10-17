@@ -1,17 +1,17 @@
-$pointKetchupDecade = $('#point-ketchup-decade');
-$pointKetchupUnit = $('#point-ketchup-unit');
-$pointMayoDecade = $('#point-mayo-decade');
-$pointMayoUnit = $('#point-mayo-unit');
+const $pointKetchupDecade = $('#point-ketchup-decade');
+const $pointKetchupUnit = $('#point-ketchup-unit');
+const $pointMayoDecade = $('#point-mayo-decade');
+const $pointMayoUnit = $('#point-mayo-unit');
 
-$modalBuzz = $('#modal-buzz');
-$mainBackground = $('#game-background');
+const $modalBuzz = $('#modal-buzz');
+const $mainBackground = $('#game-background');
 
-$modalTransition = $('#modal-transition');
-$sourceTransition = $('#source-transition');
-$videoTransitionContainer = $('#video-transition-container');
+const $modalTransition = $('#modal-transition');
+const $sourceTransition = $('#source-transition');
+const $videoTransitionContainer = $('#video-transition-container');
 
-$modalTeamMayo = $('#modal-buzz-first-mayo');
-$modalTeamKetchup = $('#modal-buzz-first-ketchup');
+const $modalTeamMayo = $('#modal-buzz-first-mayo');
+const $modalTeamKetchup = $('#modal-buzz-first-ketchup');
 
 var socket = null;
 /**
@@ -116,7 +116,7 @@ var attributePointsAtTeam = function (team, points) {
  * @param {*} points Les points que l'on va attribuer
  */
 var changeStateBackground = function (collection, points) {
-    for (let index = 0; index <= collection.length; index++) {
+    for (let index = 0; index < collection.length; index++) {
         const element = collection[index];
         if (!element)
             continue;
@@ -254,7 +254,8 @@ const receiveOrderForTransition = function (transitionName) {
     $sourceTransition.attr('src', baseDirVideos + transitionName);
     $videoTransitionContainer.load();
     $videoTransitionContainer.get(0).play();
-    $videoTransitionContainer.on('ended', function () {
+    // .one : évite d'empiler un handler à chaque transition
+    $videoTransitionContainer.one('ended', function () {
         showMainBackgroundAndHideTransition();
     });
 }
@@ -264,6 +265,7 @@ const receiveOrderForTransition = function (transitionName) {
  */
 const stopTransitionNow = function () {
     showMainBackgroundAndHideTransition();
+    $videoTransitionContainer.off('ended');
     $videoTransitionContainer.get(0).pause();
     $sourceTransition.attr('src', '');
 }
@@ -282,7 +284,12 @@ const launchBuzzSound = function () {
  */
 const playSound = function (sound) {
     var audio = new Audio(sound);
-    audio.play();
+    // play() renvoie une promesse rejetée si le navigateur bloque la lecture
+    const promise = audio.play();
+    if (promise)
+        promise.catch(function (error) {
+            console.log('Lecture du son impossible : ' + error);
+        });
 }
 
 /**
@@ -302,7 +309,14 @@ const initQrCode = function () {
             // Passage en plein écran
             const el = document.documentElement;
             const rfs = el.requestFullscreen || el.webkitRequestFullScreen || el.mozRequestFullScreen || el.msRequestFullscreen;
-            rfs.call(el);
+            // Non supporté sur certains navigateurs (ex : Safari iOS)
+            if (!rfs)
+                return;
+            const promise = rfs.call(el);
+            if (promise)
+                promise.catch(function (error) {
+                    console.log('Plein écran impossible : ' + error);
+                });
         })
     }
 

@@ -1,5 +1,5 @@
-$buzzButton = $('#buzz-button');
-$inputHiddenTeam = $('#team-hf-val');
+const $buzzButton = $('#buzz-button');
+const $inputHiddenTeam = $('#team-hf-val');
 
 var socket = null;
 
@@ -55,7 +55,7 @@ const initSocketAndListenEvents = function () {
         $buzzButton.addClass(lockBuzzerStyle);
     });
     /**
-     * Bloquer le buzzer
+     * Débloquer le buzzer
      */
     socket.on(messageToClientUnLockBuzz, function () {
         $buzzButton.removeClass(lockBuzzerStyle);
