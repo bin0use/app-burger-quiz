@@ -1,19 +1,19 @@
-$pointKetchupDecade = $('#point-ketchup-decade');
-$pointKetchupUnit = $('#point-ketchup-unit');
-$pointMayoDecade = $('#point-mayo-decade');
-$pointMayoUnit = $('#point-mayo-unit');
+const $pointKetchupDecade = $('#point-ketchup-decade');
+const $pointKetchupUnit = $('#point-ketchup-unit');
+const $pointMayoDecade = $('#point-mayo-decade');
+const $pointMayoUnit = $('#point-mayo-unit');
 
-$modalBuzz = $('#modal-buzz');
-$mainBackground = $('#game-background');
+const $modalBuzz = $('#modal-buzz');
+const $mainBackground = $('#game-background');
 
-$modalTransition = $('#modal-transition');
-$sourceTransition = $('#source-transition');
-$videoTransitionContainer = $('#video-transition-container');
+const $modalTransition = $('#modal-transition');
+const $sourceTransition = $('#source-transition');
+const $videoTransitionContainer = $('#video-transition-container');
 
-$modalTeamMayo = $('#modal-buzz-first-mayo');
-$modalTeamKetchup = $('#modal-buzz-first-ketchup');
+const $modalTeamMayo = $('#modal-buzz-first-mayo');
+const $modalTeamKetchup = $('#modal-buzz-first-ketchup');
 
-var socket = null;
+let socket = null;
 /**
  * Variable permettant de savoir quel équipe
  * Aura buzz en première
@@ -58,21 +58,8 @@ const baseDirVideos = './videos/';
  */
 const durationHiddenModalBuzzFirst = 4000;
 
-/**
- * Les messages que reçoit le client
- */
-const messageClientMayo = 'point-mayo';
-const messageClientKetchup = 'point-ketchup';
-const messageToClientReloadPart = 'reload-part';
-const messageToClientReceivePoints = 'receive-points-teams';
-const messageToClientReceiveBuzz = 'receive-buzz';
-const messageToClientNextTransition = 'receive-next-transition';
-const messageToClientReceiveBadResponse = 'receive-buzz-bad-response';
-
-/**
- * Les messages qu'envoie le client
- */
-const messageClientsNeedPointsInformations = 'need-information-points';
+// Noms des messages partagés avec le serveur (/js/messages-socket.js)
+const messages = BQ_MESSAGES;
 
 /**
  * Se charge d'attribuer des points à une equipe
@@ -116,7 +103,7 @@ var attributePointsAtTeam = function (team, points) {
  * @param {*} points Les points que l'on va attribuer
  */
 var changeStateBackground = function (collection, points) {
-    for (let index = 0; index <= collection.length; index++) {
+    for (let index = 0; index < collection.length; index++) {
         const element = collection[index];
         if (!element)
             continue;
@@ -252,9 +239,15 @@ const receiveOrderForTransition = function (transitionName) {
     $modalTransition.show();
     isTransitionRunning = true;
     $sourceTransition.attr('src', baseDirVideos + transitionName);
-    $videoTransitionContainer.load();
-    $videoTransitionContainer.get(0).play();
-    $videoTransitionContainer.on('ended', function () {
+    const video = $videoTransitionContainer.get(0);
+    video.load();
+    const promise = video.play();
+    if (promise)
+        promise.catch(function (error) {
+            console.log('Lecture de la transition impossible : ' + error);
+        });
+    // .one : évite d'empiler un handler à chaque transition
+    $videoTransitionContainer.one('ended', function () {
         showMainBackgroundAndHideTransition();
     });
 }
@@ -264,6 +257,7 @@ const receiveOrderForTransition = function (transitionName) {
  */
 const stopTransitionNow = function () {
     showMainBackgroundAndHideTransition();
+    $videoTransitionContainer.off('ended');
     $videoTransitionContainer.get(0).pause();
     $sourceTransition.attr('src', '');
 }
@@ -282,17 +276,20 @@ const launchBuzzSound = function () {
  */
 const playSound = function (sound) {
     var audio = new Audio(sound);
-    audio.play();
+    // play() renvoie une promesse rejetée si le navigateur bloque la lecture
+    const promise = audio.play();
+    if (promise)
+        promise.catch(function (error) {
+            console.log('Lecture du son impossible : ' + error);
+        });
 }
 
 /**
- * Se charge d'initialiser le QrCode avec l'url permettant d'accèder à l'url des équipes
+ * Se charge d'initialiser la modal de préparation (QR code d'accès au choix des équipes)
  */
-const initQrCode = function () {
+const initPrepareGame = function () {
     const modalPrepareGame = $('#modal-prepare-game');
-    const inputUrlToConvert = $('#input-url-to-qr-code');
     const btnEveryBodyReady = $('#button-everybody-ready');
-    const canvasElement = document.getElementById('qr-code-canvas');
 
     // Se charge de fermer la modal de Qr Code
     const closeModal = function () {
@@ -302,20 +299,19 @@ const initQrCode = function () {
             // Passage en plein écran
             const el = document.documentElement;
             const rfs = el.requestFullscreen || el.webkitRequestFullScreen || el.mozRequestFullScreen || el.msRequestFullscreen;
-            rfs.call(el);
+            // Non supporté sur certains navigateurs (ex : Safari iOS)
+            if (!rfs)
+                return;
+            const promise = rfs.call(el);
+            if (promise)
+                promise.catch(function (error) {
+                    console.log('Plein écran impossible : ' + error);
+                });
         })
     }
 
-    btnEveryBodyReady.click(closeModal);
-
-    // Si aucune url n'est fournie on ne va pas plus loin
-    if (inputUrlToConvert.val().trim() === '') {
-        canvasElement.remove();
-        return;
-    }
-
-    // Génération du QrCode
-    QRCode.toCanvas(canvasElement, inputUrlToConvert.val());
+    // Le QR code est généré côté serveur, il n'y a plus qu'à fermer la modal
+    btnEveryBodyReady.on('click', closeModal);
 }
 
 /**
@@ -326,19 +322,19 @@ const initSocketAndListenEvents = function () {
     /**
      * Points pour l'équipe mayo
      */
-    socket.on(messageClientMayo, function (points) {
+    socket.on(messages.messageToClientMayo, function (points) {
         attributePointsAtTeam(mayo, points);
     });
     /**
      * Points pour l'équipe ketchup
      */
-    socket.on(messageClientKetchup, function (points) {
+    socket.on(messages.messageToClientKetchup, function (points) {
         attributePointsAtTeam(ketchup, points);
     });
     /**
      * Rechargement de la partie
      */
-    socket.on(messageToClientReloadPart, function () {
+    socket.on(messages.messageToClientReloadPart, function () {
         attributePointsAtTeam(mayo, 0);
         attributePointsAtTeam(ketchup, 0);
         stopTransitionNow();
@@ -346,34 +342,36 @@ const initSocketAndListenEvents = function () {
     /**
      * Reception des points des différents équipes
      */
-    socket.on(messageToClientReceivePoints, function (pointsMayo, pointsKetchup) {
+    socket.on(messages.messageToClientReceivePoints, function (pointsMayo, pointsKetchup) {
         attributePointsAtTeam(mayo, pointsMayo);
         attributePointsAtTeam(ketchup, pointsKetchup);
     });
     /**
      * Réception de l'évènement du buzzer
      */
-    socket.on(messageToClientReceiveBuzz, function (teamName) {
+    socket.on(messages.messageToClientReceiveBuzz, function (teamName) {
         receiveBuzzAndInteractOnView(teamName);
     });
     /**
      * Affiche la prochaine transition
      */
-    socket.on(messageToClientNextTransition, function (transitionName) {
+    socket.on(messages.messageToClientNextTransition, function (transitionName) {
         receiveOrderForTransition(transitionName);
     });
-    socket.on(messageToClientReceiveBadResponse, function () {
+    socket.on(messages.messageToClientReceiveBadResponse, function () {
         launchBuzzSound();
     });
     /**
      * On souhaite connaitre le nombre de points
-     * Dès que l'on se connecte sur la page
+     * Dès que l'on se connecte (ou se reconnecte) sur la page
      */
-    socket.emit(messageClientsNeedPointsInformations);
+    socket.on('connect', function () {
+        socket.emit(messages.messageClientsNeedPointsInformations);
+    });
 }
 
 registerComponents();
 
 initSocketAndListenEvents();
 
-initQrCode();
+initPrepareGame();

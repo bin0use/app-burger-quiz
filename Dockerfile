@@ -1,9 +1,17 @@
-FROM node
+FROM node:22-alpine
 
+ENV NODE_ENV=production
 WORKDIR /app
 
-ADD . /app
+# Dépendances d'abord (mise en cache des couches)
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev && npm cache clean --force
 
-RUN npm install
+COPY . .
+# Dossier de sauvegarde de la partie accessible à l'utilisateur non-root
+RUN mkdir -p data && chown node:node data
 
-ENTRYPOINT ["npm", "start"]
+USER node
+EXPOSE 3000
+
+CMD ["node", "server.js"]

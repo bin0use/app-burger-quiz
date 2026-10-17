@@ -1,4 +1,6 @@
+const QRCode = require('qrcode');
 const urlResolverService = require('./services/url-resolver');
+const { validTeamNames } = require('./game');
 
 module.exports = function (app, passport) {
   /**
@@ -18,8 +20,8 @@ module.exports = function (app, passport) {
    */
   app.get("/buzzer", function (req, res) {
     let team = req.query.team;
-    // Si aucune team n'a été déterminé on renvoie sur la page
-    if (!team) {
+    // Si aucune team valide n'a été déterminée on renvoie sur la page
+    if (validTeamNames.indexOf(team) === -1) {
       res.redirect("/");
       return;
     }
@@ -31,10 +33,15 @@ module.exports = function (app, passport) {
   /**
    * Ecran de jeu
    */
-  app.get("/game", function (req, res) {
+  app.get("/game", async function (req, res) {
     const urlToGenerate = urlResolverService.retrieveUrlForQrCodeGeneration(req);
+    // Le QR code est généré côté serveur sous forme d'image
+    const qrCodeDataUrl = urlToGenerate
+      ? await QRCode.toDataURL(urlToGenerate, { width: 250, margin: 2 })
+      : '';
     res.render(basePathViews + "game", {
-      urlToGenerate
+      urlToGenerate,
+      qrCodeDataUrl
     });
   });
 
@@ -44,7 +51,9 @@ module.exports = function (app, passport) {
    * Formulaire de login
    */
   app.get("/login", function (req, res) {
-    res.render(basePathViews + "login");
+    res.render(basePathViews + "login", {
+      errors: req.flash('error')
+    });
   });
 
   // Permet d'authentifier l'admin
@@ -59,8 +68,19 @@ module.exports = function (app, passport) {
   /**
    * Télécommande admin pour animer le jeu
    */
-  app.get("/admin", function (req, res) {
+  app.get("/admin", isLoggedIn, function (req, res) {
     res.render(basePathViews + "admin");
+  });
+
+  /**
+   * Déconnexion de l'admin
+   */
+  app.get("/logout", function (req, res, next) {
+    req.logout(function (error) {
+      if (error)
+        return next(error);
+      res.redirect('/login');
+    });
   });
 
   /**
@@ -73,7 +93,7 @@ module.exports = function (app, passport) {
   });
 
   /**
-   * Middleware permettant de savoir si l'utilisateur est logguéœ
+   * Middleware permettant de savoir si l'utilisateur est loggué
    * Uniquement pour la partie admin
    * @param {*} req 
    * @param {*} res 

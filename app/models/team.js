@@ -1,4 +1,9 @@
 /**
+ * Nombre de points maximum (correspond aux éléments du burger à l'écran)
+ */
+const maxPoints = 25;
+
+/**
  * Entité équipe
  */
 function Team(name) {
@@ -8,7 +13,7 @@ function Team(name) {
      * Incrémente les points de l'équipe
      */
     this.incrementPoints = function () {
-        if (this.points >= 25)
+        if (this.points >= maxPoints)
             return;
         this.points++;
     }
@@ -20,6 +25,16 @@ function Team(name) {
             return;
         this.points--;
     }
+    /**
+     * Fixe les points de l'équipe (valeur bornée entre 0 et le maximum)
+     */
+    this.setPoints = function (points) {
+        if (!Number.isInteger(points))
+            return;
+        this.points = Math.min(Math.max(points, 0), maxPoints);
+    }
 }
+
+Team.maxPoints = maxPoints;
 
 module.exports = Team;
