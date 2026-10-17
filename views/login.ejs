@@ -13,6 +13,9 @@
                 <div class="card card-signin my-5">
                     <div class="card-body">
                         <h5 class="card-title text-center">Authentification</h5>
+                        <% errors.forEach(function (error) { %>
+                        <div class="alert alert-danger" role="alert"><%= error %></div>
+                        <% }) %>
                         <form class="form-signin" action="/login" method="post">
                             <div class="form-label-group">
                                 <input type="text" id="inputEmail" class="form-control" placeholder="Login" required

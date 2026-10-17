@@ -1,6 +1,7 @@
 var path = require('path');
 const LocalStrategy = require('passport-local').Strategy;
 const User = require(path.join(__basedir,'app/models/user'));
+const credentials = require('./credentials');
 
 // expose this function to our app using module.exports
 module.exports = function (passport) {
@@ -12,12 +13,16 @@ module.exports = function (passport) {
     // passport needs ability to serialize and unserialize users out of session
 
     // used to serialize the user for the session
+    // On ne stocke que le nom d'utilisateur (jamais le mot de passe) en session
     passport.serializeUser(function (user, done) {
-        done(null, user);
+        done(null, user.username);
     });
 
     // used to deserialize the user
-    passport.deserializeUser(function (user, done) {
+    passport.deserializeUser(function (username, done) {
+        let user = new User();
+        user.username = username;
+        user.title = 'admin';
         done(null, user);
     });
 
@@ -31,14 +36,13 @@ module.exports = function (passport) {
             passReqToCallback: true
         },
         function (req, username, password, done) {
-            if (username.toLowerCase() === 'admin' && password === 'burger2018') {
+            if (credentials.check(username, password)) {
                 let user = new User();
                 user.username = username;
-                user.password = password;
                 user.title = 'admin';
                 done(null, user);
             } else {
-                done(null, false);
+                done(null, false, { message: 'Identifiant ou mot de passe incorrect' });
             }
         }
     ));

@@ -1,6 +1,7 @@
 const colors = require('colors');
 const figlet = require('figlet');
 const networkUtils = require('../utils/network');
+const credentials = require('./credentials');
 
 const burgerQuizLabel = 'App Burger Quiz';
 const anyIpAddressMessage = `> Application accessible aux adresses suivantes :`;
@@ -13,6 +14,9 @@ const messagesToDisplayWhenServerStart = function (port) {
     console.log(figlet.textSync(burgerQuizLabel));
     console.log();
     console.log(`> Le serveur à démarré sur le port : ` + `${port}`.green);
+    if (credentials.isUsingDefaultPassword()) {
+        console.log(`> Attention : mot de passe admin par défaut, définissez ADMIN_PASSWORD`.yellow);
+    }
     const ipAddress = networkUtils.getIpAddressServer();
     if (ipAddress.length === 0) return;
     const message = (ipAddress.length === 1) ? singleIpAddressMessage : anyIpAddressMessage;

@@ -1,5 +1,10 @@
 const urlResolverService = require('./services/url-resolver');
 
+/**
+ * Noms d'équipes acceptés
+ */
+const validTeamNames = ['team-mayo', 'team-ketchup'];
+
 module.exports = function (app, passport) {
   /**
    * Le chemin de base où se trouve les views
@@ -18,8 +23,8 @@ module.exports = function (app, passport) {
    */
   app.get("/buzzer", function (req, res) {
     let team = req.query.team;
-    // Si aucune team n'a été déterminé on renvoie sur la page
-    if (!team) {
+    // Si aucune team valide n'a été déterminée on renvoie sur la page
+    if (validTeamNames.indexOf(team) === -1) {
       res.redirect("/");
       return;
     }
@@ -44,7 +49,9 @@ module.exports = function (app, passport) {
    * Formulaire de login
    */
   app.get("/login", function (req, res) {
-    res.render(basePathViews + "login");
+    res.render(basePathViews + "login", {
+      errors: req.flash('error')
+    });
   });
 
   // Permet d'authentifier l'admin
@@ -59,8 +66,16 @@ module.exports = function (app, passport) {
   /**
    * Télécommande admin pour animer le jeu
    */
-  app.get("/admin", function (req, res) {
+  app.get("/admin", isLoggedIn, function (req, res) {
     res.render(basePathViews + "admin");
+  });
+
+  /**
+   * Déconnexion de l'admin
+   */
+  app.get("/logout", function (req, res) {
+    req.logout();
+    res.redirect('/login');
   });
 
   /**
@@ -73,7 +88,7 @@ module.exports = function (app, passport) {
   });
 
   /**
-   * Middleware permettant de savoir si l'utilisateur est logguéœ
+   * Middleware permettant de savoir si l'utilisateur est loggué
    * Uniquement pour la partie admin
    * @param {*} req 
    * @param {*} res 
