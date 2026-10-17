@@ -16,6 +16,9 @@ const $screenQuestionText = $('#screen-question-text');
 const $screenQuestionChoices = $('#screen-question-choices');
 const $screenQuestionAnswer = $('#screen-question-answer');
 
+const $modalMedia = $('#modal-media');
+const videoMedia = document.getElementById('video-media');
+
 const $modalTeamMayo = $('#modal-buzz-first-mayo');
 const $modalTeamKetchup = $('#modal-buzz-first-ketchup');
 
@@ -30,6 +33,11 @@ var teamFirstBuzz = null;
  * Indique si la transition est en cours
  */
 let isTransitionRunning = false;
+
+/**
+ * Son de la question / réponse en cours de lecture
+ */
+let mediaAudio = null;
 
 const mayo = 'team-mayo'
 const ketchup = 'team-ketchup';
@@ -193,6 +201,8 @@ const receiveBuzzAndInteractOnView = function (teamName) {
     }
     if (!color)
         return;
+    // Comme dans l'émission, le buzz coupe le son ou la vidéo en cours
+    stopMedia();
     $mainBackground.hide();
     playSound(sound);
     $modalBuzz.show();
@@ -282,12 +292,52 @@ const launchBuzzSound = function () {
  */
 const playSound = function (sound) {
     var audio = new Audio(sound);
-    // play() renvoie une promesse rejetée si le navigateur bloque la lecture
-    const promise = audio.play();
+    playElement(audio);
+    return audio;
+}
+
+/**
+ * Lance la lecture d'un élément audio / vidéo
+ * play() renvoie une promesse rejetée si le navigateur bloque la lecture
+ */
+const playElement = function (element) {
+    const promise = element.play();
     if (promise)
         promise.catch(function (error) {
-            console.log('Lecture du son impossible : ' + error);
+            console.log('Lecture impossible : ' + error);
         });
+}
+
+/**
+ * Arrête le son ou la vidéo de la question / réponse
+ */
+const stopMedia = function () {
+    if (mediaAudio) {
+        mediaAudio.pause();
+        mediaAudio = null;
+    }
+    videoMedia.onended = null;
+    videoMedia.pause();
+    videoMedia.removeAttribute('src');
+    videoMedia.load();
+    $modalMedia.prop('hidden', true);
+}
+
+/**
+ * Joue le son ou la vidéo d'une question / réponse
+ * @param {*} media { url, type } type : 'audio' ou 'video'
+ */
+const playMedia = function (media) {
+    stopMedia();
+    if (media.type === 'video') {
+        $modalMedia.prop('hidden', false);
+        videoMedia.src = media.url;
+        // La vidéo disparait une fois terminée
+        videoMedia.onended = stopMedia;
+        playElement(videoMedia);
+    } else {
+        mediaAudio = playSound(media.url);
+    }
 }
 
 /**
@@ -372,6 +422,7 @@ const initSocketAndListenEvents = function () {
         attributePointsAtTeam(mayo, 0);
         attributePointsAtTeam(ketchup, 0);
         stopTransitionNow();
+        stopMedia();
     });
     /**
      * Reception des points des différents équipes
@@ -399,6 +450,11 @@ const initSocketAndListenEvents = function () {
      * Question à afficher à l'écran (Nuggets, menus)
      */
     socket.on(messages.messageToClientReceiveScreenQuestion, displayScreenQuestion);
+    /**
+     * Son ou vidéo d'une question / réponse lancé depuis la télécommande
+     */
+    socket.on(messages.messageToClientPlayMedia, playMedia);
+    socket.on(messages.messageToClientStopMedia, stopMedia);
     /**
      * On souhaite connaitre le nombre de points
      * Dès que l'on se connecte (ou se reconnecte) sur la page

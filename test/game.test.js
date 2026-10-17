@@ -340,6 +340,79 @@ test('questions sur la télécommande', async function (t) {
     assert.strictEqual(playerReceived, false);
 });
 
+test('sons et vidéos des questions', async function (t) {
+    const server = await startServer(null);
+    t.after(server.close);
+    const { cookie } = await loginAdmin(server.baseUrl);
+    const upload = async function (body, type, headers) {
+        const response = await fetch(server.baseUrl + '/admin/api/media', {
+            method: 'POST',
+            headers: Object.assign({ 'Content-Type': type }, headers),
+            body: body
+        });
+        return { status: response.status, body: await response.json().catch(function () { return null; }) };
+    }
+
+    // Réservé à l'admin, formats audio / vidéo uniquement
+    assert.strictEqual((await upload('son', 'audio/mpeg')).status, 401);
+    assert.strictEqual((await upload('<html>', 'text/html', { Cookie: cookie })).status, 415);
+    const sound = await upload('contenu du son', 'audio/mpeg', { Cookie: cookie, 'X-File-Name': encodeURIComponent('générique.mp3') });
+    assert.strictEqual(sound.status, 201);
+    assert.strictEqual(sound.body.type, 'audio');
+    assert.strictEqual(sound.body.name, 'générique.mp3');
+    const video = (await upload('contenu de la vidéo', 'video/mp4', { Cookie: cookie })).body;
+
+    // Les médias sont servis aux écrans de jeu (lecture partielle pour les vidéos)
+    let response = await fetch(server.baseUrl + '/media/' + sound.body.file, { headers: { Range: 'bytes=0-6' } });
+    assert.strictEqual(response.status, 206);
+    assert.strictEqual(await response.text(), 'contenu');
+    response = await fetch(server.baseUrl + '/media/inconnu.mp3', { redirect: 'manual' });
+    await response.text();
+    assert.strictEqual(response.status, 404);
+
+    const api = function (method, url, body) {
+        return fetch(server.baseUrl + '/admin/api/parties' + url, {
+            method: method,
+            headers: { Cookie: cookie, 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        }).then(function (response) { return response.json(); });
+    }
+    const party = await api('POST', '', { name: 'Blind test' });
+    const question = await api('POST', '/' + party.id + '/questions', {
+        round: 'nuggets', question: 'Quel est ce générique ?', answer: 'Friends',
+        questionMedia: sound.body, answerMedia: video
+    });
+    assert.strictEqual(question.questionMedia.file, sound.body.file);
+    assert.strictEqual(question.answerMedia.type, 'video');
+    const exported = await (await fetch(server.baseUrl + '/admin/api/parties/' + party.id + '/export', { headers: { Cookie: cookie } })).json();
+    assert.deepStrictEqual(exported.questions[0].answerMedia, question.answerMedia);
+
+    const admin = await server.connect(cookie);
+    const player = await server.connect();
+    admin.emit(messages.messageSelectParty, party.id);
+    let stop = waitFor(player, messages.messageToClientStopMedia);
+    admin.emit(messages.messageNextTransition);
+    await stop;
+    await pause(100);
+
+    // Un joueur ne peut pas lancer de média
+    let played = null;
+    player.on(messages.messageToClientPlayMedia, function (media) { played = media; });
+    player.emit(messages.messagePlayMedia, 'questionMedia');
+    await pause(100);
+    assert.strictEqual(played, null);
+
+    let play = waitFor(player, messages.messageToClientPlayMedia);
+    admin.emit(messages.messagePlayMedia, 'questionMedia');
+    assert.deepStrictEqual(await play, [{ url: '/media/' + sound.body.file, type: 'audio' }]);
+    play = waitFor(player, messages.messageToClientPlayMedia);
+    admin.emit(messages.messagePlayMedia, 'answerMedia');
+    assert.deepStrictEqual(await play, [{ url: '/media/' + video.file, type: 'video' }]);
+    stop = waitFor(player, messages.messageToClientStopMedia);
+    admin.emit(messages.messageStopMedia);
+    await stop;
+});
+
 test('la partie survit à un redémarrage du serveur', async function (t) {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bq-'));
     const stateFile = path.join(dir, 'state.json');

@@ -1,5 +1,7 @@
 // Gestion des parties et des questions (API /admin/api/parties)
 const apiUrl = '/admin/api/parties';
+const mediaApiUrl = '/admin/api/media';
+const mediaMaxSize = Number(document.body.getAttribute('data-media-max-size'));
 
 const $alertContainer = $('#alert-container');
 const $partyList = $('#party-list');
@@ -21,6 +23,8 @@ const $inputQuestionAnswer = $('#input-question-answer');
 const $questionChoices = $('#question-choices');
 const $inputsChoice = $questionChoices.find('[data-choice]');
 const $radiosGoodChoice = $questionChoices.find('[name=question-good-choice]');
+const $mediaFields = $('[data-media]');
+const $buttonSaveQuestion = $('#button-save-question');
 
 /**
  * Etat de la page
@@ -29,6 +33,11 @@ let parties = [];
 let currentParty = null;
 let currentRound = $roundTabs.find('[data-round]').first().data('round');
 let editedQuestionId = null;
+/**
+ * Sons / vidéos de la question en cours d'édition : { questionMedia, answerMedia }
+ */
+let editedMedia = {};
+let uploadsInProgress = 0;
 
 /**
  * Appelle l'API, renvoie le JSON de la réponse (null si vide)
@@ -51,6 +60,36 @@ const callApi = async function (method, url, body) {
     if (!response.ok)
         throw new Error(data && data.error ? data.error : 'Erreur ' + response.status);
     return data;
+}
+
+/**
+ * Envoie un son / une vidéo, renvoie { file, type, name }
+ */
+const uploadMedia = async function (file) {
+    if (file.size > mediaMaxSize)
+        throw new Error('Fichier trop volumineux (' + Math.round(mediaMaxSize / 1024 / 1024) + ' Mo maximum)');
+    const response = await fetch(mediaApiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': file.type || 'application/octet-stream', 'X-File-Name': encodeURIComponent(file.name) },
+        body: file
+    });
+    if (response.status === 401) {
+        window.location.href = '/login';
+        throw new Error('Session expirée');
+    }
+    if (response.status === 413)
+        throw new Error('Fichier trop volumineux');
+    const data = await response.json().catch(function () { return null; });
+    if (!response.ok)
+        throw new Error(data && data.error ? data.error : 'Erreur ' + response.status);
+    return data;
+}
+
+/**
+ * Libellé d'un média pour la liste des questions
+ */
+const mediaLabel = function (media) {
+    return (media.type === 'video' ? 'Vidéo' : 'Son') + (media.name ? ' : ' + media.name : '');
 }
 
 /**
@@ -136,7 +175,11 @@ const renderQuestionList = function () {
             });
             $content.append($choices);
         }
+        if (question.questionMedia)
+            $content.append($('<div class="small text-info"></div>').text('Question — ' + mediaLabel(question.questionMedia)));
         $content.append($('<div class="text-success"></div>').text(question.answer ? 'Réponse : ' + question.answer : ''));
+        if (question.answerMedia)
+            $content.append($('<div class="small text-info"></div>').text('Réponse — ' + mediaLabel(question.answerMedia)));
 
         const $actions = $('<div class="btn-group btn-group-sm align-self-start"></div>')
             .append($('<button type="button" class="btn btn-outline-secondary" data-action="up" title="Monter">&uarr;</button>').prop('disabled', index === 0))
@@ -170,6 +213,22 @@ const selectParty = async function (id) {
 }
 
 /**
+ * Affiche le son / la vidéo d'un champ média de la modal (lecteur d'aperçu)
+ * @param {*} $field Le champ ([data-media])
+ */
+const renderMediaField = function ($field) {
+    const media = editedMedia[$field.data('media')];
+    const $preview = $field.find('[data-media-preview]').empty();
+    if (media) {
+        $preview.append($(media.type === 'video' ? '<video controls preload="metadata" class="mw-100" style="max-height: 200px"></video>' : '<audio controls preload="metadata" class="w-100"></audio>')
+            .attr('src', '/media/' + media.file));
+        $preview.append($('<small class="text-muted d-block"></small>').text(media.name));
+    }
+    $field.find('[data-media-choose]').text(media ? 'Remplacer' : 'Choisir un fichier');
+    $field.find('[data-media-remove]').prop('hidden', !media);
+}
+
+/**
  * Ouvre la modal de question (ajout si question absente)
  */
 const openQuestionModal = function (question) {
@@ -185,6 +244,14 @@ const openQuestionModal = function (question) {
     });
     $radiosGoodChoice.each(function (index) {
         $(this).prop('checked', !!choices[index] && choices[index] === $inputQuestionAnswer.val());
+    });
+    editedMedia = {
+        questionMedia: question ? question.questionMedia || null : null,
+        answerMedia: question ? question.answerMedia || null : null
+    };
+    $mediaFields.each(function () {
+        $(this).find('[data-media-status]').text('');
+        renderMediaField($(this));
     });
     $modalQuestion.modal('show');
 }
@@ -276,7 +343,9 @@ const initEvents = function () {
             theme: $inputQuestionTheme.val(),
             question: $inputQuestionText.val(),
             choices: $inputsChoice.map(function () { return $(this).val(); }).get(),
-            answer: $inputQuestionAnswer.val()
+            answer: $inputQuestionAnswer.val(),
+            questionMedia: editedMedia.questionMedia,
+            answerMedia: editedMedia.answerMedia
         };
         const url = '/' + currentParty.id + '/questions';
         if (editedQuestionId)
@@ -302,6 +371,43 @@ const initEvents = function () {
 
     $modalQuestion.on('shown.bs.modal', function () {
         $inputQuestionText.trigger('focus');
+    });
+    // Coupe l'aperçu en cours de lecture à la fermeture
+    $modalQuestion.on('hidden.bs.modal', function () {
+        $mediaFields.find('audio, video').each(function () { this.pause(); });
+    });
+
+    /**
+     * Sons / vidéos : envoyés dès qu'ils sont choisis, enregistrés avec la question
+     */
+    $mediaFields.find('[data-media-input]').on('change', async function () {
+        const file = this.files[0];
+        this.value = '';
+        if (!file)
+            return;
+        const $field = $(this).closest('[data-media]');
+        const $status = $field.find('[data-media-status]').text('Envoi en cours…');
+        uploadsInProgress++;
+        $buttonSaveQuestion.prop('disabled', true);
+        // La modal a pu être rouverte sur une autre question pendant l'envoi
+        const target = editedMedia;
+        try {
+            target[$field.data('media')] = await uploadMedia(file);
+            if (target !== editedMedia)
+                return;
+            $status.text('');
+            renderMediaField($field);
+        } catch (error) {
+            $status.text(error.message);
+        } finally {
+            uploadsInProgress--;
+            $buttonSaveQuestion.prop('disabled', uploadsInProgress > 0);
+        }
+    });
+    $mediaFields.find('[data-media-remove]').on('click', function () {
+        const $field = $(this).closest('[data-media]');
+        editedMedia[$field.data('media')] = null;
+        renderMediaField($field);
     });
 }
 

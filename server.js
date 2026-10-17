@@ -14,9 +14,13 @@ const partiesFile = process.env.PARTIES_FILE !== undefined
   ? process.env.PARTIES_FILE
   : path.join(confServer.rootDir, 'data/parties.json');
 
+// Dossier des sons et vidéos des questions
+const mediaDir = process.env.MEDIA_DIR || path.join(confServer.rootDir, 'data/media');
+
 const { httpServer } = createServer({
   stateFile: stateFile,
   partiesFile: partiesFile,
+  mediaDir: mediaDir,
   sessionSecret: process.env.SESSION_SECRET
 });
 
