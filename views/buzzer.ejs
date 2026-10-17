@@ -3,10 +3,10 @@
 
 <head>
     <title>Buzzer</title>
-    <% include ./partials/header %>
+    <%- include('partials/header') %>
     <!-- Permet de ne pas faire de zoom 
     Lorsque l'utilisateur est sur mobile et qu'il spam le click -->
-    <meta name='viewport' content='user-scalable=0' />
+    <meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=0' />
 </head>
 
 <body>
@@ -21,11 +21,13 @@
             <div class="mx-auto container-buzzer">
                 <input type="hidden" value="<%= team %>" id="team-hf-val" />
                 <input id="buzz-button" type="image" src="./images/buzzer/burger-buzzer.png" />
+                <p id="buzzer-message" class="buzzer-message" aria-live="polite"></p>
             </div>
         </div>
     </div>
 </body>
 <script src="/socket.io/socket.io.js"></script>
+<script src="/js/messages-socket.js"></script>
 <script src="./js/client-buzzer.js"></script>
 
 </html>

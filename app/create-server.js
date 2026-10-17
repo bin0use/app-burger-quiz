@@ -1,0 +1,68 @@
+const express = require('express');
+const http = require('http');
+const path = require('path');
+const crypto = require('crypto');
+const flash = require('connect-flash');
+const { Passport } = require('passport');
+const session = require('express-session');
+const { Server } = require('socket.io');
+
+const confServer = require('../config/config-server');
+
+/**
+ * Se charge de créer le serveur http, express et socket.io
+ * @param {*} options.stateFile Fichier de sauvegarde de la partie (optionnel)
+ * @param {*} options.sessionSecret Secret de signature des sessions (optionnel)
+ */
+const createServer = function (options) {
+  options = options || {};
+  const app = express();
+  const httpServer = http.createServer(app);
+  const io = new Server(httpServer);
+  const passport = new Passport();
+
+  // Nécessaire derrière un reverse proxy (Heroku...) pour que req.protocol soit correct
+  app.set('trust proxy', 1);
+
+  app.use(express.static(path.join(confServer.rootDir, 'views/public/')));
+  // Librairies front installées via npm
+  app.use('/vendors/jquery', express.static(path.dirname(require.resolve('jquery'))));
+  app.use('/vendors/bootstrap', express.static(path.join(path.dirname(require.resolve('bootstrap/package.json')), 'dist')));
+  // Noms des messages socket partagés avec le serveur
+  app.get('/js/messages-socket.js', function (req, res) {
+    res.sendFile(path.join(confServer.rootDir, 'config/messages-socket.js'));
+  });
+
+  app.set('views', path.join(confServer.rootDir, 'views/'));
+  app.set('view engine', 'ejs');
+  app.use(express.urlencoded({
+    extended: true
+  }));
+
+  // Secret de session : à définir via SESSION_SECRET, sinon généré à chaque démarrage
+  const sessionMiddleware = session({
+    secret: options.sessionSecret || crypto.randomBytes(32).toString('hex'),
+    resave: false,
+    saveUninitialized: false
+  });
+  app.use(sessionMiddleware);
+  app.use(passport.initialize());
+  app.use(passport.session()); // persistent login sessions
+  app.use(flash()); // use connect-flash for flash messages stored in session
+
+  // Partage de la session express avec socket.io (permet d'identifier l'admin)
+  io.engine.use(sessionMiddleware);
+
+  // Configuration de passport
+  require('../config/passport')(passport);
+
+  // On l'inject dans le router
+  require('./routes')(app, passport);
+
+  // On déclare le jeu ici
+  require('./game')(io, { stateFile: options.stateFile });
+
+  return { app, httpServer, io };
+}
+
+module.exports = { createServer };

@@ -5,10 +5,10 @@ const $buttonKetchup = $('#buzz-button-ketchup');
 const baseRedirectUrl = '/buzzer';
 
 const initEvents = function () {
-    $buttonMayo.click(function () {
+    $buttonMayo.on('click', function () {
         location.href = baseRedirectUrl + '?team=team-mayo';
     });
-    $buttonKetchup.click(function () {
+    $buttonKetchup.on('click', function () {
         location.href = baseRedirectUrl + '?team=team-ketchup';
     });
 }

@@ -1,9 +1,6 @@
+const QRCode = require('qrcode');
 const urlResolverService = require('./services/url-resolver');
-
-/**
- * Noms d'équipes acceptés
- */
-const validTeamNames = ['team-mayo', 'team-ketchup'];
+const { validTeamNames } = require('./game');
 
 module.exports = function (app, passport) {
   /**
@@ -36,10 +33,15 @@ module.exports = function (app, passport) {
   /**
    * Ecran de jeu
    */
-  app.get("/game", function (req, res) {
+  app.get("/game", async function (req, res) {
     const urlToGenerate = urlResolverService.retrieveUrlForQrCodeGeneration(req);
+    // Le QR code est généré côté serveur sous forme d'image
+    const qrCodeDataUrl = urlToGenerate
+      ? await QRCode.toDataURL(urlToGenerate, { width: 250, margin: 2 })
+      : '';
     res.render(basePathViews + "game", {
-      urlToGenerate
+      urlToGenerate,
+      qrCodeDataUrl
     });
   });
 
@@ -73,9 +75,12 @@ module.exports = function (app, passport) {
   /**
    * Déconnexion de l'admin
    */
-  app.get("/logout", function (req, res) {
-    req.logout();
-    res.redirect('/login');
+  app.get("/logout", function (req, res, next) {
+    req.logout(function (error) {
+      if (error)
+        return next(error);
+      res.redirect('/login');
+    });
   });
 
   /**

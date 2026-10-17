@@ -1,20 +1,20 @@
 # Présentation App Burger Quiz
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/BenjaminPoutriquet35800/app-burger-quiz/master/views/public/images/backgrounds/menus.svg?sanitize=true" height="250"> 
+<img src="views/public/images/backgrounds/menus.svg" height="250"> 
 </p>
 
 :hamburger: Burger quiz est le jeu qui reprend les codes de la célèbre émission présentée par Alain Chabat. 
 
 ## Prérequis
-Installer NodeJs : https://nodejs.org/fr/
+Installer NodeJs **20.12 ou plus récent** : https://nodejs.org/fr/
 
 ## Installation
 
 Cloner le répo :
 
 ```
-https://github.com/BenjaminPoutriquet35800/app-burger-quiz.git
+git clone https://github.com/bin0use/app-burger-quiz.git
 ```
 
 Se rendre à la base du répertoire où se trouve le fichier **'package.json'** puis lancer la commande :
@@ -23,12 +23,12 @@ Se rendre à la base du répertoire où se trouve le fichier **'package.json'** 
 npm install
 ```
 
-## Déploiement
+## Lancement
 
 Une fois que les dépendances ont été installées vous pouvez lancer l'application :
 
 ```
-node server.js
+npm start
 ```
 
 Par défaut le serveur écoute sur le port **3000**. 
@@ -41,8 +41,18 @@ Par défaut le serveur écoute sur le port **3000**.
 | `ADMIN_USERNAME` | Identifiant de la télécommande admin | `admin` |
 | `ADMIN_PASSWORD` | Mot de passe de la télécommande admin | `burger2018` (un avertissement s'affiche au démarrage) |
 | `SESSION_SECRET` | Secret de signature des sessions | généré aléatoirement à chaque démarrage |
+| `STATE_FILE` | Fichier de sauvegarde de la partie (scores, transition en cours), vide pour désactiver | `data/state.json` |
 
-Exemple : `ADMIN_PASSWORD=monMotDePasse node server.js`
+Exemple : `ADMIN_PASSWORD=monMotDePasse npm start`
+
+La partie est sauvegardée à chaque modification : un redémarrage du serveur ne fait pas perdre les scores (les buzzers repartent bloqués).
+
+### Docker
+
+```
+docker build -t app-burger-quiz .
+docker run -p 3000:3000 -e ADMIN_PASSWORD=monMotDePasse app-burger-quiz
+```
 
 Vous pouvez à présent accèder à l'application via cette adressse : http://localhost:3000/ qui permet de choisir une équipe (Ketchup / Mayo) :
 
@@ -78,7 +88,28 @@ Cette page va permettre d'administrer le jeu. Vous allez pouvoir ajouter les poi
 
 Dès qu'une équipe buzze, le serveur bloque tous les buzzers : seul le premier buzz est pris en compte et l'équipe concernée s'affiche sur la télécommande. Cliquez sur **Débloquer buzzer** pour la question suivante.
 
+La télécommande indique aussi la transition en cours et la suivante, permet de revenir à la transition précédente et propose des raccourcis clavier :
+
+| Touche | Action |
+|---|---|
+| `K` / `Maj+K` | Ajouter / retirer un point à Ketchup |
+| `M` / `Maj+M` | Ajouter / retirer un point à Mayo |
+| `X` | Mauvaise réponse |
+| `D` / `B` | Débloquer / bloquer les buzzers |
+| `N` / `P` | Transition suivante / précédente |
+
+Sur les téléphones, le buzzer vibre, empêche la mise en veille de l'écran et indique l'état de la partie (en attente, à vous, connexion perdue…).
+
 **NOTA**: Si vous êtes sous **Google Chrome** cliquer une première fois sur la fenêtre du jeu car vous aurez une erreur de type **'Uncaught (in promise) DOMException'** et l'animation ne se lancera pas.
+
+## Développement
+
+```
+npm run lint   # ESLint
+npm test       # tests (node:test)
+```
+
+La CI GitHub Actions lance le lint, les tests et `npm audit` sur Node 20, 22 et 24.
 
 ## Auteurs
 
