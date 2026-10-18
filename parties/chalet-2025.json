@@ -1,0 +1,733 @@
+{
+  "name": "Chalet 2025",
+  "questions": [
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Dans « Le Seigneur des Anneaux », quel est le plat préféré de Gollum ?",
+      "choices": [
+        "Le sushi de hobbit",
+        "Le poisson cru",
+        "Le kebab de Frodon",
+        "Le tartare de Sauron"
+      ],
+      "answer": "Le poisson cru",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Que fait un panda quand il est stressé ?",
+      "choices": [
+        "Il mâche du bambou",
+        "Il s’inscrit à un stage de méditation",
+        "Il fait du karaté avec Po",
+        "Il devient un koala pour 24h"
+      ],
+      "answer": "Il mâche du bambou",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Quelle est la capitale du Canada ?",
+      "choices": [
+        "Toronto",
+        "Ottawa",
+        "Vancouver",
+        "Céline Dion"
+      ],
+      "answer": "Ottawa",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "En quelle année a été inventée la première pizza ?",
+      "choices": [
+        "1889, encore une fois une très bonne chose arrivée dans une année 89",
+        "1492, quand Christophe Colomb a découvert la mozzarella",
+        "1965, pour fêter la victoire du Pépé Ronni",
+        "2010, avec l’arrivée de Deliveroo"
+      ],
+      "answer": "1889, encore une fois une très bonne chose arrivée dans une année 89",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Que fait une poule quand elle a fini de pondre ?",
+      "choices": [
+        "Elle s’envole",
+        "Elle chante",
+        "Elle fume une clope",
+        "Elle tweete"
+      ],
+      "answer": "Elle chante",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Quel est le plus dangereux : un requin ou un grille-pain ?",
+      "choices": [
+        "Le requin",
+        "Le grille-pain",
+        "Un requin qui fait des toasts",
+        "Obi-Wan Kenobi"
+      ],
+      "answer": "Le grille-pain",
+      "points": 1,
+      "note": "Statistiquement, plus de morts par électrocution que par attaque de requin !"
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Raclette, Raquette ou les deux ?",
+      "question": "Ça se partage entre amis",
+      "choices": [
+        "Raclette",
+        "Raquette",
+        "Les deux"
+      ],
+      "answer": "Raclette",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Raclette, Raquette ou les deux ?",
+      "question": "Ça chauffe",
+      "choices": [
+        "Raclette",
+        "Raquette",
+        "Les deux"
+      ],
+      "answer": "Raclette",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Raclette, Raquette ou les deux ?",
+      "question": "Renvoie des balles",
+      "choices": [
+        "Raclette",
+        "Raquette",
+        "Les deux"
+      ],
+      "answer": "Raquette",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Raclette, Raquette ou les deux ?",
+      "question": "Il faut la poser sur la table",
+      "choices": [
+        "Raclette",
+        "Raquette",
+        "Les deux"
+      ],
+      "answer": "Raclette",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Raclette, Raquette ou les deux ?",
+      "question": "Ça peut être électrique",
+      "choices": [
+        "Raclette",
+        "Raquette",
+        "Les deux"
+      ],
+      "answer": "Les deux",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Raclette, Raquette ou les deux ?",
+      "question": "Ça se pratique en montagne",
+      "choices": [
+        "Raclette",
+        "Raquette",
+        "Les deux"
+      ],
+      "answer": "Les deux",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Raclette, Raquette ou les deux ?",
+      "question": "On en trouve à Decathlon",
+      "choices": [
+        "Raclette",
+        "Raquette",
+        "Les deux"
+      ],
+      "answer": "Raquette",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Raclette, Raquette ou les deux ?",
+      "question": "Ça peut faire transpirer",
+      "choices": [
+        "Raclette",
+        "Raquette",
+        "Les deux"
+      ],
+      "answer": "Les deux",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Raclette, Raquette ou les deux ?",
+      "question": "C’est dangereux pour les moustiques",
+      "choices": [
+        "Raclette",
+        "Raquette",
+        "Les deux"
+      ],
+      "answer": "Raquette",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Raclette, Raquette ou les deux ?",
+      "question": "On y envoie des patates",
+      "choices": [
+        "Raclette",
+        "Raquette",
+        "Les deux"
+      ],
+      "answer": "Les deux",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "C'est pas faux",
+      "question": "Dans quel film entend-on cette réplique : « Je suis ton père. » ?",
+      "choices": [
+        "Matrix",
+        "Star Wars – L’Empire contre-attaque",
+        "Le Seigneur des Anneaux : Les deux tours",
+        "Mes vacances dans le Nord, une production Jackie et Michel"
+      ],
+      "answer": "Star Wars – L’Empire contre-attaque",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "C'est pas faux",
+      "question": "Complétez cette célèbre réplique de film français : « Les cons, ça ose tout… »",
+      "choices": [
+        "… et c’est bien pour ça qu’on les aime.",
+        "… c’est même à ça qu’on les reconnaît.",
+        "… et c’est souvent les autres.",
+        "… il y en a même qui arrivent à devenir présidents des USA."
+      ],
+      "answer": "… c’est même à ça qu’on les reconnaît.",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "C'est pas faux",
+      "question": "Dans quelle publicité entend-on le slogan : « Parce que je le vaux bien. » ?",
+      "choices": [
+        "L’Oréal",
+        "Dior",
+        "Yves Rocher",
+        "Findus pour sa gamme de lasagnes au veau"
+      ],
+      "answer": "L’Oréal",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "C'est pas faux",
+      "question": "Les chiffres, c'est :",
+      "choices": [
+        "pas une science exacte figurez-vous ! (genre c'est 50% correct quoi)",
+        "n'importe quoi, on leur fait dire ce qu'on veut (cette réponse est sponsorisée par IPSOS)",
+        "juste des nombres mais en plus petit (tout dépend des valeurs)",
+        "comme les lettres, mais on ne comprend pas quand je parle (et ça en fatigue certains)"
+      ],
+      "answer": "pas une science exacte figurez-vous ! (genre c'est 50% correct quoi)",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "C'est pas faux",
+      "question": "Mercurochrome, c'est :",
+      "choices": [
+        "La couleur officielle de Mercure",
+        "Ça fait du bien là où ça fait du mal",
+        "Le pansement des héros.",
+        "Une pub qui ne rentre pas du tout dans la tête à passer 5 fois de suite"
+      ],
+      "answer": "Le pansement des héros.",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le jeu vidéo, c'était mieux avant",
+      "question": "Dans quel jeu NES pouvait-on entrer le code « ↑ ↑ ↓ ↓ ← → ← → B A » pour obtenir des vies infinies ?",
+      "choices": [
+        "Metroid",
+        "Castlevania",
+        "Contra",
+        "Pong"
+      ],
+      "answer": "Contra",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le jeu vidéo, c'était mieux avant",
+      "question": "De quelle ville est inspirée Vice City dans le GTA éponyme ?",
+      "choices": [
+        "Los Angeles",
+        "Miami",
+        "New York",
+        "Stéphanie de Monaco"
+      ],
+      "answer": "Miami",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le jeu vidéo, c'était mieux avant",
+      "question": "Dans The Legend of Zelda: Ocarina of Time, comment appelle-t-on la monture de Link ?",
+      "choices": [
+        "Epona",
+        "Navi",
+        "Midna",
+        "On ne l'appelle pas, de toute façon elle se bloque tout le temps dans les textures ou ne saute pas quand il faut"
+      ],
+      "answer": "Epona",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le jeu vidéo, c'était mieux avant",
+      "question": "Quel studio a développé le tout premier Tomb Raider en 1996 ?",
+      "choices": [
+        "Naughty Dog",
+        "Core Design",
+        "Eidos Montreal",
+        "Nintendo, on reconnaît clairement leur touche"
+      ],
+      "answer": "Core Design",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le jeu vidéo, c'était mieux avant",
+      "question": "Dans Metal Gear Solid (1998), quel boss pouvait lire les données de ta carte mémoire ?",
+      "choices": [
+        "Ocelot",
+        "Psycho Mantis",
+        "Sniper Wolf",
+        "Hideo Kojima, qu'est-ce qu'il ne sait pas faire en même temps ?"
+      ],
+      "answer": "Psycho Mantis",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Il y avait 50% de chance que ça arrive",
+      "question": "Quel dispositif de fixation non permanent est arrivé par erreur suite à une erreur d'un ingénieur qui devait créer un système permanent ?",
+      "choices": [
+        "Le ruban adhésif (ou scotch, mais juste un doigt)",
+        "Le bouton pression (celui qui ferme les vêtements, pas celui qui te sert une bière quand tu appuies dessus)",
+        "Le Post-it",
+        "Le trombone (il voulait juste se déstresser)"
+      ],
+      "answer": "Le Post-it",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Il y avait 50% de chance que ça arrive",
+      "question": "Comment a été inventé le Velcro ?",
+      "choices": [
+        "L'inventeur a eu l'idée en voyant un fruit accroché à ses vêtements",
+        "Il a eu l'idée en voyant un chat faire sa toilette",
+        "Il a eu l'idée lors d'une session d'alpinisme",
+        "L'inventeur s'appelait en fait Peter Parker, il a trouvé l'idée en un claquement de doigts"
+      ],
+      "answer": "L'inventeur a eu l'idée en voyant un fruit accroché à ses vêtements",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Il y avait 50% de chance que ça arrive",
+      "question": "Quelle invention médicale majeure est arrivée après qu’un chercheur ait découvert qu’une moisissure dans une boîte de Petri exterminait des bactéries ?",
+      "choices": [
+        "L’insuline",
+        "Le vaccin contre la rage",
+        "La pénicilline",
+        "Le cyanure"
+      ],
+      "answer": "La pénicilline",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Il y avait 50% de chance que ça arrive",
+      "question": "Comment un ingénieur radio a découvert que les micro-ondes permettaient de chauffer alors qu'il travaillait avec ?",
+      "choices": [
+        "Son café est resté chaud plus longtemps que d'habitude",
+        "Son maïs s'est mis subitement à se transformer en popcorn",
+        "Le chocolat qu'il avait dans une de ses poches avait fondu",
+        "Son gremlins a explosé"
+      ],
+      "answer": "Son café est resté chaud plus longtemps que d'habitude",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Il y avait 50% de chance que ça arrive",
+      "question": "Une compagnie de savon avait produit une pâte malléable permettant de nettoyer le papier peint, mais elle était en faillite. Le fils du propriétaire décide de modifier la pâte en :",
+      "choices": [
+        "Pâte à modeler, pour faire rire les enfants",
+        "Pâte à prout, pour faire rire les grand enfants",
+        "Ce qui deviendra la patafix, pour se raccrocher à ce qu'ils pouvaient",
+        "C4, pour tout faire péter"
+      ],
+      "answer": "Pâte à modeler, pour faire rire les enfants",
+      "points": 1,
+      "note": "C'est la naissance de la Play-Doh."
+    },
+    {
+      "round": "menus",
+      "theme": "Les principes de la Physique Quantique",
+      "question": "Dans l’équation de Dirac, quel élément mathématique permet d’obtenir l’antimatière ?",
+      "choices": [
+        "L’introduction des matrices gamma",
+        "La séparation du spin et du moment cinétique orbital",
+        "L’approximation semi-classique de WKB",
+        "La quantification canonique"
+      ],
+      "answer": "L’introduction des matrices gamma",
+      "points": 1,
+      "note": "Un menu qui est bien si tu es expert dans le domaine, ou si tu aimes bien perdre, ou les deux à la fois."
+    },
+    {
+      "round": "menus",
+      "theme": "Les principes de la Physique Quantique",
+      "question": "L’inégalité de Bell teste la compatibilité entre les prédictions quantiques et :",
+      "choices": [
+        "Le réalisme local",
+        "La conservation du spin total",
+        "L’unicité des valeurs propres dans l’espace de Hilbert",
+        "La linéarité des opérateurs d'observables"
+      ],
+      "answer": "Le réalisme local",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les principes de la Physique Quantique",
+      "question": "L’effet Casimir est dû :",
+      "choices": [
+        "À l’échange de photons virtuels entre les surfaces",
+        "À la polarisation du vide par une source électrostatique externe",
+        "À la pression de radiation thermique entre conducteurs",
+        "À l’interaction dipôle–dipôle à courte distance"
+      ],
+      "answer": "À l’échange de photons virtuels entre les surfaces",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les principes de la Physique Quantique",
+      "question": "La décohérence quantique décrit :",
+      "choices": [
+        "La réduction non-linéaire de la fonction d’onde",
+        "L'entremêlement du système avec l’environnement, rendant les phases relatives non observables",
+        "La violation de l’unitarité du système",
+        "La destruction de l’information dans un trou noir"
+      ],
+      "answer": "L'entremêlement du système avec l’environnement, rendant les phases relatives non observables",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les principes de la Physique Quantique",
+      "question": "Dans une théorie topologique des champs (TQFT), les observables physiques dépendent principalement :",
+      "choices": [
+        "De la métrique locale de l’espace",
+        "De la structure de calabi-yau compacte",
+        "De la structure topologique globale de l’espace",
+        "De la connectivité quantique des niveaux énergétiques"
+      ],
+      "answer": "De la structure topologique globale de l’espace",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Je pitch mal les films (et jeux vidéos)",
+      "question": "Un riche vieux monsieur invite des enfants à visiter son usine où tout est potentiellement mortel, et personne ne trouve ça inquiétant.",
+      "choices": [],
+      "answer": "Charlie et la Chocolaterie",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Je pitch mal les films (et jeux vidéos)",
+      "question": "Un garçon maigre apprend à faire de la magie dans un internat où la direction semble ok avec le fait que les élèves meurent régulièrement.",
+      "choices": [],
+      "answer": "Harry Potter",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Je pitch mal les films (et jeux vidéos)",
+      "question": "Un mec retourne dans le passé pour empêcher sa mère de tomber amoureuse de lui.",
+      "choices": [],
+      "answer": "Retour vers le Futur",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Je pitch mal les films (et jeux vidéos)",
+      "question": "Un groupe d’anciens colocataires traverse le pays pour jeter un bijou dans un volcan, parce que prendre l’avion, apparemment, ce n’est pas une option.",
+      "choices": [],
+      "answer": "Le Seigneur des Anneaux",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Je pitch mal les films (et jeux vidéos)",
+      "question": "Des gens paient très cher pour se faire poursuivre par des lézards géants, puis sont surpris que ça se passe mal.",
+      "choices": [],
+      "answer": "Jurassic Park",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Je pitch mal les films (et jeux vidéos)",
+      "question": "Deux robots passent deux heures à faire du rangement et à parler d’amour.",
+      "choices": [],
+      "answer": "WALL-E",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Je pitch mal les films (et jeux vidéos)",
+      "question": "Un milliardaire s’habille en chauve-souris pour frapper des gens pauvres au lieu de payer des impôts.",
+      "choices": [],
+      "answer": "Batman",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Je pitch mal les films (et jeux vidéos)",
+      "question": "Un mec se réveille tous les matins et doit convaincre une fille qu’il n’est pas un psychopathe.",
+      "choices": [],
+      "answer": "Un Jour Sans Fin",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Je pitch mal les films (et jeux vidéos)",
+      "question": "Un gars qui parle peu se balade dans des ruines en détruisant des pots parce qu’il a besoin d’argent.",
+      "choices": [],
+      "answer": "The Legend of Zelda",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Je pitch mal les films (et jeux vidéos)",
+      "question": "Un poisson dit à un autre poisson de ne pas s’éloigner. Il s’éloigne. Ça finit en road trip.",
+      "choices": [],
+      "answer": "Le Monde de Nemo",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Je pitch mal les films (et jeux vidéos)",
+      "question": "Un pays très pauvre en infrastructures de sécurité accueille un parc animalier basé sur des créatures disparues, et est surpris que ça tourne mal.",
+      "choices": [],
+      "answer": "Jurassic Park",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Je pitch mal les films (et jeux vidéos)",
+      "question": "Un plombier moustachu fait des compétitions de kart au lieu de réparer le moindre tuyau depuis 40 ans.",
+      "choices": [],
+      "answer": "Mario Kart",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Je pitch mal les films (et jeux vidéos)",
+      "question": "Un adolescent se fait mordre par un animal et se dit que devenir super-héros est une super idée.",
+      "choices": [],
+      "answer": "Spider-Man",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Je pitch mal les films (et jeux vidéos)",
+      "question": "Un aventurier vole des plaques anciennes dans des temples et appelle ça de l’archéologie.",
+      "choices": [],
+      "answer": "Indiana Jones",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Je pitch mal les films (et jeux vidéos)",
+      "question": "Une tragédie familiale est réglée à coups de karaoké dans la savane.",
+      "choices": [],
+      "answer": "Le Roi Lion",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Je pitch mal les films (et jeux vidéos)",
+      "question": "On enferme des animaux dans des boules et on les fait se battre. Et tout le monde trouve ça mignon.",
+      "choices": [],
+      "answer": "Pokémon",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Quel animal est sur le logo de Lacoste ?",
+      "choices": [],
+      "answer": "Un crocodile",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Dans quelle ville se situe la Tour Eiffel ?",
+      "choices": [],
+      "answer": "Paris",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Si tu devais donner un prénom à ton pied gauche, ce serait quoi ?",
+      "choices": [],
+      "answer": "",
+      "points": 1,
+      "note": "Pas de réponse attendue : toute réponse donnée sans hésiter est bonne."
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Qu’est-ce qui est jaune et qui attend ?",
+      "choices": [],
+      "answer": "Jonathan",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Sinon, ça va toi ?",
+      "choices": [],
+      "answer": "",
+      "points": 1,
+      "note": "Pas de réponse attendue : toute réponse donnée sans hésiter est bonne."
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Combien y a-t-il de pattes sur trois vaches normales qui vont bien ?",
+      "choices": [],
+      "answer": "12",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Quel est l’animal le plus susceptible de te juger en silence ?",
+      "choices": [],
+      "answer": "Le chat",
+      "points": 1,
+      "note": "Pas de réponse attendue : toute réponse donnée sans hésiter est bonne."
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Si la Tour Eiffel pouvait parler, quel serait son mot de passe Wi-Fi ?",
+      "choices": [],
+      "answer": "",
+      "points": 1,
+      "note": "Pas de réponse attendue : toute réponse donnée sans hésiter est bonne."
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Quelle est la couleur de l’invisibilité ?",
+      "choices": [],
+      "answer": "",
+      "points": 1,
+      "note": "Pas de réponse attendue : toute réponse donnée sans hésiter est bonne."
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Complète cette phrase de sage philosophe français : « On n’a pas le cul sorti des… »",
+      "choices": [],
+      "answer": "ronces",
+      "points": 1,
+      "note": ""
+    }
+  ]
+}

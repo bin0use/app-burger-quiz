@@ -88,38 +88,71 @@ Ouvrez enfin un dernier onglet : http://localhost:3000/admin. Cette page est pro
 
 Cette page va permettre d'administrer le jeu. Vous allez pouvoir ajouter les points des différentes équipes lancer les transitions et de bloquer / débloquer les cheeses buzzer.
 
-Dès qu'une équipe buzze, le serveur bloque tous les buzzers : seul le premier buzz est pris en compte et l'équipe concernée s'affiche sur la télécommande. Cliquez sur **Débloquer buzzer** pour la question suivante.
+Dès qu'une équipe buzze, le serveur bloque tous les buzzers : seul le premier buzz est pris en compte. Le logo de l'équipe s'affiche en grand sur l'écran de jeu, avec l'écart de temps si l'autre équipe a buzzé juste après (« Ketchup : 0,12 s trop tard ! »). Sur le téléphone de l'équipe qui a la main, tout l'écran prend la couleur de l'équipe.
 
-La télécommande indique aussi la transition en cours et la suivante, permet de revenir à la transition précédente et propose des raccourcis clavier :
+Ensuite, depuis la télécommande :
+
+* **✔ Bonne réponse** (`Entrée`) : l'équipe qui a buzzé marque les points de la question, la réponse est révélée à l'écran et les buzzers sont bloqués ;
+* **X Mauvaise réponse** : « pouet » à l'écran et **la main passe à l'autre équipe** (seul son buzzer est débloqué). Si les deux équipes se trompent, plus personne ne peut buzzer ;
+* **↶ Annuler** (`Z` ou `Ctrl+Z`) : annule la dernière action (point, bonne / mauvaise réponse, blocage ou déblocage des buzzers), jusqu'à 30 actions.
+
+Passer à la question ou à la manche suivante bloque les buzzers : cliquez sur **Débloquer buzzer** (`D`) une fois la question lue.
+
+La télécommande affiche aussi :
+
+* le nombre de **buzzers connectés** par équipe ;
+* la question **en gros**, sa réponse, son barème et la **note de l'animateur** ;
+* un **chrono** affiché en grand sur l'écran de jeu (60 s proposées pour l'addition, 30 s sinon) : lancer, mettre en pause, reprendre, masquer. Option : un chrono de réponse lancé automatiquement après chaque buzz (3 à 15 s). Une sonnerie retentit à la fin ;
+* au **Burger de la mort**, un compteur de 10 bonnes réponses d'affilée sur l'écran de jeu : ✔ le fait avancer, X le remet à zéro ;
+* l'**écran de victoire** (équipe gagnante, scores, confettis) ;
+* **Démarrer la partie à l'écran** : ferme l'écran du QR code sur la TV sans aller cliquer dessus.
 
 | Touche | Action |
 |---|---|
+| `Entrée` | Bonne réponse |
+| `X` | Mauvaise réponse |
+| `Z` / `Ctrl+Z` | Annuler la dernière action |
 | `K` / `Maj+K` | Ajouter / retirer un point à Ketchup |
 | `M` / `Maj+M` | Ajouter / retirer un point à Mayo |
-| `X` | Mauvaise réponse |
 | `D` / `B` | Débloquer / bloquer les buzzers |
 | `N` / `P` | Transition suivante / précédente |
 | `→` / `←` | Question suivante / précédente |
 | `E` / `R` | Afficher / masquer la question à l'écran, révéler la réponse |
 | `J` / `Maj+J` | Jouer le son / la vidéo de la question / de la réponse |
 | `S` | Arrêter le son / la vidéo |
+| `T` / `Maj+T` | Lancer ou mettre en pause / masquer le chrono |
+| `V` | Afficher / masquer l'écran de victoire |
+| `G` | Démarrer la partie à l'écran |
+
+### Ecran de jeu sur une TV
+
+Sur l'écran de jeu, le curseur disparait quand la souris ne bouge plus. `F` ou un double-clic passe en plein écran ou en sort.
+
+Les navigateurs bloquent le son tant qu'on n'a pas cliqué sur la page, et le plein écran demande une action sur la page. Le plus simple est de lancer Chrome en mode kiosque, avec la lecture automatique autorisée :
+
+```
+chrome --kiosk --autoplay-policy=no-user-gesture-required http://localhost:3000/game
+```
+
+Sans ces options, cliquez une fois sur l'écran de jeu (par exemple sur **Tout le monde est prêt !**).
 
 ### Gestion des parties et des questions
 
 Depuis la télécommande, le lien **Gérer les parties et questions** (http://localhost:3000/admin/parties) permet de :
 
 * créer, renommer, dupliquer et supprimer des parties ;
-* ajouter, modifier, supprimer et réordonner les questions de chaque manche (Nuggets, Sel ou Poivre, Les menus, L'addition, Burger de la mort), avec un thème optionnel (nom du menu…), jusqu'à 4 propositions (Nuggets) et la réponse ;
+* ajouter, modifier, supprimer et réordonner les questions de chaque manche (Nuggets, Sel ou Poivre, Les menus, L'addition, Burger de la mort), avec un thème optionnel (nom du menu…), jusqu'à 4 propositions et la réponse ;
+* donner un barème à chaque question (1 à 10 miams, 1 par défaut), et ajouter une note de l'animateur (une blague, une précision…) visible seulement sur la télécommande ;
 * joindre un son ou une vidéo à la question et / ou à la réponse (mp3, wav, ogg, m4a, mp4, webm, 100 Mo maximum) : blind test, extrait de film, générique… ;
 * exporter une partie en JSON et la réimporter (sur un autre serveur par exemple).
 
-Choisissez ensuite la partie dans la télécommande : à chaque transition, la première question de la manche s'affiche avec sa réponse, et les boutons **Précédente / Suivante** (ou les flèches `←` / `→`) permettent de naviguer. Comme dans l'émission, les questions des **Nuggets** et des **menus** s'affichent aussi sur l'écran de jeu (question, nom du menu et propositions). Depuis la télécommande, **Masquer / Afficher à l'écran** (`E`) et **Révéler la réponse à l'écran** (`R`) : la bonne proposition est mise en avant, ou la réponse s'affiche sous la question. Tant qu'elle n'est pas révélée, la réponse n'est envoyée qu'aux télécommandes authentifiées, jamais aux buzzers ni à l'écran de jeu.
+Choisissez ensuite la partie dans la télécommande : à chaque transition, la première question de la manche s'affiche avec sa réponse, et les boutons **Précédente / Suivante** (ou les flèches `←` / `→`) permettent de naviguer. Comme dans l'émission, les questions des **Nuggets** et des **menus** s'affichent aussi sur l'écran de jeu (question, nom du menu et propositions). Pour **Sel ou Poivre**, seuls le thème et les propositions s'affichent (« Johnny, Eddy ou les deux ? ») : vous lisez la question. Depuis la télécommande, **Masquer / Afficher à l'écran** (`E`) et **Révéler la réponse à l'écran** (`R`) : la bonne proposition est mise en avant, ou la réponse s'affiche sous la question. Tant qu'elle n'est pas révélée, la réponse n'est envoyée qu'aux télécommandes authentifiées, jamais aux buzzers ni à l'écran de jeu.
 
 Quand la question en cours a un son ou une vidéo, quelle que soit la manche, la télécommande affiche les boutons **▶ Son / Vidéo de la question**, **▶ Son / Vidéo de la réponse** et **Stop** (`J`, `Maj+J`, `S`) : le média est joué sur l'écran de jeu (les vidéos en plein écran). Comme dans l'émission, un buzz coupe le son ou la vidéo en cours ; changer de question ou de manche l'arrête aussi. Les fichiers sont stockés dans `MEDIA_DIR` et supprimés une fois qu'aucune question ne les utilise. L'export d'une partie ne contient que la référence des médias : réimportée sur un autre serveur, la partie perd ses sons et vidéos.
 
-Sur les téléphones, le buzzer vibre, empêche la mise en veille de l'écran et indique l'état de la partie (en attente, à vous, connexion perdue…).
+Sur les téléphones, le buzzer vibre, empêche la mise en veille de l'écran et indique l'état de la partie (en attente, à vous, la main passe à l'autre équipe, connexion perdue…).
 
-**NOTA**: Si vous êtes sous **Google Chrome** cliquer une première fois sur la fenêtre du jeu car vous aurez une erreur de type **'Uncaught (in promise) DOMException'** et l'animation ne se lancera pas.
+**NOTA** : sous **Google Chrome**, sans l'option `--autoplay-policy=no-user-gesture-required` (voir *Ecran de jeu sur une TV*), cliquez une première fois sur la fenêtre du jeu, sinon les vidéos et les sons ne se lancent pas.
 
 ## Développement
 

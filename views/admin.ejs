@@ -24,18 +24,37 @@
         <h3><span id="buzzer-status" class="badge badge-secondary p-2">Buzzer bloqué</span></h3>
         <span id="connection-status" class="badge badge-danger ml-2 align-self-start">Déconnecté…</span>
       </div>
+      <div class="row justify-content-center mt-1">
+        <small class="text-muted mr-2">Buzzers connectés :</small>
+        <span id="buzzers-ketchup" class="badge badge-pill badge-danger mr-1">Ketchup : 0</span>
+        <span id="buzzers-mayo" class="badge badge-pill badge-warning">Mayo : 0</span>
+      </div>
+      <div class="row justify-content-center mt-3">
+        <input class="btn btn-primary btn-lg mr-2" type="button" value="Démarrer la partie à l'écran" id="button-start-game" />
+      </div>
       <div class="row mt-4">
         <div class="col-lg-4 col-sm-6 text-center">
           <input id="button-add-point-ketchup" type="button" class="base-button button-ketchup" value="+" />
           <input id="button-remove-point-ketchup" type="button" class="base-button button-ketchup" value="-" />
         </div>
         <div class="col-lg-4 col-sm-4 text-center">
-          <input id="button-buzz-bad-response" type="button" class="base-button button-ketchup" value="X" />
+          <button id="button-good-answer" type="button" class="base-button button-good" title="Bonne réponse (Entrée)" disabled>&#10004;</button>
+          <input id="button-buzz-bad-response" type="button" class="base-button button-bad" value="X" title="Mauvaise réponse (X)" />
         </div>
         <div class="col-lg-4 col-sm-6 text-center">
           <input id="button-add-point-mayo" type="button" class="base-button button-mayo" value="+" />
           <input id="button-remove-point-mayo" type="button" class="base-button button-mayo" value="-" />
         </div>
+      </div>
+      <div class="row justify-content-center mt-2">
+        <small class="text-muted text-center" id="good-answer-help">&#10004; donne les points de la question à l'équipe qui a buzzé et révèle la réponse. X fait « pouet » et passe la main à l'autre équipe.</small>
+      </div>
+      <div class="row justify-content-center mt-3">
+        <button class="btn btn-outline-dark btn-lg" type="button" id="button-undo" disabled title="Annuler la dernière action (Z)">&#8630; Annuler</button>
+      </div>
+      <div class="row justify-content-center mt-4">
+        <input class="btn btn-success btn-lg mr-2" type="button" value="Débloquer buzzer" id="button-unlock-buzz" />
+        <input class="btn btn-secondary btn-lg" type="button" value="Bloquer buzzer" id="button-lock-buzz" />
       </div>
       <div class="row justify-content-center mt-4">
         <input class="btn btn-secondary btn-lg mr-2" type="button" value="Transition précédente" id="button-previous-transition" disabled />
@@ -43,6 +62,10 @@
       </div>
       <div class="row justify-content-center mt-2">
         <small id="transition-status" class="text-muted"></small>
+      </div>
+      <div class="alert alert-dark text-center mt-3 mb-0" id="death-burger-panel" hidden>
+        <strong>Burger de la mort</strong> : <span class="h4" id="death-burger-count">0 / 10</span>
+        <div class="small">&#10004; fait avancer le compteur, X le remet à zéro.</div>
       </div>
       <div class="card mt-4" id="question-panel">
         <div class="card-header d-flex flex-wrap align-items-center">
@@ -61,10 +84,14 @@
             </div>
           </div>
           <div id="question-content" hidden>
-            <small class="text-muted d-block" id="question-theme"></small>
-            <p class="h4" id="question-text"></p>
-            <ol type="A" class="h5 font-weight-normal" id="question-choices"></ol>
-            <p class="h5 text-success mb-0" id="question-answer"></p>
+            <div class="d-flex align-items-center">
+              <small class="text-muted d-block flex-grow-1" id="question-theme"></small>
+              <span class="badge badge-warning" id="question-points"></span>
+            </div>
+            <p class="admin-question-text" id="question-text"></p>
+            <ol type="A" class="h4 font-weight-normal" id="question-choices"></ol>
+            <p class="admin-question-answer text-success mb-0" id="question-answer"></p>
+            <div class="alert alert-info mt-3 mb-0" id="question-note" hidden></div>
             <div class="mt-3" id="media-controls" hidden>
               <button type="button" class="btn btn-outline-info mr-2 mb-1" id="button-play-question-media"></button>
               <button type="button" class="btn btn-outline-info mr-2 mb-1" id="button-play-answer-media"></button>
@@ -77,22 +104,49 @@
           </div>
         </div>
       </div>
+      <div class="card mt-4" id="timer-panel">
+        <div class="card-header"><strong>Chrono à l'écran</strong></div>
+        <div class="card-body">
+          <div class="d-flex flex-wrap align-items-center">
+            <span class="admin-timer mr-3" id="timer-display">--</span>
+            <div class="input-group input-group-sm w-auto mr-2 mb-1">
+              <input type="number" class="form-control" id="input-timer-seconds" min="1" max="600" value="30" aria-label="Durée du chrono" style="width: 5em" />
+              <div class="input-group-append"><span class="input-group-text">s</span></div>
+            </div>
+            <button type="button" class="btn btn-success mr-2 mb-1" id="button-timer-start">&#9654; Lancer</button>
+            <button type="button" class="btn btn-outline-secondary mb-1" id="button-timer-reset">Masquer</button>
+          </div>
+          <div class="form-inline mt-2">
+            <label class="mr-2" for="select-buzz-timer">Chrono de réponse après chaque buzz :</label>
+            <select class="form-control form-control-sm" id="select-buzz-timer">
+              <option value="0">Désactivé</option>
+              <option value="3">3 s</option>
+              <option value="5">5 s</option>
+              <option value="10">10 s</option>
+              <option value="15">15 s</option>
+            </select>
+          </div>
+        </div>
+      </div>
       <div class="row justify-content-center mt-4">
-        <input class="btn btn-success btn-lg mr-2" type="button" value="Débloquer buzzer" id="button-unlock-buzz" />
-        <input class="btn btn-secondary btn-lg" type="button" value="Bloquer buzzer" id="button-lock-buzz" />
+        <input class="btn btn-warning btn-lg" type="button" value="Afficher l'écran de victoire" id="button-toggle-victory" />
       </div>
       <div class="row justify-content-center mt-4">
         <input class="btn btn-success btn-lg" type="button" value="Recharger partie" data-toggle="modal" data-target="#modal-reload-part" />
       </div>
       <div class="row justify-content-center mt-4 d-none d-md-flex">
         <small class="text-muted text-center">
-          Raccourcis : <kbd>K</kbd> / <kbd>Maj+K</kbd> point Ketchup ±,
-          <kbd>M</kbd> / <kbd>Maj+M</kbd> point Mayo ±, <kbd>X</kbd> mauvaise réponse,
+          Raccourcis : <kbd>Entrée</kbd> bonne réponse, <kbd>X</kbd> mauvaise réponse,
+          <kbd>Z</kbd> / <kbd>Ctrl+Z</kbd> annuler,
+          <kbd>K</kbd> / <kbd>Maj+K</kbd> point Ketchup ±,
+          <kbd>M</kbd> / <kbd>Maj+M</kbd> point Mayo ±,
           <kbd>D</kbd> débloquer, <kbd>B</kbd> bloquer,
           <kbd>N</kbd> transition suivante, <kbd>P</kbd> précédente,
           <kbd>&rarr;</kbd> / <kbd>&larr;</kbd> question suivante / précédente,
           <kbd>E</kbd> afficher / masquer la question à l'écran, <kbd>R</kbd> révéler la réponse,
-          <kbd>J</kbd> / <kbd>Maj+J</kbd> jouer le son / la vidéo de la question / de la réponse, <kbd>S</kbd> l'arrêter
+          <kbd>J</kbd> / <kbd>Maj+J</kbd> jouer le son / la vidéo de la question / de la réponse, <kbd>S</kbd> l'arrêter,
+          <kbd>T</kbd> lancer / mettre en pause le chrono, <kbd>Maj+T</kbd> le masquer,
+          <kbd>V</kbd> écran de victoire, <kbd>G</kbd> démarrer la partie à l'écran
         </small>
       </div>
       <div class="row justify-content-center mt-2">

@@ -123,7 +123,9 @@ module.exports = function (app, passport, partyStore, mediaStore) {
           theme: question.theme,
           question: question.question,
           choices: question.choices,
-          answer: question.answer
+          answer: question.answer,
+          points: question.points || 1,
+          note: question.note || ''
         };
         // Seule la référence est exportée : le fichier reste sur ce serveur
         mediaFields.forEach(function (field) {

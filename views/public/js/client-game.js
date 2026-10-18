@@ -12,6 +12,7 @@ const $videoTransitionContainer = $('#video-transition-container');
 
 const $screenQuestion = $('#screen-question');
 const $screenQuestionRound = $('#screen-question-round');
+const $screenQuestionPoints = $('#screen-question-points');
 const $screenQuestionText = $('#screen-question-text');
 const $screenQuestionChoices = $('#screen-question-choices');
 const $screenQuestionAnswer = $('#screen-question-answer');
@@ -19,15 +20,46 @@ const $screenQuestionAnswer = $('#screen-question-answer');
 const $modalMedia = $('#modal-media');
 const videoMedia = document.getElementById('video-media');
 
-const $modalTeamMayo = $('#modal-buzz-first-mayo');
-const $modalTeamKetchup = $('#modal-buzz-first-ketchup');
+const $buzzFirst = $('#buzz-first');
+const $buzzFirstLogo = $('#buzz-first-logo');
+const $buzzFirstGap = $('#buzz-first-gap');
+
+const $screenTimer = $('#screen-timer');
+const $deathBurger = $('#death-burger');
+const $deathBurgerSteps = $('#death-burger-steps');
+const $deathBurgerTitle = $deathBurger.find('.death-burger-title');
+
+const $victory = $('#victory');
+const $victoryTitle = $('#victory-title');
+const $victoryLogo = $('#victory-logo');
+const $victoryScoreKetchup = $('#victory-score-ketchup');
+const $victoryScoreMayo = $('#victory-score-mayo');
+const $confetti = $('#confetti');
 
 let socket = null;
 /**
  * Variable permettant de savoir quel équipe
  * Aura buzz en première
  */
-var teamFirstBuzz = null;
+let buzzFirstTimeout = null;
+
+/**
+ * Points affichés par équipe (le burger se remplit étage par étage)
+ */
+const displayedPoints = { 'team-mayo': 0, 'team-ketchup': 0 };
+const pointsAnimations = {};
+const durationPointStep = 300;
+
+/**
+ * Chrono : décompte local à partir du temps restant envoyé par le serveur
+ */
+let timer = { visible: false, running: false, remaining: 0, endsAt: 0 };
+const timerHurryMs = 5000;
+
+/**
+ * Dernier compteur du Burger de la mort affiché
+ */
+let lastDeathCount = 0;
 
 /**
  * Indique si la transition est en cours
@@ -71,6 +103,17 @@ const baseDirVideos = './videos/';
  * Les Durées
  */
 const durationHiddenModalBuzzFirst = 4000;
+const durationHideCursor = 3000;
+const confettiCount = 150;
+
+const teamLogos = {
+    'team-mayo': './images/teams/mayo.svg',
+    'team-ketchup': './images/teams/ketchup.svg'
+};
+const teamLabels = {
+    'team-mayo': 'Mayo',
+    'team-ketchup': 'Ketchup'
+};
 
 // Noms des messages partagés avec le serveur (/js/messages-socket.js)
 const messages = BQ_MESSAGES;
@@ -216,24 +259,75 @@ const receiveBuzzAndInteractOnView = function (teamName) {
 }
 
 /**
- * Affiche une modal pour l'équipe qui aura
- * Buzz en première
- * @param {*} teamName Le nom de l'équipe pour qui on
- *  On souhaite afficher la modal
+ * Affiche en grand le logo de l'équipe qui a buzzé en premier
+ * @param {*} teamName Le nom de l'équipe
  */
 const pinupTeamBuzzFirstOnView = function (teamName) {
-    if (teamFirstBuzz)
-        return;
-    teamFirstBuzz = teamName;
-    // Récupére la modal à afficher par rapport à l'équipe
-    let modal = teamName === mayo ? $modalTeamMayo : $modalTeamKetchup;
-    modal.show();
-    // On fait disparaitre la modal au bout
-    // D'une certaine durée
-    setTimeout(function () {
-        modal.hide();
-        teamFirstBuzz = null;
+    clearTimeout(buzzFirstTimeout);
+    $buzzFirstLogo.attr('src', teamLogos[teamName]).attr('alt', teamLabels[teamName]);
+    // Relance l'animation d'apparition
+    $buzzFirst.prop('hidden', true);
+    void $buzzFirst.get(0).offsetWidth;
+    $buzzFirst.prop('hidden', false);
+    buzzFirstTimeout = setTimeout(function () {
+        $buzzFirst.prop('hidden', true);
     }, durationHiddenModalBuzzFirst);
+}
+
+/**
+ * Ecart entre le buzz de l'équipe gagnante et celui de l'autre équipe
+ * @param {*} teamName L'équipe ayant buzzé trop tard
+ * @param {*} gap L'écart en ms
+ */
+const displayBuzzGap = function (teamName, gap) {
+    const seconds = (gap / 1000).toFixed(2).replace('.', ',');
+    $buzzFirstGap.text(teamLabels[teamName] + ' : ' + seconds + ' s trop tard !');
+}
+
+/**
+ * Anime l'élément du burger correspondant au point gagné
+ */
+const popBurgerElement = function (team, points) {
+    const collection = team === mayo ? componentsMayo : componentsKetchup;
+    collection.forEach(function (element) {
+        if (Number(element.getAttribute('data-points')) === points && element.animate)
+            element.animate([
+                { transform: 'scale(1)' },
+                { transform: 'scale(1.25)' },
+                { transform: 'scale(1)' }
+            ], { duration: 350, easing: 'ease-out' });
+    });
+}
+
+/**
+ * Affiche directement les points d'une équipe
+ */
+const showPoints = function (team, points) {
+    clearInterval(pointsAnimations[team]);
+    displayedPoints[team] = points;
+    attributePointsAtTeam(team, points);
+}
+
+/**
+ * Le burger se remplit étage par étage jusqu'aux nouveaux points
+ */
+const animatePoints = function (team, points) {
+    clearInterval(pointsAnimations[team]);
+    if (points <= displayedPoints[team]) {
+        showPoints(team, points);
+        return;
+    }
+    const step = function () {
+        const next = displayedPoints[team] + 1;
+        displayedPoints[team] = next;
+        attributePointsAtTeam(team, next);
+        popBurgerElement(team, next);
+        if (next >= points)
+            clearInterval(pointsAnimations[team]);
+    }
+    step();
+    if (displayedPoints[team] < points)
+        pointsAnimations[team] = setInterval(step, durationPointStep);
 }
 
 /**
@@ -244,6 +338,7 @@ const showMainBackgroundAndHideTransition = function () {
     $mainBackground.show();
     $modalTransition.hide();
     isTransitionRunning = false;
+    $('body').removeClass('transition-running');
 }
 
 /**
@@ -254,6 +349,7 @@ const receiveOrderForTransition = function (transitionName) {
     $mainBackground.hide();
     $modalTransition.show();
     isTransitionRunning = true;
+    $('body').addClass('transition-running');
     $sourceTransition.attr('src', baseDirVideos + transitionName);
     const video = $videoTransitionContainer.get(0);
     video.load();
@@ -341,7 +437,7 @@ const playMedia = function (media) {
 }
 
 /**
- * Affiche la question en cours (Nuggets, menus) ou la masque
+ * Affiche la question en cours (Nuggets, menus, propositions de Sel ou Poivre) ou la masque
  * @param {*} question { round, theme, question, choices, answer } (answer seulement une fois révélée), null pour masquer
  */
 const displayScreenQuestion = function (question) {
@@ -350,6 +446,7 @@ const displayScreenQuestion = function (question) {
         return;
     $screenQuestionRound.text(question.theme ? question.round + ' — ' + question.theme : question.round);
     $screenQuestionText.text(question.question);
+    $screenQuestionPoints.prop('hidden', !(question.points > 1)).text(question.points + ' miams');
 
     const revealed = question.answer !== null && question.answer !== '';
     const normalize = function (text) { return text.trim().toLowerCase(); };
@@ -369,33 +466,158 @@ const displayScreenQuestion = function (question) {
 }
 
 /**
+ * Chrono à l'écran
+ * @param {*} state { visible, running, duration, remaining }
+ */
+const displayTimer = function (state) {
+    timer = {
+        visible: state.visible,
+        running: state.running,
+        remaining: state.remaining,
+        endsAt: Date.now() + state.remaining
+    };
+    renderTimer();
+}
+
+const renderTimer = function () {
+    $screenTimer.prop('hidden', !timer.visible);
+    if (!timer.visible)
+        return;
+    const remaining = timer.running ? Math.max(timer.endsAt - Date.now(), 0) : timer.remaining;
+    $screenTimer.text(Math.ceil(remaining / 1000))
+        .toggleClass('paused', !timer.running && remaining > 0)
+        .toggleClass('hurry', timer.running && remaining <= timerHurryMs)
+        .toggleClass('ended', remaining <= 0);
+}
+
+/**
+ * Compteur du Burger de la mort
+ * @param {*} state { active, count, total }
+ */
+const displayDeathBurger = function (state) {
+    $deathBurger.prop('hidden', !state.active);
+    if ($deathBurgerSteps.children().length !== state.total) {
+        $deathBurgerSteps.empty();
+        for (let index = 1; index <= state.total; index++)
+            $deathBurgerSteps.append($('<div class="death-burger-step"></div>').text(index));
+    }
+    $deathBurgerSteps.children().each(function (index) {
+        $(this).toggleClass('done', index < state.count);
+    });
+    const won = state.count >= state.total;
+    $deathBurger.toggleClass('won', won);
+    $deathBurgerTitle.text(won ? 'Burger de la mort gagné !' : 'Burger de la mort');
+    // Erreur : le compteur repart à zéro en tremblant
+    if (state.active && state.count === 0 && lastDeathCount > 0) {
+        $deathBurger.removeClass('reset');
+        void $deathBurger.get(0).offsetWidth;
+        $deathBurger.addClass('reset');
+    }
+    lastDeathCount = state.count;
+}
+
+/**
+ * Pluie de confettis aux couleurs du jeu
+ */
+const launchConfetti = function () {
+    const colors = [ketchupColor, mayoColor, '#ffffff', '#1E8F3A', '#B2733F'];
+    $confetti.empty();
+    for (let index = 0; index < confettiCount; index++) {
+        $confetti.append($('<div class="confetti-piece"></div>').css({
+            left: (Math.random() * 100) + 'vw',
+            background: colors[index % colors.length],
+            animationDuration: (2.5 + Math.random() * 3) + 's',
+            animationDelay: (-Math.random() * 5) + 's'
+        }));
+    }
+}
+
+/**
+ * Ecran de victoire
+ * @param {*} state { visible, winner, mayo, ketchup }
+ */
+const displayVictory = function (state) {
+    const wasVisible = !$victory.prop('hidden');
+    $victory.prop('hidden', !state.visible);
+    if (!state.visible) {
+        $confetti.empty();
+        return;
+    }
+    $victoryTitle.text(state.winner ? "Victoire de l'équipe " + teamLabels[state.winner] + ' !' : 'Égalité !');
+    $victoryLogo.prop('hidden', !state.winner);
+    if (state.winner)
+        $victoryLogo.attr('src', teamLogos[state.winner]).attr('alt', teamLabels[state.winner]);
+    $victoryScoreKetchup.text(state.ketchup);
+    $victoryScoreMayo.text(state.mayo);
+    if (!wasVisible)
+        launchConfetti();
+}
+
+/**
+ * Plein écran (nécessite une action sur la page : clic, touche)
+ */
+const toggleFullscreen = function () {
+    const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+    const el = document.documentElement;
+    const method = isFullscreen
+        ? document.exitFullscreen || document.webkitExitFullscreen
+        : el.requestFullscreen || el.webkitRequestFullScreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+    // Non supporté sur certains navigateurs (ex : Safari iOS)
+    if (!method)
+        return;
+    const promise = method.call(isFullscreen ? document : el);
+    if (promise)
+        promise.catch(function (error) {
+            console.log('Plein écran impossible : ' + error);
+        });
+}
+
+/**
+ * Mode TV : curseur masqué quand la souris ne bouge plus,
+ * plein écran avec la touche F ou un double-clic
+ */
+const initTvMode = function () {
+    let cursorTimeout = null;
+    const $body = $('body');
+    const showCursor = function () {
+        $body.removeClass('hide-cursor');
+        clearTimeout(cursorTimeout);
+        cursorTimeout = setTimeout(function () { $body.addClass('hide-cursor'); }, durationHideCursor);
+    }
+    $(document).on('mousemove', showCursor);
+    showCursor();
+    $(document).on('dblclick', toggleFullscreen);
+    $(document).on('keydown', function (event) {
+        if (event.key.toLowerCase() === 'f' && !event.ctrlKey && !event.metaKey && !event.altKey)
+            toggleFullscreen();
+    });
+    setInterval(renderTimer, 200);
+}
+
+/**
  * Se charge d'initialiser la modal de préparation (QR code d'accès au choix des équipes)
  */
 const initPrepareGame = function () {
-    const modalPrepareGame = $('#modal-prepare-game');
     const btnEveryBodyReady = $('#button-everybody-ready');
-
-    // Se charge de fermer la modal de Qr Code
-    const closeModal = function () {
-        modalPrepareGame.fadeOut('slow', function () {
-            modalPrepareGame.remove();
-
-            // Passage en plein écran
-            const el = document.documentElement;
-            const rfs = el.requestFullscreen || el.webkitRequestFullScreen || el.mozRequestFullScreen || el.msRequestFullscreen;
-            // Non supporté sur certains navigateurs (ex : Safari iOS)
-            if (!rfs)
-                return;
-            const promise = rfs.call(el);
-            if (promise)
-                promise.catch(function (error) {
-                    console.log('Plein écran impossible : ' + error);
-                });
-        })
-    }
-
     // Le QR code est généré côté serveur, il n'y a plus qu'à fermer la modal
-    btnEveryBodyReady.on('click', closeModal);
+    btnEveryBodyReady.on('click', function () {
+        closePrepareGame(true);
+    });
+}
+
+/**
+ * Ferme la modal de préparation (bouton « Tout le monde est prêt ! » ou télécommande)
+ * @param {*} fullscreen Passe en plein écran (seulement possible après un clic sur l'écran)
+ */
+const closePrepareGame = function (fullscreen) {
+    const modalPrepareGame = $('#modal-prepare-game');
+    if (!modalPrepareGame.length)
+        return;
+    modalPrepareGame.fadeOut('slow', function () {
+        modalPrepareGame.remove();
+        if (fullscreen && !document.fullscreenElement)
+            toggleFullscreen();
+    });
 }
 
 /**
@@ -407,20 +629,20 @@ const initSocketAndListenEvents = function () {
      * Points pour l'équipe mayo
      */
     socket.on(messages.messageToClientMayo, function (points) {
-        attributePointsAtTeam(mayo, points);
+        animatePoints(mayo, points);
     });
     /**
      * Points pour l'équipe ketchup
      */
     socket.on(messages.messageToClientKetchup, function (points) {
-        attributePointsAtTeam(ketchup, points);
+        animatePoints(ketchup, points);
     });
     /**
      * Rechargement de la partie
      */
     socket.on(messages.messageToClientReloadPart, function () {
-        attributePointsAtTeam(mayo, 0);
-        attributePointsAtTeam(ketchup, 0);
+        showPoints(mayo, 0);
+        showPoints(ketchup, 0);
         stopTransitionNow();
         stopMedia();
     });
@@ -428,14 +650,26 @@ const initSocketAndListenEvents = function () {
      * Reception des points des différents équipes
      */
     socket.on(messages.messageToClientReceivePoints, function (pointsMayo, pointsKetchup) {
-        attributePointsAtTeam(mayo, pointsMayo);
-        attributePointsAtTeam(ketchup, pointsKetchup);
+        showPoints(mayo, pointsMayo);
+        showPoints(ketchup, pointsKetchup);
     });
     /**
      * Réception de l'évènement du buzzer
      */
     socket.on(messages.messageToClientReceiveBuzz, function (teamName) {
+        $buzzFirstGap.text('');
         receiveBuzzAndInteractOnView(teamName);
+    });
+    socket.on(messages.messageToClientReceiveBuzzGap, displayBuzzGap);
+    /**
+     * Chrono, Burger de la mort, écran de victoire, lancement depuis la télécommande
+     */
+    socket.on(messages.messageToClientReceiveTimer, displayTimer);
+    socket.on(messages.messageToClientTimerEnded, launchBuzzSound);
+    socket.on(messages.messageToClientReceiveDeathBurger, displayDeathBurger);
+    socket.on(messages.messageToClientReceiveVictory, displayVictory);
+    socket.on(messages.messageToClientStartGame, function () {
+        closePrepareGame(false);
     });
     /**
      * Affiche la prochaine transition
@@ -462,6 +696,7 @@ const initSocketAndListenEvents = function () {
     socket.on('connect', function () {
         socket.emit(messages.messageClientsNeedPointsInformations);
         socket.emit(messages.messageClientNeedScreenQuestion);
+        socket.emit(messages.messageClientNeedStateGame);
     });
 }
 
@@ -470,3 +705,5 @@ registerComponents();
 initSocketAndListenEvents();
 
 initPrepareGame();
+
+initTvMode();

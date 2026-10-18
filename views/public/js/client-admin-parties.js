@@ -20,6 +20,8 @@ const $inputQuestionRound = $('#input-question-round');
 const $inputQuestionTheme = $('#input-question-theme');
 const $inputQuestionText = $('#input-question-text');
 const $inputQuestionAnswer = $('#input-question-answer');
+const $inputQuestionPoints = $('#input-question-points');
+const $inputQuestionNote = $('#input-question-note');
 const $questionChoices = $('#question-choices');
 const $inputsChoice = $questionChoices.find('[data-choice]');
 const $radiosGoodChoice = $questionChoices.find('[name=question-good-choice]');
@@ -167,7 +169,9 @@ const renderQuestionList = function () {
         const $content = $('<div class="flex-grow-1 mr-3"></div>');
         if (question.theme)
             $content.append($('<small class="text-muted d-block"></small>').text(question.theme));
-        $content.append($('<div class="font-weight-bold"></div>').text((index + 1) + '. ' + question.question));
+        const points = question.points || 1;
+        $content.append($('<div class="font-weight-bold"></div>').text((index + 1) + '. ' + question.question)
+            .append(points > 1 ? $('<span class="badge badge-warning ml-2"></span>').text(points + ' miams') : null));
         if (question.choices && question.choices.length) {
             const $choices = $('<ol type="A" class="mb-0 pl-4 small"></ol>');
             question.choices.forEach(function (choice) {
@@ -180,6 +184,8 @@ const renderQuestionList = function () {
         $content.append($('<div class="text-success"></div>').text(question.answer ? 'Réponse : ' + question.answer : ''));
         if (question.answerMedia)
             $content.append($('<div class="small text-info"></div>').text('Réponse — ' + mediaLabel(question.answerMedia)));
+        if (question.note)
+            $content.append($('<div class="small text-muted font-italic"></div>').text('Note : ' + question.note));
 
         const $actions = $('<div class="btn-group btn-group-sm align-self-start"></div>')
             .append($('<button type="button" class="btn btn-outline-secondary" data-action="up" title="Monter">&uarr;</button>').prop('disabled', index === 0))
@@ -238,6 +244,8 @@ const openQuestionModal = function (question) {
     $inputQuestionTheme.val(question ? question.theme : '');
     $inputQuestionText.val(question ? question.question : '');
     $inputQuestionAnswer.val(question ? question.answer : '');
+    $inputQuestionPoints.val(question && question.points ? question.points : 1);
+    $inputQuestionNote.val(question && question.note ? question.note : '');
     const choices = question && question.choices ? question.choices : [];
     $inputsChoice.each(function (index) {
         $(this).val(choices[index] || '');
@@ -344,6 +352,8 @@ const initEvents = function () {
             question: $inputQuestionText.val(),
             choices: $inputsChoice.map(function () { return $(this).val(); }).get(),
             answer: $inputQuestionAnswer.val(),
+            points: Number($inputQuestionPoints.val()),
+            note: $inputQuestionNote.val(),
             questionMedia: editedMedia.questionMedia,
             answerMedia: editedMedia.answerMedia
         };

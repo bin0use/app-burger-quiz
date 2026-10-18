@@ -107,3 +107,17 @@ test('sons et vidéos des questions', function () {
     store.updateQuestion(party.id, question.id, { round: 'menus', question: 'Q' });
     assert.strictEqual(store.usedMedia().size, 0);
 });
+
+test("questions : barème et note de l'animateur", function () {
+    const store = createPartyStore(null);
+    const party = store.create('Partie');
+    const simple = store.addQuestion(party.id, { round: 'menus', question: 'Q' });
+    assert.strictEqual(simple.points, 1);
+    assert.strictEqual(simple.note, '');
+    const scored = store.addQuestion(party.id, { round: 'addition', question: 'Q', points: '3', note: '  Blague  ' });
+    assert.strictEqual(scored.points, 3);
+    assert.strictEqual(scored.note, 'Blague');
+    assert.throws(function () { store.addQuestion(party.id, { round: 'menus', question: 'Q', points: 0 }); }, ValidationError);
+    assert.throws(function () { store.addQuestion(party.id, { round: 'menus', question: 'Q', points: 11 }); }, ValidationError);
+    assert.throws(function () { store.addQuestion(party.id, { round: 'menus', question: 'Q', points: 1.5 }); }, ValidationError);
+});
