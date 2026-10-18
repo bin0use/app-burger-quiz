@@ -26,30 +26,6 @@ body {
     display: none;
 }
 
-#modal-buzz-first-ketchup {
-    position:absolute;
-    z-index:99;
-    top:25px;
-    left: 25px;
-    display: none;
-}
-
-#modal-buzz-first-mayo {
-    position:absolute;
-    z-index:99;
-    top:60%;
-    left: 25px;
-    display: none ;
-}
-
-#modal-buzz-first-mayo > input[type="image"] {
-    height: 150px;
-}
-
-#modal-buzz-first-ketchup > input[type="image"] {
-    height: 150px;
-}
-
 .point-ketchup {
     background: #C71000;
     width: 140px;
@@ -175,4 +151,71 @@ body.admin-page {
     height: auto;
     min-height: 100%;
     overflow: auto;
+}
+
+/* L'équipe a buzzé en premier : tout l'écran du téléphone prend sa couleur */
+body.buzzed-first {
+    transition: background-color 0.2s;
+}
+
+/* !important : le fond noir de la page est lui-même en !important */
+body.buzzed-first.team-ketchup {
+    background: #C71000 !important;
+}
+
+body.buzzed-first.team-mayo {
+    background: #E0C800 !important;
+}
+
+body.buzzed-first .buzzer-message {
+    color: #fff;
+    font-size: 3.5rem;
+    font-weight: 700;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+body.buzzed-first .container-buzzer .lock-buzz-button {
+    opacity: 1;
+    filter: none;
+    background-color: transparent;
+}
+
+/* Télécommande : bonne / mauvaise réponse */
+.button-good {
+    background: #1E8F3A;
+    font-size: 64px;
+    line-height: 1;
+    vertical-align: top;
+}
+.button-good:active {
+    background: #17702D;
+}
+.button-good:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.button-bad {
+    background: #444;
+}
+.button-bad:active {
+    background: #222;
+}
+
+/* Télécommande : question et réponse lisibles de loin */
+.admin-question-text {
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.admin-question-answer {
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+.admin-timer {
+    font-family: 'Cabin Sketch', cursive;
+    font-size: 2.5rem;
+    min-width: 3.5em;
 }

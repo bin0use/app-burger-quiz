@@ -1,15 +1,21 @@
 const Transition = require('./transition');
 
 /**
+ * Clé de la manche du Burger de la mort (compteur de 10 bonnes réponses d'affilée)
+ */
+const deathBurgerRound = 'burger-de-la-mort';
+
+/**
  * Liste des transitions (une par manche) dans l'ordre de la partie
- * Comme dans l'émission, les questions des Nuggets et des menus s'affichent à l'écran
+ * Comme dans l'émission, les questions des Nuggets et des menus s'affichent à l'écran,
+ * et pour Sel ou Poivre seulement le thème et les propositions
  */
 const transitionsList = [
-    new Transition('nuggets-transition.mp4', 'Nuggets', 1, 'nuggets', true),
-    new Transition('selt-pepper-transition.mp4', 'Sel ou Poivre', 2, 'sel-ou-poivre'),
-    new Transition('menus-transition.mp4', 'Les menus', 3, 'menus', true),
-    new Transition('addition-transition.mp4', "L'addition", 4, 'addition'),
-    new Transition('death-burger-transition.mp4', 'Burger de la mort', 5, 'burger-de-la-mort'),
+    new Transition('nuggets-transition.mp4', 'Nuggets', 1, 'nuggets', { screenMode: 'question' }),
+    new Transition('selt-pepper-transition.mp4', 'Sel ou Poivre', 2, 'sel-ou-poivre', { screenMode: 'choices' }),
+    new Transition('menus-transition.mp4', 'Les menus', 3, 'menus', { screenMode: 'question' }),
+    new Transition('addition-transition.mp4', "L'addition", 4, 'addition', { timerSeconds: 60 }),
+    new Transition('death-burger-transition.mp4', 'Burger de la mort', 5, deathBurgerRound),
 ].sort(function (a, b) {
     return a.order - b.order;
 });
@@ -18,7 +24,7 @@ const transitionsList = [
  * Manches disponibles pour les questions : [{ key, label }]
  */
 const rounds = transitionsList.map(function (transition) {
-    return { key: transition.round, label: transition.label, questionsOnScreen: transition.questionsOnScreen };
+    return { key: transition.round, label: transition.label, screenMode: transition.screenMode };
 });
 
 /**
@@ -28,4 +34,4 @@ const isValidRound = function (key) {
     return rounds.some(function (round) { return round.key === key; });
 }
 
-module.exports = { transitionsList, rounds, isValidRound };
+module.exports = { transitionsList, rounds, isValidRound, deathBurgerRound };

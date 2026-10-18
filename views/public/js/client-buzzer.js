@@ -11,6 +11,7 @@ const messages = BQ_MESSAGES;
  * Les styles css
  */
 const lockBuzzerStyle = 'lock-buzz-button';
+const buzzedFirstStyle = 'buzzed-first';
 
 const teamLabels = {
     'team-mayo': 'Mayo',
@@ -25,6 +26,13 @@ const teamName = $inputHiddenTeam.val();
 let isLocked = true;
 
 /**
+ * L'autre équipe vient de buzzer : un appui est encore envoyé au serveur
+ * Pendant un court instant pour afficher l'écart à l'écran (sans prendre la main)
+ */
+let lateBuzzUntil = 0;
+const lateBuzzWindow = 2000;
+
+/**
  * Fait vibrer le téléphone si possible
  * @param {*} pattern durée(s) de vibration en ms
  */
@@ -37,23 +45,36 @@ const vibrate = function (pattern) {
  * Met à jour l'affichage du buzzer
  * @param {*} locked Indique si le buzzer est bloqué
  * @param {*} message Le message à afficher sous le buzzer
+ * @param {*} buzzedFirst Indique si notre équipe a buzzé en premier (écran aux couleurs de l'équipe)
  */
-const displayState = function (locked, message) {
+const displayState = function (locked, message, buzzedFirst) {
     isLocked = locked;
     $buzzButton.toggleClass(lockBuzzerStyle, locked);
     $buzzerMessage.text(message);
+    $('body').toggleClass(buzzedFirstStyle, !!buzzedFirst);
 }
 
 /**
- * Message à afficher suivant l'équipe ayant buzzé
+ * Affiche l'état du buzzer envoyé par le serveur
+ * @param {*} locked Les buzzers sont bloqués
  * @param {*} buzzTeam L'équipe ayant buzzé (ou null)
+ * @param {*} lockedOutTeams Les équipes s'étant trompées (elles ont perdu la main)
  */
-const messageForBuzz = function (buzzTeam) {
-    if (!buzzTeam)
-        return 'En attente…';
+const displayServerState = function (locked, buzzTeam, lockedOutTeams) {
+    lockedOutTeams = lockedOutTeams || [];
+    const lockedOut = lockedOutTeams.indexOf(teamName) !== -1;
     if (buzzTeam === teamName)
-        return 'Vous avez buzzé !';
-    return teamLabels[buzzTeam] + ' a buzzé';
+        displayState(true, 'À vous !', true);
+    else if (buzzTeam)
+        displayState(true, teamLabels[buzzTeam] + ' a buzzé');
+    else if (!locked && lockedOut)
+        displayState(true, "Raté… la main passe à l'autre équipe");
+    else if (!locked && lockedOutTeams.length)
+        displayState(false, 'À vous la main ! Buzzez !');
+    else if (!locked)
+        displayState(false, 'Buzzez !');
+    else
+        displayState(true, 'En attente…');
 }
 
 /**
@@ -81,8 +102,14 @@ const keepScreenAwake = function () {
 const initEvents = function () {
     $buzzButton.on('click', function () {
         // Si le bouton est bloqué on emet rien
-        if (isLocked)
+        // Sauf juste après le buzz de l'autre équipe : le serveur mesure l'écart
+        if (isLocked) {
+            if (Date.now() < lateBuzzUntil) {
+                lateBuzzUntil = 0;
+                socket.emit(messages.messageClientSendBuzz, teamName);
+            }
             return;
+        }
         vibrate(50);
         socket.emit(messages.messageClientSendBuzz, teamName);
     });
@@ -93,31 +120,18 @@ const initEvents = function () {
  */
 const initSocketAndListenEvents = function () {
     socket = io();
-    socket.on(messages.messageToClientReceiveStateBuzzer, function (buzzerIsLocked, buzzTeam) {
-        if (buzzerIsLocked)
-            displayState(true, messageForBuzz(buzzTeam));
-        else
-            displayState(false, 'Buzzez !');
-    });
     /**
-     * Bloquer le buzzer
+     * Etat du buzzer (envoyé à chaque changement)
      */
-    socket.on(messages.messageToClientLockBuzz, function () {
-        displayState(true, 'En attente…');
-    });
-    /**
-     * Débloquer le buzzer
-     */
-    socket.on(messages.messageToClientUnLockBuzz, function () {
-        displayState(false, 'Buzzez !');
-    });
+    socket.on(messages.messageToClientReceiveStateBuzzer, displayServerState);
     /**
      * Une équipe a buzzé
      */
     socket.on(messages.messageToClientReceiveBuzz, function (buzzTeam) {
-        displayState(true, messageForBuzz(buzzTeam));
         if (buzzTeam === teamName)
             vibrate([100, 50, 100]);
+        else
+            lateBuzzUntil = Date.now() + lateBuzzWindow;
     });
     /**
      * Connexion perdue : on bloque le buzzer en attendant la reconnexion
@@ -130,6 +144,7 @@ const initSocketAndListenEvents = function () {
      * Dès que l'on se connecte (ou se reconnecte) sur la page
      */
     socket.on('connect', function () {
+        socket.emit(messages.messageClientRegisterBuzzer, teamName);
         socket.emit(messages.messageClientNeedStateBuzzer);
     });
 }

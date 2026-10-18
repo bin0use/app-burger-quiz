@@ -90,12 +90,12 @@
             <label for="input-question-round">Manche</label>
             <select class="form-control" id="input-question-round" required>
               <% rounds.forEach(function (round) { %>
-              <option value="<%= round.key %>"><%= round.label %><%= round.questionsOnScreen ? ' (affichée à l\'écran)' : '' %></option>
+              <option value="<%= round.key %>"><%= round.label %><%= round.screenMode === 'question' ? ' (affichée à l\'écran)' : round.screenMode === 'choices' ? ' (thème et propositions affichés à l\'écran)' : '' %></option>
               <% }) %>
             </select>
           </div>
           <div class="form-group">
-            <label for="input-question-theme">Thème <small class="text-muted">(optionnel : nom du menu, propositions sel / poivre…)</small></label>
+            <label for="input-question-theme">Thème <small class="text-muted">(optionnel : nom du menu, « Johnny, Eddy ou les deux ? »…)</small></label>
             <input type="text" class="form-control" id="input-question-theme" maxlength="<%= limits.theme %>" />
           </div>
           <div class="form-group">
@@ -114,7 +114,7 @@
             </div>
           </div>
           <div class="form-group" id="question-choices">
-            <label>Propositions <small class="text-muted">(optionnel, affichées à l'écran : cochez la bonne réponse)</small></label>
+            <label>Propositions <small class="text-muted">(optionnel, affichées à l'écran pour les Nuggets, Sel ou Poivre et les menus : cochez la bonne réponse)</small></label>
             <% for (let index = 0; index < limits.choices; index++) { %>
             <div class="input-group mb-1">
               <div class="input-group-prepend">
@@ -131,7 +131,7 @@
             <label for="input-question-answer">Réponse</label>
             <textarea class="form-control" id="input-question-answer" rows="2" maxlength="<%= limits.answer %>"></textarea>
           </div>
-          <div class="form-group mb-0" data-media="answerMedia">
+          <div class="form-group" data-media="answerMedia">
             <label>Son ou vidéo de la réponse <small class="text-muted">(optionnel, joué sur l'écran de jeu depuis la télécommande)</small></label>
             <div class="mb-2" data-media-preview></div>
             <div class="d-flex flex-wrap align-items-center">
@@ -140,6 +140,21 @@
               </label>
               <button type="button" class="btn btn-sm btn-outline-danger mr-2" data-media-remove hidden>Retirer</button>
               <small class="text-muted" data-media-status></small>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-sm-3 mb-0">
+              <label for="input-question-points">Points <small class="text-muted">(miams)</small></label>
+              <select class="form-control" id="input-question-points">
+                <% for (let points = 1; points <= limits.points; points++) { %>
+                <option value="<%= points %>"><%= points %></option>
+                <% } %>
+              </select>
+            </div>
+            <div class="form-group col-sm-9 mb-0">
+              <label for="input-question-note">Note de l'animateur <small class="text-muted">(optionnel, visible seulement sur la télécommande)</small></label>
+              <textarea class="form-control" id="input-question-note" rows="2" maxlength="<%= limits.note %>"
+                placeholder="Une blague, une précision, une anecdote…"></textarea>
             </div>
           </div>
         </div>

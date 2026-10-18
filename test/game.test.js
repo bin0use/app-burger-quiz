@@ -3,88 +3,8 @@ const assert = require('node:assert');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const ioClient = require('socket.io-client');
-const { createServer } = require('../app/create-server');
 const messages = require('../config/messages-socket');
-
-/**
- * Démarre un serveur sur un port libre
- */
-const startServer = async function (stateFile) {
-    const server = createServer({ stateFile: stateFile });
-    await new Promise(function (resolve) {
-        server.httpServer.listen(0, resolve);
-    });
-    const baseUrl = 'http://localhost:' + server.httpServer.address().port;
-    const clients = [];
-    return {
-        baseUrl,
-        connect: async function (cookie) {
-            const client = ioClient(baseUrl, {
-                extraHeaders: cookie ? { Cookie: cookie } : {},
-                forceNew: true
-            });
-            clients.push(client);
-            await new Promise(function (resolve) {
-                client.on('connect', resolve);
-            });
-            return client;
-        },
-        close: async function () {
-            clients.forEach(function (client) { client.close(); });
-            server.io.close();
-            await new Promise(function (resolve) {
-                server.httpServer.close(resolve);
-            });
-        }
-    };
-}
-
-/**
- * Se connecte en admin et renvoie le cookie de session
- */
-const loginAdmin = async function (baseUrl, password) {
-    const response = await fetch(baseUrl + '/login', {
-        method: 'POST',
-        redirect: 'manual',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'username=admin&password=' + encodeURIComponent(password || 'burger2018')
-    });
-    return {
-        location: response.headers.get('location'),
-        cookie: (response.headers.get('set-cookie') || '').split(';')[0]
-    };
-}
-
-/**
- * Attend un message sur une socket
- */
-const waitFor = function (client, message) {
-    return new Promise(function (resolve) {
-        client.once(message, function () {
-            resolve(Array.from(arguments));
-        });
-    });
-}
-
-/**
- * Attend un message sur une socket dont le premier argument vérifie le prédicat
- */
-const waitForMatch = function (client, message, predicate) {
-    return new Promise(function (resolve) {
-        const listener = function (value) {
-            if (!predicate(value))
-                return;
-            client.off(message, listener);
-            resolve(value);
-        };
-        client.on(message, listener);
-    });
-}
-
-const pause = function (ms) {
-    return new Promise(function (resolve) { setTimeout(resolve, ms); });
-}
+const { startServer, loginAdmin, waitFor, waitForMatch, pause } = require('./helpers');
 
 test('routes http', async function (t) {
     const server = await startServer(null);
@@ -168,7 +88,7 @@ test('routes http', async function (t) {
         const exported = await (await get('/admin/api/parties/' + party.id + '/export', cookie)).json();
         assert.deepStrictEqual(exported, {
             name: 'Soirée 2',
-            questions: [{ round: 'nuggets', theme: '', question: 'Q1 bis', choices: [], answer: 'R' }]
+            questions: [{ round: 'nuggets', theme: '', question: 'Q1 bis', choices: [], answer: 'R', points: 1, note: '' }]
         });
         const imported = (await call('POST', '/import', exported)).body;
         assert.notStrictEqual(imported.id, party.id);
@@ -197,7 +117,7 @@ test('déroulement du jeu', async function (t) {
         await pause(200);
         assert.strictEqual(received, false);
         player.emit(messages.messageClientNeedStateBuzzer);
-        assert.deepStrictEqual(await waitFor(player, messages.messageToClientReceiveStateBuzzer), [true, null]);
+        assert.deepStrictEqual(await waitFor(player, messages.messageToClientReceiveStateBuzzer), [true, null, []]);
     });
 
     await t.test("l'admin modifie les points", async function () {
@@ -220,7 +140,7 @@ test('déroulement du jeu', async function (t) {
         assert.deepStrictEqual(buzzes, ['team-ketchup']);
 
         admin.emit(messages.messageClientNeedStateBuzzer);
-        assert.deepStrictEqual(await waitFor(admin, messages.messageToClientReceiveStateBuzzer), [true, 'team-ketchup']);
+        assert.deepStrictEqual(await waitFor(admin, messages.messageToClientReceiveStateBuzzer), [true, 'team-ketchup', []]);
     });
 
     await t.test('transitions suivante et précédente', async function () {
@@ -294,7 +214,7 @@ test('questions sur la télécommande', async function (t) {
     // Nuggets : la question et les propositions s'affichent à l'écran, sans la réponse
     player.emit(messages.messageClientNeedScreenQuestion);
     assert.deepStrictEqual(await waitFor(player, messages.messageToClientReceiveScreenQuestion), [{
-        round: 'Nuggets', theme: '', question: 'N1', choices: ['R1', 'Faux'], answer: null
+        round: 'Nuggets', theme: '', question: 'N1', choices: ['R1', 'Faux'], points: 1, answer: null
     }]);
     let screen = waitForMatch(player, messages.messageToClientReceiveScreenQuestion, function (value) {
         return value && value.answer;
@@ -319,14 +239,15 @@ test('questions sur la télécommande', async function (t) {
     assert.strictEqual((await screen)[0].question, 'N2');
     assert.strictEqual((await screen)[0].answer, null);
 
-    // Nouvelle manche : retour à la première question, Sel ou Poivre n'est pas affiché à l'écran
+    // Nouvelle manche : retour à la première question
+    // Sel ou Poivre n'affiche que le thème et les propositions : rien ici (S1 n'en a pas)
     state = waitFor(admin, messages.messageToClientReceiveStateQuestion);
     screen = waitFor(player, messages.messageToClientReceiveScreenQuestion);
     admin.emit(messages.messageNextTransition);
     current = (await state)[0];
     assert.strictEqual(current.round, 'Sel ou Poivre');
     assert.strictEqual(current.question.question, 'S1');
-    assert.strictEqual(current.questionsOnScreen, false);
+    assert.strictEqual(current.screenMode, 'choices');
     assert.deepStrictEqual(await screen, [null]);
 
     // Suppression de la partie active depuis la page de gestion
