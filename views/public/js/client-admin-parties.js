@@ -13,6 +13,14 @@ const $linkExportParty = $('#link-export-party');
 const $roundTabs = $('#round-tabs');
 const $questionList = $('#question-list');
 const $questionListEmpty = $('#question-list-empty');
+const $selectionToolbar = $('#selection-toolbar');
+const $inputSelectAll = $('#input-select-all');
+const $selectionCount = $('#selection-count');
+const $buttonTransfer = $('#button-transfer');
+
+const $modalTransfer = $('#modal-transfer');
+const $modalTransferTitle = $('#modal-transfer-title');
+const $inputTransferTarget = $('#input-transfer-target');
 
 const $modalQuestion = $('#modal-question');
 const $modalQuestionTitle = $('#modal-question-title');
@@ -35,6 +43,10 @@ let parties = [];
 let currentParty = null;
 let currentRound = $roundTabs.find('[data-round]').first().data('round');
 let editedQuestionId = null;
+/**
+ * Questions cochées dans la manche affichée (à copier / déplacer vers une autre partie)
+ */
+let selectedIds = new Set();
 /**
  * Sons / vidéos de la question en cours d'édition : { questionMedia, answerMedia }
  */
@@ -165,10 +177,29 @@ const renderQuestionList = function () {
     const questions = questionsOfRound(currentRound);
     $questionList.empty();
     $questionListEmpty.prop('hidden', questions.length > 0);
+    // On oublie les questions cochées qui ne sont plus dans la manche
+    selectedIds = new Set(questions.filter(function (question) { return selectedIds.has(question.id); })
+        .map(function (question) { return question.id; }));
+    let previousTheme = '';
     questions.forEach(function (question, index) {
+        // En-tête à chaque changement de thème (menu…) pour le sélectionner d'un coup
+        if (question.theme !== previousTheme) {
+            const theme = question.theme;
+            const themeIds = questions.filter(function (other) { return other.theme === theme; })
+                .map(function (other) { return other.id; });
+            $questionList.append($('<li class="list-group-item list-group-item-secondary d-flex align-items-center py-2"></li>')
+                .append($('<strong class="flex-grow-1"></strong>').text(theme || 'Sans thème'))
+                .append($('<button type="button" class="btn btn-sm btn-link p-0" data-select-theme></button>')
+                    .text(themeIds.every(function (id) { return selectedIds.has(id); }) ? 'Désélectionner' : 'Sélectionner')
+                    .attr('data-theme', theme)));
+            previousTheme = theme;
+        }
+        const $select = $('<div class="custom-control custom-checkbox align-self-start mr-1"></div>')
+            .append($('<input type="checkbox" class="custom-control-input" data-select />')
+                .attr('id', 'select-' + question.id).prop('checked', selectedIds.has(question.id)))
+            .append($('<label class="custom-control-label"><span class="sr-only">Sélectionner</span></label>')
+                .attr('for', 'select-' + question.id));
         const $content = $('<div class="flex-grow-1 mr-3"></div>');
-        if (question.theme)
-            $content.append($('<small class="text-muted d-block"></small>').text(question.theme));
         const points = question.points || 1;
         $content.append($('<div class="font-weight-bold"></div>').text((index + 1) + '. ' + question.question)
             .append(points > 1 ? $('<span class="badge badge-warning ml-2"></span>').text(points + ' miams') : null));
@@ -195,8 +226,20 @@ const renderQuestionList = function () {
 
         $questionList.append($('<li class="list-group-item d-flex"></li>')
             .attr('data-id', question.id)
-            .append($content, $actions));
+            .append($select, $content, $actions));
     });
+    renderSelection(questions);
+}
+
+/**
+ * Barre de sélection (nombre de questions cochées, bouton de transfert)
+ */
+const renderSelection = function (questions) {
+    $selectionToolbar.toggleClass('d-none', questions.length === 0).toggleClass('d-flex', questions.length > 0);
+    $inputSelectAll.prop('checked', questions.length > 0 && selectedIds.size === questions.length)
+        .prop('indeterminate', selectedIds.size > 0 && selectedIds.size < questions.length);
+    $selectionCount.text(selectedIds.size ? selectedIds.size + ' question(s) sélectionnée(s)' : '');
+    $buttonTransfer.prop('disabled', selectedIds.size === 0);
 }
 
 /**
@@ -213,6 +256,7 @@ const refresh = async function () {
 }
 
 const selectParty = async function (id) {
+    selectedIds = new Set();
     currentParty = await callApi('GET', '/' + id);
     renderPartyList();
     renderPartyDetail();
@@ -319,6 +363,7 @@ const initEvents = function () {
     $roundTabs.on('click', '[data-round]', function (event) {
         event.preventDefault();
         currentRound = $(this).data('round');
+        selectedIds = new Set();
         renderPartyDetail();
     });
 
@@ -342,6 +387,65 @@ const initEvents = function () {
             await callApi('POST', url + '/move', { direction: action === 'up' ? -1 : 1 });
         }
         await refresh();
+    }));
+
+    /**
+     * Sélection des questions à copier / déplacer
+     */
+    $questionList.on('change', '[data-select]', function () {
+        const id = $(this).closest('[data-id]').attr('data-id');
+        if (this.checked)
+            selectedIds.add(id);
+        else
+            selectedIds.delete(id);
+        renderQuestionList();
+    });
+    $questionList.on('click', '[data-select-theme]', function () {
+        const theme = $(this).attr('data-theme');
+        const ids = questionsOfRound(currentRound)
+            .filter(function (question) { return question.theme === theme; })
+            .map(function (question) { return question.id; });
+        const select = !ids.every(function (id) { return selectedIds.has(id); });
+        ids.forEach(function (id) {
+            if (select)
+                selectedIds.add(id);
+            else
+                selectedIds.delete(id);
+        });
+        renderQuestionList();
+    });
+    $inputSelectAll.on('change', function () {
+        selectedIds = new Set(this.checked ? questionsOfRound(currentRound).map(function (question) { return question.id; }) : []);
+        renderQuestionList();
+    });
+
+    $buttonTransfer.on('click', function () {
+        const others = parties.filter(function (party) { return party.id !== currentParty.id; });
+        if (others.length === 0) {
+            showAlert('Créez ou importez d\'abord une autre partie pour y copier ces questions.', 'warning');
+            return;
+        }
+        $modalTransferTitle.text('Copier / déplacer ' + selectedIds.size + ' question(s)');
+        $inputTransferTarget.empty();
+        others.forEach(function (party) {
+            $inputTransferTarget.append($('<option></option>').val(party.id).text(party.name));
+        });
+        $modalTransfer.modal('show');
+    });
+
+    $('#form-transfer').on('submit', run(async function (event) {
+        event.preventDefault();
+        const mode = $modalTransfer.find('[name=transfer-mode]:checked').val();
+        const target = await callApi('POST', '/' + currentParty.id + '/questions/transfer', {
+            questionIds: Array.from(selectedIds),
+            targetId: $inputTransferTarget.val(),
+            mode: mode
+        });
+        const count = selectedIds.size;
+        selectedIds = new Set();
+        $modalTransfer.modal('hide');
+        await refresh();
+        showAlert(count + ' question(s) ' + (mode === 'move' ? 'déplacée(s)' : 'copiée(s)') + ' vers « ' + target.name + ' »', 'success');
     }));
 
     $('#form-question').on('submit', run(async function (event) {

@@ -121,3 +121,36 @@ test("questions : barème et note de l'animateur", function () {
     assert.throws(function () { store.addQuestion(party.id, { round: 'menus', question: 'Q', points: 11 }); }, ValidationError);
     assert.throws(function () { store.addQuestion(party.id, { round: 'menus', question: 'Q', points: 1.5 }); }, ValidationError);
 });
+
+test("copie et déplacement de questions (un menu…) vers une autre partie", function () {
+    const store = createPartyStore(null);
+    const source = store.create('Source');
+    const target = store.create('Destination');
+    const m1 = store.addQuestion(source.id, { round: 'menus', theme: 'Cinéma', question: 'M1', choices: ['A', 'B'], answer: 'A', note: 'Note' });
+    store.addQuestion(source.id, { round: 'menus', theme: 'Sport', question: 'S1' });
+    const m2 = store.addQuestion(source.id, { round: 'menus', theme: 'Cinéma', question: 'M2' });
+    store.addQuestion(target.id, { round: 'menus', theme: 'Musique', question: 'T1' });
+    const texts = function (id) {
+        return store.questionsOfRound(id, 'menus').map(function (q) { return q.question; });
+    }
+
+    // L'ordre d'origine est conservé, quel que soit l'ordre de la sélection
+    const copied = store.transferQuestions(source.id, [m2.id, m1.id], target.id, 'copy');
+    assert.deepStrictEqual(texts(target.id), ['T1', 'M1', 'M2']);
+    assert.deepStrictEqual(texts(source.id), ['M1', 'S1', 'M2']);
+    const copy = copied.questions[1];
+    assert.notStrictEqual(copy.id, m1.id);
+    assert.deepStrictEqual(Object.assign({}, copy, { id: m1.id }), store.get(source.id).questions[0]);
+
+    store.transferQuestions(source.id, [m1.id, m2.id], target.id, 'move');
+    assert.deepStrictEqual(texts(source.id), ['S1']);
+    assert.deepStrictEqual(texts(target.id), ['T1', 'M1', 'M2', 'M1', 'M2']);
+
+    // Question déjà partie, partie inconnue, sélection vide ou mode invalide
+    assert.strictEqual(store.transferQuestions(source.id, [m1.id], target.id, 'copy'), null);
+    assert.strictEqual(store.transferQuestions(source.id, [m1.id], 'inconnue', 'copy'), null);
+    assert.throws(function () { store.transferQuestions(source.id, [], target.id, 'copy'); }, ValidationError);
+    assert.throws(function () { store.transferQuestions(source.id, ['x'], target.id, 'swap'); }, ValidationError);
+    const s1 = store.questionsOfRound(source.id, 'menus')[0];
+    assert.throws(function () { store.transferQuestions(source.id, [s1.id], source.id, 'move'); }, ValidationError);
+});

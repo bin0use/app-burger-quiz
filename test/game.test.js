@@ -99,7 +99,18 @@ test('routes http', async function (t) {
         assert.strictEqual((await call('POST', '/' + party.id + '/duplicate', {})).status, 201);
         assert.strictEqual((await call('GET', '')).body.length, 3);
 
-        assert.strictEqual((await call('DELETE', '/' + party.id + '/questions/' + question.id)).status, 204);
+        // Copie / déplacement vers une autre partie
+        const transfer = function (questionIds, mode) {
+            return call('POST', '/' + party.id + '/questions/transfer', { questionIds: questionIds, targetId: imported.id, mode: mode });
+        }
+        assert.strictEqual((await transfer([question.id], 'swap')).status, 400);
+        assert.strictEqual((await transfer(['inconnue'], 'copy')).status, 404);
+        response = await transfer([question.id], 'copy');
+        assert.strictEqual(response.status, 200);
+        assert.deepStrictEqual(response.body.questions.map(function (q) { return q.question; }), ['Q1 bis', 'Q1 bis']);
+        assert.strictEqual((await transfer([question.id], 'move')).body.questions.length, 3);
+        assert.strictEqual((await call('GET', '/' + party.id)).body.questions.length, 0);
+        assert.strictEqual((await call('DELETE', '/' + party.id + '/questions/' + question.id)).status, 404);
         assert.strictEqual((await call('DELETE', '/' + party.id)).status, 204);
         assert.strictEqual((await call('GET', '/' + party.id)).status, 404);
     });

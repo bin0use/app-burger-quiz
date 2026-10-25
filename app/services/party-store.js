@@ -301,6 +301,43 @@ const createPartyStore = function (filePath, options) {
             return copy(party);
         },
         /**
+         * Copie ou déplace des questions (une question, un menu, une manche…) vers une autre partie
+         * Elles sont ajoutées à la fin de leur manche, dans leur ordre d'origine
+         * @param {*} id La partie d'origine
+         * @param {*} questionIds Les questions à transférer
+         * @param {*} targetId La partie de destination
+         * @param {*} mode 'copy' ou 'move'
+         * @returns La partie de destination (null si une partie ou une question est introuvable)
+         */
+        transferQuestions: function (id, questionIds, targetId, mode) {
+            const party = find(id);
+            const target = find(targetId);
+            if (mode !== 'copy' && mode !== 'move')
+                throw new ValidationError('Mode de transfert invalide');
+            if (!Array.isArray(questionIds) || questionIds.length === 0)
+                throw new ValidationError('Aucune question sélectionnée');
+            if (!party || !target)
+                return null;
+            if (mode === 'move' && party === target)
+                throw new ValidationError('Les questions sont déjà dans cette partie');
+            const selected = party.questions.filter(function (question) {
+                return questionIds.indexOf(question.id) !== -1;
+            });
+            if (selected.length !== new Set(questionIds).size)
+                return null;
+            selected.forEach(function (question) {
+                target.questions.push(Object.assign(structuredClone(question), { id: crypto.randomUUID() }));
+            });
+            if (mode === 'move') {
+                party.questions = party.questions.filter(function (question) {
+                    return selected.indexOf(question) === -1;
+                });
+                party.updatedAt = now();
+            }
+            commit(target);
+            return copy(target);
+        },
+        /**
          * Fichiers médias utilisés par au moins une question
          */
         usedMedia: function () {

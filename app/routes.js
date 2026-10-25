@@ -153,7 +153,14 @@ module.exports = function (app, passport, partyStore, mediaStore) {
     return [201, partyStore.addQuestion(req.params.id, req.body)];
   }));
 
-  app.put(api + '/:id/questions/:questionId', isApiLoggedIn, requireJson, handle(function (req) {
+  /**
+   * Copie ou déplace des questions vers une autre partie : { questionIds, targetId, mode: 'copy' | 'move' }
+   */
+  app.post(api + '/:id/questions/transfer', isApiLoggedIn, requireJson, handle(function (req) {
+    return [200, partyStore.transferQuestions(req.params.id, req.body.questionIds, req.body.targetId, req.body.mode)];
+  }));
+
+  app.put(api + '/:id/questions/:questionId',isApiLoggedIn, requireJson, handle(function (req) {
     return [200, partyStore.updateQuestion(req.params.id, req.params.questionId, req.body)];
   }));
 

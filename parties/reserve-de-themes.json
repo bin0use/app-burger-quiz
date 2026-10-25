@@ -1,0 +1,1235 @@
+{
+  "name": "Réserve de thèmes",
+  "questions": [
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Combien de temps met la lumière du Soleil pour arriver sur Terre ?",
+      "choices": [
+        "Environ 8 minutes",
+        "Environ 8 secondes",
+        "Environ 8 heures",
+        "Ça dépend du trafic"
+      ],
+      "answer": "Environ 8 minutes",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Quel est le plus long fleuve de France ?",
+      "choices": [
+        "La Loire",
+        "La Seine",
+        "Le Rhône",
+        "La Garonne"
+      ],
+      "answer": "La Loire",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Combien de touches a un piano standard ?",
+      "choices": [
+        "88",
+        "52",
+        "100",
+        "Do, ré, mi… et le reste"
+      ],
+      "answer": "88",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Quelle planète est surnommée la planète rouge ?",
+      "choices": [
+        "Mars",
+        "Vénus",
+        "Jupiter",
+        "Pluton, mais elle a honte"
+      ],
+      "answer": "Mars",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Quel est l'os le plus long du corps humain ?",
+      "choices": [
+        "Le fémur",
+        "L'humérus",
+        "Le tibia",
+        "L'os à moelle"
+      ],
+      "answer": "Le fémur",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Combien de côtés a un hexagone ?",
+      "choices": [
+        "6",
+        "8",
+        "5",
+        "Ça dépend de son humeur"
+      ],
+      "answer": "6",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Céline Dion, Garou ou les deux ?",
+      "question": "A chanté la chanson de « Titanic »",
+      "choices": [
+        "Céline Dion",
+        "Garou",
+        "Les deux"
+      ],
+      "answer": "Céline Dion",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Céline Dion, Garou ou les deux ?",
+      "question": "A joué Quasimodo dans « Notre-Dame de Paris »",
+      "choices": [
+        "Céline Dion",
+        "Garou",
+        "Les deux"
+      ],
+      "answer": "Garou",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Céline Dion, Garou ou les deux ?",
+      "question": "Est né au Québec",
+      "choices": [
+        "Céline Dion",
+        "Garou",
+        "Les deux"
+      ],
+      "answer": "Les deux",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Céline Dion, Garou ou les deux ?",
+      "question": "A chanté « Sous le vent »",
+      "choices": [
+        "Céline Dion",
+        "Garou",
+        "Les deux"
+      ],
+      "answer": "Les deux",
+      "points": 1,
+      "note": "C'est un duo, sorti en 2001."
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Céline Dion, Garou ou les deux ?",
+      "question": "A été coach dans « The Voice »",
+      "choices": [
+        "Céline Dion",
+        "Garou",
+        "Les deux"
+      ],
+      "answer": "Garou",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Céline Dion, Garou ou les deux ?",
+      "question": "A gagné l'Eurovision pour la Suisse",
+      "choices": [
+        "Céline Dion",
+        "Garou",
+        "Les deux"
+      ],
+      "answer": "Céline Dion",
+      "points": 1,
+      "note": "En 1988, avec « Ne partez pas sans moi »."
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Céline Dion, Garou ou les deux ?",
+      "question": "A chanté « Seul »",
+      "choices": [
+        "Céline Dion",
+        "Garou",
+        "Les deux"
+      ],
+      "answer": "Garou",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Céline Dion, Garou ou les deux ?",
+      "question": "A chanté « Pour que tu m'aimes encore »",
+      "choices": [
+        "Céline Dion",
+        "Garou",
+        "Les deux"
+      ],
+      "answer": "Céline Dion",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Le Père Noël, le Grinch ou les deux ?",
+      "question": "Il est vert",
+      "choices": [
+        "Le Père Noël",
+        "Le Grinch",
+        "Les deux"
+      ],
+      "answer": "Le Grinch",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Le Père Noël, le Grinch ou les deux ?",
+      "question": "Il descend par la cheminée",
+      "choices": [
+        "Le Père Noël",
+        "Le Grinch",
+        "Les deux"
+      ],
+      "answer": "Les deux",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Le Père Noël, le Grinch ou les deux ?",
+      "question": "Il a un chien qui s'appelle Max",
+      "choices": [
+        "Le Père Noël",
+        "Le Grinch",
+        "Les deux"
+      ],
+      "answer": "Le Grinch",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Le Père Noël, le Grinch ou les deux ?",
+      "question": "Il porte un costume rouge",
+      "choices": [
+        "Le Père Noël",
+        "Le Grinch",
+        "Les deux"
+      ],
+      "answer": "Les deux",
+      "points": 1,
+      "note": "Le Grinch se déguise en Père Noël pour voler les cadeaux."
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Le Père Noël, le Grinch ou les deux ?",
+      "question": "Il vit au pôle Nord",
+      "choices": [
+        "Le Père Noël",
+        "Le Grinch",
+        "Les deux"
+      ],
+      "answer": "Le Père Noël",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Le Père Noël, le Grinch ou les deux ?",
+      "question": "Il a été joué par Jim Carrey",
+      "choices": [
+        "Le Père Noël",
+        "Le Grinch",
+        "Les deux"
+      ],
+      "answer": "Le Grinch",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Le Père Noël, le Grinch ou les deux ?",
+      "question": "Il a une barbe blanche",
+      "choices": [
+        "Le Père Noël",
+        "Le Grinch",
+        "Les deux"
+      ],
+      "answer": "Le Père Noël",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Le Père Noël, le Grinch ou les deux ?",
+      "question": "Il emporte les cadeaux dans un grand sac",
+      "choices": [
+        "Le Père Noël",
+        "Le Grinch",
+        "Les deux"
+      ],
+      "answer": "Les deux",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Le ski, la fondue ou les deux ?",
+      "question": "Il faut un caquelon",
+      "choices": [
+        "Le ski",
+        "La fondue",
+        "Les deux"
+      ],
+      "answer": "La fondue",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Le ski, la fondue ou les deux ?",
+      "question": "Ça se fait sur des pistes",
+      "choices": [
+        "Le ski",
+        "La fondue",
+        "Les deux"
+      ],
+      "answer": "Le ski",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Le ski, la fondue ou les deux ?",
+      "question": "Il faut un forfait",
+      "choices": [
+        "Le ski",
+        "La fondue",
+        "Les deux"
+      ],
+      "answer": "Le ski",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Le ski, la fondue ou les deux ?",
+      "question": "On peut y perdre quelque chose",
+      "choices": [
+        "Le ski",
+        "La fondue",
+        "Les deux"
+      ],
+      "answer": "Les deux",
+      "points": 1,
+      "note": "Un ski dans la poudreuse, son pain dans le fromage."
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Le ski, la fondue ou les deux ?",
+      "question": "Il faut du fromage",
+      "choices": [
+        "Le ski",
+        "La fondue",
+        "Les deux"
+      ],
+      "answer": "La fondue",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Le ski, la fondue ou les deux ?",
+      "question": "Il existe une version bourguignonne",
+      "choices": [
+        "Le ski",
+        "La fondue",
+        "Les deux"
+      ],
+      "answer": "La fondue",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Le ski, la fondue ou les deux ?",
+      "question": "Ça se pratique hors-piste",
+      "choices": [
+        "Le ski",
+        "La fondue",
+        "Les deux"
+      ],
+      "answer": "Le ski",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Le ski, la fondue ou les deux ?",
+      "question": "C'est mieux en montagne",
+      "choices": [
+        "Le ski",
+        "La fondue",
+        "Les deux"
+      ],
+      "answer": "Les deux",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La montagne",
+      "question": "Quel est le plus haut sommet des Alpes ?",
+      "choices": [
+        "Le mont Blanc",
+        "Le Cervin",
+        "La Meije",
+        "Le mont Ventoux"
+      ],
+      "answer": "Le mont Blanc",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La montagne",
+      "question": "Le Cervin est partagé entre l'Italie et :",
+      "choices": [
+        "La Suisse",
+        "La France",
+        "L'Autriche",
+        "Toblerone"
+      ],
+      "answer": "La Suisse",
+      "points": 1,
+      "note": "Le Cervin est la montagne du logo Toblerone."
+    },
+    {
+      "round": "menus",
+      "theme": "La montagne",
+      "question": "Quel chien porte un tonnelet autour du cou dans les dessins animés ?",
+      "choices": [
+        "Le saint-bernard",
+        "Le husky",
+        "Le bouvier bernois",
+        "Le chihuahua des neiges"
+      ],
+      "answer": "Le saint-bernard",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La montagne",
+      "question": "Quel animal siffle pour prévenir d'un danger ?",
+      "choices": [
+        "La marmotte",
+        "Le chamois",
+        "Le bouquetin",
+        "Le moniteur de ski"
+      ],
+      "answer": "La marmotte",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La montagne",
+      "question": "Quelle ville a accueilli les Jeux olympiques d'hiver en 1992 ?",
+      "choices": [
+        "Albertville",
+        "Grenoble",
+        "Chamonix",
+        "Courchevel"
+      ],
+      "answer": "Albertville",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le sport",
+      "question": "Combien de joueurs par équipe sur le terrain au rugby à XV ?",
+      "choices": [
+        "15",
+        "11",
+        "13",
+        "7, les autres sont à la buvette"
+      ],
+      "answer": "15",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le sport",
+      "question": "Quel pays a gagné la Coupe du monde de football 2018 ?",
+      "choices": [
+        "La France",
+        "La Croatie",
+        "La Belgique",
+        "L'Allemagne"
+      ],
+      "answer": "La France",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le sport",
+      "question": "Combien de points vaut un essai au rugby ?",
+      "choices": [
+        "5",
+        "3",
+        "7",
+        "2"
+      ],
+      "answer": "5",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le sport",
+      "question": "Dans quel sport utilise-t-on un volant ?",
+      "choices": [
+        "Le badminton",
+        "Le tennis de table",
+        "Le squash",
+        "Le rallye automobile"
+      ],
+      "answer": "Le badminton",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le sport",
+      "question": "Quelle est la distance d'un marathon ?",
+      "choices": [
+        "42,195 km",
+        "40 km",
+        "45,5 km",
+        "21,1 km, mais deux fois"
+      ],
+      "answer": "42,195 km",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La chanson française",
+      "question": "Qui chante « La Bohème » ?",
+      "choices": [
+        "Charles Aznavour",
+        "Jacques Brel",
+        "Serge Gainsbourg",
+        "Mimi Mathy"
+      ],
+      "answer": "Charles Aznavour",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La chanson française",
+      "question": "Qui chante « Alors on danse » ?",
+      "choices": [
+        "Stromae",
+        "Angèle",
+        "Christine and the Queens",
+        "Patrick Sébastien"
+      ],
+      "answer": "Stromae",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La chanson française",
+      "question": "Quel groupe chante « L'Aventurier » ?",
+      "choices": [
+        "Indochine",
+        "Téléphone",
+        "Noir Désir",
+        "Les Forbans"
+      ],
+      "answer": "Indochine",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La chanson française",
+      "question": "Qui chante « Je veux » en 2010 ?",
+      "choices": [
+        "Zaz",
+        "Louane",
+        "Nolwenn Leroy",
+        "Ton neveu de 4 ans"
+      ],
+      "answer": "Zaz",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La chanson française",
+      "question": "« Ne me quitte pas » est une chanson de :",
+      "choices": [
+        "Jacques Brel",
+        "Édith Piaf",
+        "Georges Brassens",
+        "Ton ex"
+      ],
+      "answer": "Jacques Brel",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Noël",
+      "question": "Comment s'appelle le renne au nez rouge ?",
+      "choices": [
+        "Rudolph",
+        "Tornade",
+        "Comète",
+        "Bambi"
+      ],
+      "answer": "Rudolph",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Noël",
+      "question": "Quel pays offre chaque année à Londres le sapin de Trafalgar Square ?",
+      "choices": [
+        "La Norvège",
+        "Le Canada",
+        "La Suède",
+        "IKEA"
+      ],
+      "answer": "La Norvège",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Noël",
+      "question": "Dans « Maman, j'ai raté l'avion », comment s'appelle le garçon ?",
+      "choices": [
+        "Kevin",
+        "Kenny",
+        "Billy",
+        "Macaulay"
+      ],
+      "answer": "Kevin",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Noël",
+      "question": "Combien de cases compte un calendrier de l'Avent classique ?",
+      "choices": [
+        "24",
+        "25",
+        "31",
+        "12"
+      ],
+      "answer": "24",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Noël",
+      "question": "Dans quelle langue dit-on « Feliz Navidad » ?",
+      "choices": [
+        "Espagnol",
+        "Italien",
+        "Portugais",
+        "Latin"
+      ],
+      "answer": "Espagnol",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La comptabilité analytique",
+      "question": "Que veut dire « PCG » ?",
+      "choices": [
+        "Plan comptable général",
+        "Prévision des comptes globaux",
+        "Procédure de contrôle de gestion",
+        "Petit croque gratiné"
+      ],
+      "answer": "Plan comptable général",
+      "points": 1,
+      "note": "Le menu piège."
+    },
+    {
+      "round": "menus",
+      "theme": "La comptabilité analytique",
+      "question": "Dans le plan comptable, la classe 6 regroupe :",
+      "choices": [
+        "Les charges",
+        "Les produits",
+        "Les immobilisations",
+        "Les comptes de tiers"
+      ],
+      "answer": "Les charges",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La comptabilité analytique",
+      "question": "Le seuil de rentabilité est atteint quand :",
+      "choices": [
+        "La marge sur coûts variables couvre les charges fixes",
+        "Le chiffre d'affaires double",
+        "Les charges variables sont nulles",
+        "Le comptable part en vacances"
+      ],
+      "answer": "La marge sur coûts variables couvre les charges fixes",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La comptabilité analytique",
+      "question": "En coûts complets, on répartit les charges indirectes grâce aux :",
+      "choices": [
+        "Centres d'analyse",
+        "Comptes de régularisation",
+        "Amortissements dégressifs",
+        "Provisions pour risques"
+      ],
+      "answer": "Centres d'analyse",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La comptabilité analytique",
+      "question": "À quoi correspond le compte 512 ?",
+      "choices": [
+        "Banque",
+        "Caisse",
+        "Clients",
+        "Fournisseurs"
+      ],
+      "answer": "Banque",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les animaux",
+      "question": "Combien de cœurs a une pieuvre ?",
+      "choices": [
+        "3",
+        "1",
+        "2",
+        "8, un par bras"
+      ],
+      "answer": "3",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les animaux",
+      "question": "Quel est le plus grand animal du monde ?",
+      "choices": [
+        "La baleine bleue",
+        "L'éléphant d'Afrique",
+        "Le requin-baleine",
+        "La girafe"
+      ],
+      "answer": "La baleine bleue",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les animaux",
+      "question": "Quel animal est l'emblème du WWF ?",
+      "choices": [
+        "Le panda",
+        "Le tigre",
+        "L'ours polaire",
+        "Le catcheur"
+      ],
+      "answer": "Le panda",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les animaux",
+      "question": "Le dauphin est :",
+      "choices": [
+        "Un mammifère",
+        "Un poisson",
+        "Un reptile",
+        "Le fils aîné du roi"
+      ],
+      "answer": "Un mammifère",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les animaux",
+      "question": "Quel oiseau ne vole pas ?",
+      "choices": [
+        "L'autruche",
+        "Le pigeon",
+        "Le moineau",
+        "L'aigle"
+      ],
+      "answer": "L'autruche",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Capitales express",
+      "question": "Australie",
+      "choices": [],
+      "answer": "Canberra",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Capitales express",
+      "question": "Japon",
+      "choices": [],
+      "answer": "Tokyo",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Capitales express",
+      "question": "Portugal",
+      "choices": [],
+      "answer": "Lisbonne",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Capitales express",
+      "question": "Brésil",
+      "choices": [],
+      "answer": "Brasília",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Capitales express",
+      "question": "Égypte",
+      "choices": [],
+      "answer": "Le Caire",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Capitales express",
+      "question": "Norvège",
+      "choices": [],
+      "answer": "Oslo",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Capitales express",
+      "question": "Maroc",
+      "choices": [],
+      "answer": "Rabat",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Capitales express",
+      "question": "Argentine",
+      "choices": [],
+      "answer": "Buenos Aires",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Capitales express",
+      "question": "Suisse",
+      "choices": [],
+      "answer": "Berne",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Capitales express",
+      "question": "Irlande",
+      "choices": [],
+      "answer": "Dublin",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Capitales express",
+      "question": "Grèce",
+      "choices": [],
+      "answer": "Athènes",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Capitales express",
+      "question": "Canada",
+      "choices": [],
+      "answer": "Ottawa",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les héros de dessins animés",
+      "question": "Quelle éponge vit dans un ananas sous la mer ?",
+      "choices": [],
+      "answer": "Bob l'éponge",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les héros de dessins animés",
+      "question": "Comment s'appelle le chat qui court après Titi ?",
+      "choices": [],
+      "answer": "Grosminet",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les héros de dessins animés",
+      "question": "Comment s'appelle le chien de Tintin ?",
+      "choices": [],
+      "answer": "Milou",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les héros de dessins animés",
+      "question": "Quelle famille jaune vit à Springfield ?",
+      "choices": [],
+      "answer": "Les Simpson",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les héros de dessins animés",
+      "question": "Quel lapin dit « Quoi de neuf, docteur ? »",
+      "choices": [],
+      "answer": "Bugs Bunny",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les héros de dessins animés",
+      "question": "Comment s'appelle l'exploratrice qui voyage avec le singe Babouche ?",
+      "choices": [],
+      "answer": "Dora",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les héros de dessins animés",
+      "question": "Quel ours gourmand de miel vit dans la forêt des Rêves bleus ?",
+      "choices": [],
+      "answer": "Winnie l'ourson",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les héros de dessins animés",
+      "question": "Comment s'appelle le petit cochon rose qui saute dans les flaques ?",
+      "choices": [],
+      "answer": "Peppa Pig",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les héros de dessins animés",
+      "question": "Comment appelle-t-on les petits bonshommes bleus ?",
+      "choices": [],
+      "answer": "Les Schtroumpfs",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les héros de dessins animés",
+      "question": "Quel marin devient fort en mangeant des épinards ?",
+      "choices": [],
+      "answer": "Popeye",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les héros de dessins animés",
+      "question": "Qui est le meilleur ami d'Astérix ?",
+      "choices": [],
+      "answer": "Obélix",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les héros de dessins animés",
+      "question": "Quel est le nom de l'ours du « Livre de la jungle » ?",
+      "choices": [],
+      "answer": "Baloo",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Ça commence par B",
+      "question": "Capitale de la Belgique",
+      "choices": [],
+      "answer": "Bruxelles",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Ça commence par B",
+      "question": "Plus grand mammifère marin",
+      "choices": [],
+      "answer": "Baleine",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Ça commence par B",
+      "question": "Fruit jaune et courbé",
+      "choices": [],
+      "answer": "Banane",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Ça commence par B",
+      "question": "Héros masqué de Gotham City",
+      "choices": [],
+      "answer": "Batman",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Ça commence par B",
+      "question": "Boisson faite avec du houblon",
+      "choices": [],
+      "answer": "Bière",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Ça commence par B",
+      "question": "Pain long et fin",
+      "choices": [],
+      "answer": "Baguette",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Ça commence par B",
+      "question": "Couleur du ciel quand il fait beau",
+      "choices": [],
+      "answer": "Bleu",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Ça commence par B",
+      "question": "Sport où l'on marque dans un panier",
+      "choices": [],
+      "answer": "Basket",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Ça commence par B",
+      "question": "Grande ville du Sud-Ouest réputée pour son vin",
+      "choices": [],
+      "answer": "Bordeaux",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Ça commence par B",
+      "question": "Contraire de « mauvais »",
+      "choices": [],
+      "answer": "Bon",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Ça commence par B",
+      "question": "Pays d'Amérique du Sud où l'on parle portugais",
+      "choices": [],
+      "answer": "Brésil",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Ça commence par B",
+      "question": "Ce qu'on mange dans un fast-food, entre deux pains",
+      "choices": [],
+      "answer": "Burger",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Combien de mois ont 28 jours ?",
+      "choices": [],
+      "answer": "Tous",
+      "points": 1,
+      "note": "Les 12 mois ont au moins 28 jours."
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Combien font 15 + 15 ?",
+      "choices": [],
+      "answer": "30",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "De quelle couleur est le lait ?",
+      "choices": [],
+      "answer": "Blanc",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Quel est le pluriel de « cheval » ?",
+      "choices": [],
+      "answer": "Chevaux",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Combien de roues a un tricycle ?",
+      "choices": [],
+      "answer": "3",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Quel jour vient après lundi ?",
+      "choices": [],
+      "answer": "Mardi",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Quelle est la capitale de l'Allemagne ?",
+      "choices": [],
+      "answer": "Berlin",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Dis bonjour à la caméra.",
+      "choices": [],
+      "answer": "",
+      "points": 1,
+      "note": "Pas de réponse attendue : toute réponse donnée sans hésiter est bonne."
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Combien de doigts sur deux mains ?",
+      "choices": [],
+      "answer": "10",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Tu crois au Père Noël ?",
+      "choices": [],
+      "answer": "",
+      "points": 1,
+      "note": "Pas de réponse attendue : toute réponse donnée sans hésiter est bonne."
+    }
+  ]
+}
