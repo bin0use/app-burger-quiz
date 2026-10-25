@@ -31,6 +31,14 @@
         messageToggleRevealAnswer: 'event-toggle-reveal-answer',
         messagePlayMedia: 'event-play-media',
         messageStopMedia: 'event-stop-media',
+        messageGoodAnswer: 'event-good-answer',
+        messageUndo: 'event-undo',
+        messageTimerStart: 'event-timer-start',
+        messageTimerPause: 'event-timer-pause',
+        messageTimerReset: 'event-timer-reset',
+        messageSetBuzzTimer: 'event-set-buzz-timer',
+        messageToggleVictory: 'event-toggle-victory',
+        messageStartGame: 'event-start-game',
         /**
          * Les messages que les clients envoies
          */
@@ -40,6 +48,9 @@
         messageClientNeedStateTransition: 'need-state-transition',
         messageClientNeedStateQuestion: 'need-state-question',
         messageClientNeedScreenQuestion: 'need-screen-question',
+        messageClientNeedStateGame: 'need-state-game',
+        messageClientNeedStateAdmin: 'need-state-admin',
+        messageClientRegisterBuzzer: 'register-buzzer',
         /**
          * Les messages à envoyer aux clients
          */
@@ -58,6 +69,13 @@
         messageToClientReceiveScreenQuestion: 'receive-screen-question',
         messageToClientPlayMedia: 'receive-play-media',
         messageToClientStopMedia: 'receive-stop-media',
+        messageToClientReceiveBuzzGap: 'receive-buzz-gap',
+        messageToClientReceiveTimer: 'receive-timer',
+        messageToClientTimerEnded: 'receive-timer-ended',
+        messageToClientReceiveDeathBurger: 'receive-death-burger',
+        messageToClientReceiveVictory: 'receive-victory',
+        messageToClientStartGame: 'receive-start-game',
+        messageToClientReceiveStateAdmin: 'receive-state-admin',
     });
 
     if (typeof module !== 'undefined' && module.exports) {

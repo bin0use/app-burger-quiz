@@ -14,6 +14,19 @@ const $buttonRemovePointMayo = $('#button-remove-point-mayo');
 const $buttonAddPointKetchup = $('#button-add-point-ketchup');
 const $buttonRemovePointKetchup = $('#button-remove-point-ketchup');
 const $buttonBuzzBadResponse = $('#button-buzz-bad-response');
+const $buttonGoodAnswer = $('#button-good-answer');
+const $buttonUndo = $('#button-undo');
+const $buttonStartGame = $('#button-start-game');
+const $buttonToggleVictory = $('#button-toggle-victory');
+const $buzzersKetchup = $('#buzzers-ketchup');
+const $buzzersMayo = $('#buzzers-mayo');
+const $deathBurgerPanel = $('#death-burger-panel');
+const $deathBurgerCount = $('#death-burger-count');
+const $timerDisplay = $('#timer-display');
+const $inputTimerSeconds = $('#input-timer-seconds');
+const $buttonTimerStart = $('#button-timer-start');
+const $buttonTimerReset = $('#button-timer-reset');
+const $selectBuzzTimer = $('#select-buzz-timer');
 
 const $buttonLockBuzzer = $('#button-lock-buzz');
 const $buttonUnLockBuzzer = $('#button-unlock-buzz');
@@ -33,6 +46,8 @@ const $questionTheme = $('#question-theme');
 const $questionText = $('#question-text');
 const $questionChoices = $('#question-choices');
 const $questionAnswer = $('#question-answer');
+const $questionPoints = $('#question-points');
+const $questionNote = $('#question-note');
 const $screenControls = $('#screen-controls');
 const $buttonToggleScreenQuestion = $('#button-toggle-screen-question');
 const $buttonToggleRevealAnswer = $('#button-toggle-reveal-answer');
@@ -45,6 +60,14 @@ const $buzzerStatus = $('#buzzer-status');
 const $connectionStatus = $('#connection-status');
 
 /**
+ * Etat du jeu utile à la télécommande
+ */
+let buzzTeam = null;
+let deathBurgerActive = false;
+let timer = { visible: false, running: false, remaining: 0, endsAt: 0 };
+let currentRoundKey = null;
+
+/**
  * Actions de la télécommande (utilisées par les boutons et les raccourcis clavier)
  */
 const actions = {
@@ -53,6 +76,20 @@ const actions = {
     addPointKetchup: function () { socket.emit(messages.messageKetchupTeam, messages.messageAdd); },
     removePointKetchup: function () { socket.emit(messages.messageKetchupTeam, messages.messageRemove); },
     badResponse: function () { socket.emit(messages.messageBuzzBadResponse); },
+    goodAnswer: function () {
+        if (!$buttonGoodAnswer.prop('disabled'))
+            socket.emit(messages.messageGoodAnswer);
+    },
+    undo: function () { socket.emit(messages.messageUndo); },
+    toggleTimer: function () {
+        if (timer.running)
+            socket.emit(messages.messageTimerPause);
+        else
+            socket.emit(messages.messageTimerStart, parseInt($inputTimerSeconds.val(), 10));
+    },
+    resetTimer: function () { socket.emit(messages.messageTimerReset); },
+    toggleVictory: function () { socket.emit(messages.messageToggleVictory); },
+    startGame: function () { socket.emit(messages.messageStartGame); },
     lockBuzzer: function () { socket.emit(messages.messageLockBuzz); },
     unlockBuzzer: function () { socket.emit(messages.messageUnLockBuzz); },
     nextTransition: function () { socket.emit(messages.messageNextTransition); },
@@ -72,7 +109,12 @@ const actions = {
 const shortcuts = {
     'k': [actions.addPointKetchup, actions.removePointKetchup],
     'm': [actions.addPointMayo, actions.removePointMayo],
+    'enter': [actions.goodAnswer],
     'x': [actions.badResponse],
+    'z': [actions.undo],
+    't': [actions.toggleTimer, actions.resetTimer],
+    'v': [actions.toggleVictory],
+    'g': [actions.startGame],
     'd': [actions.unlockBuzzer],
     'b': [actions.lockBuzzer],
     'n': [actions.nextTransition],
@@ -99,6 +141,15 @@ const initEvents = function () {
     $buttonNextTransition.on('click', actions.nextTransition);
     $buttonPreviousTransition.on('click', actions.previousTransition);
     $buttonBuzzBadResponse.on('click', actions.badResponse);
+    $buttonGoodAnswer.on('click', actions.goodAnswer);
+    $buttonUndo.on('click', actions.undo);
+    $buttonTimerStart.on('click', actions.toggleTimer);
+    $buttonTimerReset.on('click', actions.resetTimer);
+    $buttonToggleVictory.on('click', actions.toggleVictory);
+    $buttonStartGame.on('click', actions.startGame);
+    $selectBuzzTimer.on('change', function () {
+        socket.emit(messages.messageSetBuzzTimer, parseInt($selectBuzzTimer.val(), 10));
+    });
     $buttonNextQuestion.on('click', actions.nextQuestion);
     $buttonPreviousQuestion.on('click', actions.previousQuestion);
     $buttonToggleScreenQuestion.on('click', actions.toggleScreenQuestion);
@@ -116,10 +167,16 @@ const initEvents = function () {
  */
 const initShortcuts = function () {
     $(document).on('keydown', function (event) {
+        if ($(event.target).is('input[type=text], input[type=password], input[type=number], textarea, select'))
+            return;
+        // Ctrl+Z (Cmd+Z sur Mac) : annuler
+        if ((event.ctrlKey || event.metaKey) && !event.shiftKey && !event.altKey && event.key.toLowerCase() === 'z') {
+            event.preventDefault();
+            actions.undo();
+            return;
+        }
         // On ne gêne pas les combinaisons système ni la saisie
         if (event.ctrlKey || event.metaKey || event.altKey || event.repeat)
-            return;
-        if ($(event.target).is('input[type=text], input[type=password], textarea, select'))
             return;
         // Pas de raccourci tant que la modal de rechargement est ouverte
         if ($modalReloadPartWarn.hasClass('show'))
@@ -137,17 +194,88 @@ const initShortcuts = function () {
  * Affiche l'état du buzzer et l'équipe ayant buzzé en premier
  * @param {*} isLocked Indique si le buzzer est bloqué
  * @param {*} teamName L'équipe ayant buzzé (ou null)
+ * @param {*} lockedOutTeams Les équipes s'étant trompées (elles ont perdu la main)
  */
-const displayBuzzerState = function (isLocked, teamName) {
+const displayBuzzerState = function (isLocked, teamName, lockedOutTeams) {
+    lockedOutTeams = lockedOutTeams || [];
+    buzzTeam = teamName && teamLabels[teamName] ? teamName : null;
     let text = isLocked ? 'Buzzer bloqué' : 'Buzzer débloqué';
     let style = isLocked ? 'badge-secondary' : 'badge-success';
-    if (teamName && teamLabels[teamName]) {
-        text = teamLabels[teamName] + ' a buzzé !';
-        style = teamName === 'team-mayo' ? 'badge-warning' : 'badge-danger';
+    if (buzzTeam) {
+        text = teamLabels[buzzTeam] + ' a buzzé !';
+        style = buzzTeam === 'team-mayo' ? 'badge-warning' : 'badge-danger';
+    } else if (!isLocked && lockedOutTeams.length) {
+        const others = Object.keys(teamLabels).filter(function (team) { return lockedOutTeams.indexOf(team) === -1; });
+        text = 'Main à ' + others.map(function (team) { return teamLabels[team]; }).join(', ');
+    } else if (isLocked && lockedOutTeams.length) {
+        text = 'Personne n\'a trouvé';
     }
     $buzzerStatus.text(text)
         .removeClass('badge-secondary badge-success badge-warning badge-danger')
         .addClass(style);
+    displayGoodAnswerButton();
+}
+
+/**
+ * Bonne réponse possible : une équipe a buzzé, ou Burger de la mort
+ */
+const displayGoodAnswerButton = function () {
+    $buttonGoodAnswer.prop('disabled', !buzzTeam && !deathBurgerActive)
+        .attr('title', buzzTeam
+            ? 'Bonne réponse de ' + teamLabels[buzzTeam] + ' (Entrée)'
+            : 'Bonne réponse (Entrée)');
+}
+
+/**
+ * Compteur du Burger de la mort
+ * @param {*} state { active, count, total }
+ */
+const displayDeathBurger = function (state) {
+    deathBurgerActive = state.active;
+    $deathBurgerPanel.prop('hidden', !state.active);
+    $deathBurgerCount.text(state.count + ' / ' + state.total);
+    displayGoodAnswerButton();
+}
+
+/**
+ * Chrono : décompte local à partir du temps restant envoyé par le serveur
+ * @param {*} state { visible, running, duration, remaining }
+ */
+const displayTimer = function (state) {
+    timer = {
+        visible: state.visible,
+        running: state.running,
+        remaining: state.remaining,
+        endsAt: Date.now() + state.remaining
+    };
+    $buttonTimerStart.html(state.running ? '&#10074;&#10074; Pause' : (state.visible && state.remaining > 0 ? '&#9654; Reprendre' : '&#9654; Lancer'))
+        .toggleClass('btn-success', !state.running)
+        .toggleClass('btn-warning', state.running);
+    renderTimer();
+}
+
+const renderTimer = function () {
+    if (!timer.visible) {
+        $timerDisplay.text('--');
+        return;
+    }
+    const remaining = timer.running ? Math.max(timer.endsAt - Date.now(), 0) : timer.remaining;
+    $timerDisplay.text(Math.ceil(remaining / 1000) + ' s');
+}
+
+/**
+ * Etat réservé à la télécommande
+ * @param {*} state { canUndo, buzzers, buzzTimerSeconds, victoryVisible, gameStarted }
+ */
+const displayAdminState = function (state) {
+    $buttonUndo.prop('disabled', !state.canUndo);
+    $buzzersKetchup.text('Ketchup : ' + state.buzzers['team-ketchup']);
+    $buzzersMayo.text('Mayo : ' + state.buzzers['team-mayo']);
+    $selectBuzzTimer.val(String(state.buzzTimerSeconds));
+    $buttonToggleVictory.val(state.victoryVisible ? "Masquer l'écran de victoire" : "Afficher l'écran de victoire");
+    $buttonStartGame.val(state.gameStarted ? 'Partie démarrée à l\'écran' : 'Démarrer la partie à l\'écran')
+        .toggleClass('btn-primary', !state.gameStarted)
+        .toggleClass('btn-outline-primary', state.gameStarted);
 }
 
 /**
@@ -205,12 +333,19 @@ const displayQuestionState = function (state) {
     $questionTheme.text(question ? question.theme : '');
     $questionText.text(question ? question.question : '');
     $questionAnswer.text(question && question.answer ? 'Réponse : ' + question.answer : '');
+    $questionPoints.text(question ? question.points + (question.points > 1 ? ' miams' : ' miam') : '');
+    $questionNote.prop('hidden', !question || !question.note).text(question && question.note ? question.note : '');
+    // Nouvelle manche : la durée du chrono proposée est celle de la manche
+    if (state.roundKey !== currentRoundKey) {
+        currentRoundKey = state.roundKey;
+        $inputTimerSeconds.val(state.timerSeconds);
+    }
     $questionChoices.empty();
     (question && question.choices ? question.choices : []).forEach(function (choice) {
         $questionChoices.append($('<li></li>').text(choice));
     });
 
-    // Nuggets et menus : la question s'affiche aussi sur l'écran de jeu
+    // Nuggets, Sel ou Poivre et menus : la question (ou ses propositions) s'affiche aussi sur l'écran de jeu
     $screenControls.prop('hidden', !question || !state.questionsOnScreen);
     $buttonToggleScreenQuestion.text(state.screenVisible ? "Masquer de l'écran" : "Afficher à l'écran");
     $buttonToggleRevealAnswer.text(state.answerRevealed ? "Cacher la réponse à l'écran" : "Révéler la réponse à l'écran")
@@ -238,22 +373,10 @@ const displayConnectionState = function (isConnected) {
  * Ecoute les changements d'état du jeu
  */
 const listenGameState = function () {
-    let lastBuzzTeam = null;
-    socket.on(messages.messageToClientReceiveStateBuzzer, function (isLocked, teamName) {
-        lastBuzzTeam = teamName;
-        displayBuzzerState(isLocked, teamName);
-    });
-    socket.on(messages.messageToClientLockBuzz, function () {
-        displayBuzzerState(true, lastBuzzTeam);
-    });
-    socket.on(messages.messageToClientUnLockBuzz, function () {
-        lastBuzzTeam = null;
-        displayBuzzerState(false, null);
-    });
-    socket.on(messages.messageToClientReceiveBuzz, function (teamName) {
-        lastBuzzTeam = teamName;
-        displayBuzzerState(true, teamName);
-    });
+    socket.on(messages.messageToClientReceiveStateBuzzer, displayBuzzerState);
+    socket.on(messages.messageToClientReceiveStateAdmin, displayAdminState);
+    socket.on(messages.messageToClientReceiveDeathBurger, displayDeathBurger);
+    socket.on(messages.messageToClientReceiveTimer, displayTimer);
     socket.on(messages.messageToClientReceiveStateTransition, displayTransitionState);
     socket.on(messages.messageToClientReceiveStateQuestion, displayQuestionState);
     socket.on('disconnect', function () {
@@ -265,7 +388,9 @@ const listenGameState = function () {
         socket.emit(messages.messageClientNeedStateBuzzer);
         socket.emit(messages.messageClientNeedStateTransition);
         socket.emit(messages.messageClientNeedStateQuestion);
+        socket.emit(messages.messageClientNeedStateAdmin);
     });
+    setInterval(renderTimer, 250);
 }
 
 initEvents();

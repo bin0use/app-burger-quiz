@@ -7,7 +7,7 @@
     <link href="./css/game.css" rel="stylesheet" />
 </head>
 
-<body>
+<body class="game-page">
     <div id="game-background">
         <!-- Ecran Ketchup -->
         <div class="row h-50 mt-2" id="team-ketchup">
@@ -123,13 +123,36 @@
                 </div>
             </div>
         </div>
-        <!-- Question affichée à l'écran (Nuggets, menus) -->
+        <!-- Question affichée à l'écran (Nuggets, menus, propositions de Sel ou Poivre) -->
         <div id="screen-question" hidden>
             <div class="screen-question-round" id="screen-question-round"></div>
+            <div class="screen-question-points" id="screen-question-points" hidden></div>
             <div class="screen-question-text" id="screen-question-text"></div>
             <div class="screen-question-choices" id="screen-question-choices"></div>
             <div class="screen-question-answer" id="screen-question-answer" hidden></div>
         </div>
+    </div>
+
+    <!-- Chrono -->
+    <div id="screen-timer" hidden></div>
+
+    <!-- Compteur du Burger de la mort -->
+    <div id="death-burger" hidden>
+        <div class="death-burger-title">Burger de la mort</div>
+        <div class="death-burger-steps" id="death-burger-steps"></div>
+    </div>
+
+    <!-- Ecran de victoire -->
+    <div id="victory" hidden>
+        <div class="victory-content">
+            <div class="victory-title" id="victory-title"></div>
+            <img class="victory-logo" id="victory-logo" alt="" />
+            <div class="victory-scores">
+                <span class="victory-score victory-score-ketchup" id="victory-score-ketchup">0</span>
+                <span class="victory-score victory-score-mayo" id="victory-score-mayo">0</span>
+            </div>
+        </div>
+        <div id="confetti"></div>
     </div>
 
     <!-- Modal permettant de scanner l'url des équipes & de pouvoir lancer la partie -->
@@ -165,13 +188,10 @@
     <!-- Modal Buzz -->
     <div id="modal-buzz"></div>
 
-    <!-- Modals permettant d'afficher la première équipe a avoir buzz -->
-    <div id="modal-buzz-first-ketchup">
-        <input type="image" src="./images/teams/ketchup.svg" />
-    </div>
-
-    <div id="modal-buzz-first-mayo">
-        <input type="image" src="./images/teams/mayo.svg" />
+    <!-- Première équipe a avoir buzzé (et écart avec l'autre équipe) -->
+    <div id="buzz-first" hidden>
+        <img id="buzz-first-logo" alt="" />
+        <div id="buzz-first-gap"></div>
     </div>
 
     <!-- Modal Transition -->

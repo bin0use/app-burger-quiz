@@ -26,6 +26,14 @@ function Team(name) {
         this.points--;
     }
     /**
+     * Ajoute plusieurs points (valeur bornée au maximum)
+     */
+    this.addPoints = function (count) {
+        if (!Number.isInteger(count) || count <= 0)
+            return;
+        this.points = Math.min(this.points + count, maxPoints);
+    }
+    /**
      * Fixe les points de l'équipe (valeur bornée entre 0 et le maximum)
      */
     this.setPoints = function (points) {

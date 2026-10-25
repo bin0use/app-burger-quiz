@@ -13,6 +13,8 @@ const limits = {
     answer: 500,
     choice: 200,
     choices: 4,
+    note: 500,
+    points: 10,
     mediaName: 200,
     mediaSize: maxSize
 };
@@ -64,6 +66,18 @@ const cleanChoices = function (choices) {
 }
 
 /**
+ * Nombre de points (« miams ») rapportés par une bonne réponse : 1 par défaut
+ */
+const cleanPoints = function (points) {
+    if (points === undefined || points === null || points === '')
+        return 1;
+    const value = Number(points);
+    if (!Number.isInteger(value) || value < 1 || value > limits.points)
+        throw new ValidationError(`Le nombre de points doit être compris entre 1 et ${limits.points}`);
+    return value;
+}
+
+/**
  * Son ou vidéo envoyé au préalable : { file, type, name }
  * Un fichier absent du serveur (partie importée d'ailleurs) est ignoré
  */
@@ -95,6 +109,8 @@ const cleanQuestion = function (data, mediaExists) {
         question: cleanText(data.question, 'Question', limits.question, true),
         choices: cleanChoices(data.choices),
         answer: cleanText(data.answer, 'Réponse', limits.answer, false),
+        points: cleanPoints(data.points),
+        note: cleanText(data.note, "Note de l'animateur", limits.note, false),
         questionMedia: cleanMedia(data.questionMedia, mediaExists),
         answerMedia: cleanMedia(data.answerMedia, mediaExists)
     };
