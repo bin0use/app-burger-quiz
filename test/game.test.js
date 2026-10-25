@@ -49,6 +49,10 @@ test('routes http', async function (t) {
         assert.strictEqual((await get('/vendors/bootstrap/css/bootstrap.min.css')).status, 200);
         assert.strictEqual((await get('/vendors/bootstrap/js/bootstrap.bundle.min.js')).status, 200);
         assert.match(await (await get('/js/messages-socket.js')).text(), /BQ_MESSAGES/);
+        // Polices hébergées localement (la partie marche sans internet)
+        assert.strictEqual((await get('/vendors/fonts/bangers/files/bangers-latin-400-normal.woff2')).status, 200);
+        assert.strictEqual((await get('/vendors/fonts/fredoka/files/fredoka-latin-wght-normal.woff2')).status, 200);
+        assert.strictEqual((await get('/css/fonts.css')).status, 200);
     });
 
     await t.test('gestion des parties réservée à l\'admin', async function () {

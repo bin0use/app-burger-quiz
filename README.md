@@ -163,6 +163,8 @@ L'écran de jeu est dessiné en 16:9 et s'adapte à n'importe quelle TV ou vidé
 * au **Burger de la mort**, une tour se construit étage par étage au centre de l'écran et s'effondre à la moindre erreur ;
 * l'**écran de victoire** récapitule les points par manche et le nombre de fois où chaque équipe a buzzé en premier.
 
+Polices (ambiance fidèle à l'émission) : **Bangers** pour les titres et noms d'équipes, **Fredoka** pour les questions, propositions et chiffres. Elles sont installées avec npm (`@fontsource`) et servies par l'application : la partie fonctionne sans connexion internet.
+
 Quand la question en cours a un son ou une vidéo, quelle que soit la manche, la télécommande affiche les boutons **▶ Son / Vidéo de la question**, **▶ Son / Vidéo de la réponse** et **Stop** (`J`, `Maj+J`, `S`) : le média est joué sur l'écran de jeu (les vidéos en plein écran). Comme dans l'émission, un buzz coupe le son ou la vidéo en cours ; changer de question ou de manche l'arrête aussi. Les fichiers sont stockés dans `MEDIA_DIR` et supprimés une fois qu'aucune question ne les utilise. L'export d'une partie ne contient que la référence des médias : réimportée sur un autre serveur, la partie perd ses sons et vidéos.
 
 Sur les téléphones, le buzzer vibre, empêche la mise en veille de l'écran et indique l'état de la partie (en attente, à vous, la main passe à l'autre équipe, connexion perdue…).

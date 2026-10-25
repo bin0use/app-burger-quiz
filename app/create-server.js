@@ -32,6 +32,8 @@ const createServer = function (options) {
   // Librairies front installées via npm
   app.use('/vendors/jquery', express.static(path.dirname(require.resolve('jquery'))));
   app.use('/vendors/bootstrap', express.static(path.join(path.dirname(require.resolve('bootstrap/package.json')), 'dist')));
+  app.use('/vendors/fonts/bangers', express.static(path.dirname(require.resolve('@fontsource/bangers/package.json'))));
+  app.use('/vendors/fonts/fredoka', express.static(path.dirname(require.resolve('@fontsource-variable/fredoka/package.json'))));
   // Noms des messages socket partagés avec le serveur
   app.get('/js/messages-socket.js', function (req, res) {
     res.sendFile(path.join(confServer.rootDir, 'config/messages-socket.js'));

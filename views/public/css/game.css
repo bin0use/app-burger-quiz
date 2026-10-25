@@ -15,7 +15,6 @@
     --good: #1E8F3A;
     --good-light: #7CE38B;
     --panel: rgba(12, 8, 4, 0.92);
-    --font: 'Cabin Sketch', cursive;
     --ease-pop: cubic-bezier(0.2, 1.6, 0.4, 1);
 }
 
@@ -37,7 +36,8 @@ body {
     transform: translate(-50%, -50%);
     transform-origin: center;
     color: #fff;
-    font-family: var(--font);
+    font-family: var(--font-text);
+    font-weight: 500;
     background: radial-gradient(ellipse at 50% 45%, #1d140b 0%, #000 70%);
 }
 
@@ -92,20 +92,24 @@ body.hide-cursor * {
 
 .scoreboard-name {
     font-size: 54px;
-    font-weight: 700;
     text-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 2px;
 }
 
 .scoreboard-score {
     min-width: 130px;
     padding: 0 20px;
     font-size: 100px;
-    font-weight: 700;
     line-height: 112px;
     text-align: center;
     border: 5px solid #fff;
     border-radius: 18px;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+    font-family: var(--font-text);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
 }
 
 .scoreboard-ketchup .scoreboard-score {
@@ -123,11 +127,13 @@ body.hide-cursor * {
 
 .scoreboard-round {
     padding: 0 40px;
-    font-size: 46px;
     color: var(--mayo-light);
     text-transform: uppercase;
-    letter-spacing: 4px;
     white-space: nowrap;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 4px;
+    font-size: 54px;
 }
 
 @keyframes score-bump {
@@ -346,10 +352,12 @@ body.hide-cursor * {
 }
 
 .question-round {
-    font-size: 0.75em;
     color: var(--mayo-light);
     text-transform: uppercase;
+    font-family: var(--font-display);
+    font-weight: 400;
     letter-spacing: 3px;
+    font-size: 0.85em;
 }
 
 .question-points {
@@ -364,6 +372,7 @@ body.hide-cursor * {
     margin-top: 10px;
     font-size: 1.55em;
     line-height: 1.15;
+    font-weight: 600;
 }
 
 .question-text:empty {
@@ -405,8 +414,10 @@ body.hide-cursor * {
 .question-choice-letter {
     flex: none;
     width: 1.5em;
-    font-weight: 700;
     color: var(--mayo-light);
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.15em;
 }
 
 /* Roulement avant la réponse : les propositions s'allument tour à tour */
@@ -469,8 +480,11 @@ body.hide-cursor * {
 }
 
 .question-menu-name {
-    font-size: 1.15em;
     line-height: 1.1;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 1px;
+    font-size: 1.3em;
 }
 
 .question-menu-count {
@@ -495,13 +509,15 @@ body.hide-cursor * {
     top: -16px;
     right: -10px;
     padding: 4px 14px;
-    font-size: 0.6em;
-    font-weight: 700;
     text-transform: uppercase;
     border: 4px solid #fff;
     border-radius: 8px;
     transform: rotate(8deg);
     animation: stamp 0.4s var(--ease-pop);
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 2px;
+    font-size: 0.7em;
 }
 
 .question-menu-stamp.team-ketchup {
@@ -559,7 +575,9 @@ body.hide-cursor * {
     align-items: center;
     justify-content: center;
     font-size: 92px;
+    font-family: var(--font-text);
     font-weight: 700;
+    font-variant-numeric: tabular-nums;
 }
 
 #timer.warning .timer-ring {
@@ -614,12 +632,14 @@ body.hide-cursor * {
 }
 
 .death-burger-title {
-    font-size: 38px;
     line-height: 1.05;
     text-align: center;
     color: var(--mayo-light);
     text-transform: uppercase;
-    letter-spacing: 2px;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 3px;
+    font-size: 44px;
 }
 
 .death-burger-tower {
@@ -671,7 +691,9 @@ body.hide-cursor * {
 .death-burger-count {
     margin-top: 8px;
     font-size: 64px;
+    font-family: var(--font-text);
     font-weight: 700;
+    font-variant-numeric: tabular-nums;
 }
 
 #death-burger.won {
@@ -709,17 +731,21 @@ body.hide-cursor * {
     font-size: 54px;
     color: #000;
     text-transform: uppercase;
-    letter-spacing: 6px;
     background: var(--mayo);
     border-radius: 999px;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 6px;
 }
 
 .round-card-label {
     margin-top: 20px;
-    font-size: 190px;
-    font-weight: 700;
     line-height: 1;
     text-shadow: 0 10px 30px #000;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 6px;
+    font-size: 220px;
 }
 
 .round-card-rules {
@@ -783,10 +809,12 @@ body.hide-cursor * {
 
 #buzz-first-name {
     margin-top: 10px;
-    font-size: 110px;
-    font-weight: 700;
     text-shadow: 0 6px 18px #000;
     animation: fade-up 0.5s 0.2s ease-out backwards;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 6px;
+    font-size: 130px;
 }
 
 #buzz-first-gap {
@@ -849,10 +877,13 @@ body.hide-cursor * {
 }
 
 .victory-title {
-    font-size: 110px;
     line-height: 1.1;
     text-shadow: 0 6px 16px #000;
     animation: fade-up 0.8s ease-out;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 4px;
+    font-size: 130px;
 }
 
 .victory-logo {
@@ -873,6 +904,9 @@ body.hide-cursor * {
     font-size: 100px;
     border: 5px solid #fff;
     border-radius: 20px;
+    font-family: var(--font-text);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
 }
 
 .victory-score-ketchup {
@@ -894,6 +928,12 @@ body.hide-cursor * {
 .victory-recap th,
 .victory-recap td {
     padding: 4px 30px;
+}
+
+.victory-recap th {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 2px;
 }
 
 .victory-recap td:first-child {
@@ -995,8 +1035,10 @@ body.hide-cursor * {
 
 .prepare-title {
     margin: 30px 0;
-    font-size: 72px;
-    font-weight: 700;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 3px;
+    font-size: 84px;
 }
 
 .prepare-ketchup {
@@ -1026,15 +1068,16 @@ body.hide-cursor * {
 .prepare-button {
     margin-top: 40px;
     padding: 16px 50px;
-    font-family: var(--font);
-    font-size: 48px;
-    font-weight: 700;
     color: #fff;
     background: var(--good);
     border: 4px solid #fff;
     border-radius: 999px;
     cursor: pointer;
     transition: transform 0.2s;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 2px;
+    font-size: 56px;
 }
 
 .prepare-button:hover {
