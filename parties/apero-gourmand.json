@@ -1,0 +1,706 @@
+{
+  "name": "Apéro gourmand",
+  "questions": [
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "De quel pays est originaire la feta ?",
+      "choices": [
+        "La Grèce",
+        "L'Italie",
+        "La Turquie",
+        "Mykonos-sur-Loire"
+      ],
+      "answer": "La Grèce",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Quel fromage met-on dans une tartiflette ?",
+      "choices": [
+        "Le reblochon",
+        "Le comté",
+        "Le roquefort",
+        "Le Babybel, en enlevant la cire"
+      ],
+      "answer": "Le reblochon",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Quel fruit est la base du guacamole ?",
+      "choices": [
+        "L'avocat",
+        "Le kiwi",
+        "La courgette",
+        "Le petit pois, si on est un chef étoilé"
+      ],
+      "answer": "L'avocat",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Que veut dire « al dente » ?",
+      "choices": [
+        "« À la dent »",
+        "« Avec de l'ail »",
+        "« Pas cuit, mais avec assurance »",
+        "« Chez le dentiste »"
+      ],
+      "answer": "« À la dent »",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Quel est l'ingrédient principal du houmous ?",
+      "choices": [
+        "Le pois chiche",
+        "La lentille",
+        "Le haricot rouge",
+        "Le sable fin"
+      ],
+      "answer": "Le pois chiche",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Quelle ville a donné son nom à une moutarde célèbre ?",
+      "choices": [
+        "Dijon",
+        "Lyon",
+        "Strasbourg",
+        "Ketchup-les-Bains"
+      ],
+      "answer": "Dijon",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Pizza, Pastis ou les deux ?",
+      "question": "Ça sent l'anis",
+      "choices": [
+        "Pizza",
+        "Pastis",
+        "Les deux"
+      ],
+      "answer": "Pastis",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Pizza, Pastis ou les deux ?",
+      "question": "Ça peut être « quatre fromages »",
+      "choices": [
+        "Pizza",
+        "Pastis",
+        "Les deux"
+      ],
+      "answer": "Pizza",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Pizza, Pastis ou les deux ?",
+      "question": "Ça se prend à l'apéro",
+      "choices": [
+        "Pizza",
+        "Pastis",
+        "Les deux"
+      ],
+      "answer": "Les deux",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Pizza, Pastis ou les deux ?",
+      "question": "Ça se coupe en parts",
+      "choices": [
+        "Pizza",
+        "Pastis",
+        "Les deux"
+      ],
+      "answer": "Pizza",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Pizza, Pastis ou les deux ?",
+      "question": "Ça se sert dans un verre",
+      "choices": [
+        "Pizza",
+        "Pastis",
+        "Les deux"
+      ],
+      "answer": "Pastis",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Pizza, Pastis ou les deux ?",
+      "question": "Ça se cuit au feu de bois",
+      "choices": [
+        "Pizza",
+        "Pastis",
+        "Les deux"
+      ],
+      "answer": "Pizza",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Pizza, Pastis ou les deux ?",
+      "question": "Il y a une marque qui s'appelle Ricard",
+      "choices": [
+        "Pizza",
+        "Pastis",
+        "Les deux"
+      ],
+      "answer": "Pastis",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Pizza, Pastis ou les deux ?",
+      "question": "Ça vient de Naples",
+      "choices": [
+        "Pizza",
+        "Pastis",
+        "Les deux"
+      ],
+      "answer": "Pizza",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Pizza, Pastis ou les deux ?",
+      "question": "Ça commence par un P",
+      "choices": [
+        "Pizza",
+        "Pastis",
+        "Les deux"
+      ],
+      "answer": "Les deux",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Pizza, Pastis ou les deux ?",
+      "question": "On peut en commander un « petit jaune »",
+      "choices": [
+        "Pizza",
+        "Pastis",
+        "Les deux"
+      ],
+      "answer": "Pastis",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les fromages de France",
+      "question": "Quel fromage AOP est fabriqué dans le massif du Jura ?",
+      "choices": [
+        "Le comté",
+        "Le cantal",
+        "Le roquefort",
+        "Le Babybel du Jura"
+      ],
+      "answer": "Le comté",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les fromages de France",
+      "question": "Où est affiné le roquefort ?",
+      "choices": [
+        "Dans des caves",
+        "Dans des tonneaux",
+        "Dans un frigo Darty",
+        "Au grenier"
+      ],
+      "answer": "Dans des caves",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les fromages de France",
+      "question": "Quel fromage normand peut avoir la forme d'un cœur ?",
+      "choices": [
+        "Le neufchâtel",
+        "Le livarot",
+        "Le pont-l'évêque",
+        "Le camembert amoureux"
+      ],
+      "answer": "Le neufchâtel",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les fromages de France",
+      "question": "Avec quel lait fait-on le roquefort ?",
+      "choices": [
+        "Brebis",
+        "Vache",
+        "Chèvre",
+        "Amande bio"
+      ],
+      "answer": "Brebis",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les fromages de France",
+      "question": "Quel fromage est surnommé « le colonel » à cause de ses cinq bandes ?",
+      "choices": [
+        "Le livarot",
+        "Le maroilles",
+        "Le munster",
+        "La Vache qui rit, gradée"
+      ],
+      "answer": "Le livarot",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La cuisine du monde",
+      "question": "De quel pays vient le kimchi ?",
+      "choices": [
+        "Corée",
+        "Japon",
+        "Chine",
+        "Kimchiland"
+      ],
+      "answer": "Corée",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La cuisine du monde",
+      "question": "De quel pays vient la paella ?",
+      "choices": [
+        "Espagne",
+        "Portugal",
+        "Mexique",
+        "Italie"
+      ],
+      "answer": "Espagne",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La cuisine du monde",
+      "question": "Les pierogi sont une spécialité de :",
+      "choices": [
+        "Pologne",
+        "Grèce",
+        "Pérou",
+        "Pierre et Gilles"
+      ],
+      "answer": "Pologne",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La cuisine du monde",
+      "question": "Le ceviche est à base de :",
+      "choices": [
+        "Poisson cru mariné",
+        "Bœuf séché",
+        "Riz frit",
+        "Chips de ceviche"
+      ],
+      "answer": "Poisson cru mariné",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La cuisine du monde",
+      "question": "« Tiramisu » veut dire :",
+      "choices": [
+        "« Tire-moi vers le haut »",
+        "« Gâteau de grand-mère »",
+        "« Café sucré »",
+        "« Tire sur Missou »"
+      ],
+      "answer": "« Tire-moi vers le haut »",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La chimie de la cuisson",
+      "question": "La réaction de Maillard se produit entre :",
+      "choices": [
+        "Des sucres réducteurs et des acides aminés",
+        "Des lipides et de l'eau",
+        "De l'amidon et du sel",
+        "Des protéines et des graisses saturées"
+      ],
+      "answer": "Des sucres réducteurs et des acides aminés",
+      "points": 1,
+      "note": "Le menu piège : on espère que vous avez révisé."
+    },
+    {
+      "round": "menus",
+      "theme": "La chimie de la cuisson",
+      "question": "À quelle température l'eau bout-elle au sommet du mont Blanc ?",
+      "choices": [
+        "Environ 85 °C",
+        "100 °C",
+        "Environ 95 °C",
+        "Environ 70 °C"
+      ],
+      "answer": "Environ 85 °C",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La chimie de la cuisson",
+      "question": "Vers quelle température le sucre de table commence-t-il à caraméliser ?",
+      "choices": [
+        "Environ 160 °C",
+        "Environ 100 °C",
+        "Environ 60 °C",
+        "Environ 250 °C"
+      ],
+      "answer": "Environ 160 °C",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La chimie de la cuisson",
+      "question": "Quelle molécule donne son piquant au piment ?",
+      "choices": [
+        "La capsaïcine",
+        "La pipérine",
+        "L'allicine",
+        "Le gingérol"
+      ],
+      "answer": "La capsaïcine",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La chimie de la cuisson",
+      "question": "Quel est le pH approximatif du jus de citron ?",
+      "choices": [
+        "Environ 2",
+        "Environ 5",
+        "Environ 7",
+        "Environ 10"
+      ],
+      "answer": "Environ 2",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les plats de mamie",
+      "question": "Le bœuf bourguignon mijote dans :",
+      "choices": [
+        "Du vin rouge",
+        "De la bière",
+        "Du cidre",
+        "De l'eau de Javel"
+      ],
+      "answer": "Du vin rouge",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les plats de mamie",
+      "question": "Quelle viande met-on dans une blanquette traditionnelle ?",
+      "choices": [
+        "Du veau",
+        "Du porc",
+        "De l'agneau",
+        "Du tofu"
+      ],
+      "answer": "Du veau",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les plats de mamie",
+      "question": "Le cassoulet est fait avec des :",
+      "choices": [
+        "Haricots blancs",
+        "Lentilles",
+        "Pois chiches",
+        "Smarties"
+      ],
+      "answer": "Haricots blancs",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les plats de mamie",
+      "question": "Le hachis parmentier doit son nom à :",
+      "choices": [
+        "Antoine Parmentier, qui a fait connaître la pomme de terre",
+        "Un village de Picardie",
+        "Un parmesan entier",
+        "Un parmentier, l'outil pour hacher"
+      ],
+      "answer": "Antoine Parmentier, qui a fait connaître la pomme de terre",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les plats de mamie",
+      "question": "Dans la quiche lorraine traditionnelle, il n'y a pas de :",
+      "choices": [
+        "Fromage",
+        "Lardons",
+        "Œufs",
+        "Crème"
+      ],
+      "answer": "Fromage",
+      "points": 1,
+      "note": "Eh oui, le gruyère, c'est une hérésie pour les Lorrains."
+    },
+    {
+      "round": "addition",
+      "theme": "À table !",
+      "question": "Avec quel légume fait-on les frites ?",
+      "choices": [],
+      "answer": "La pomme de terre",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "À table !",
+      "question": "Quel aliment donne sa force à Popeye ?",
+      "choices": [],
+      "answer": "Les épinards",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "À table !",
+      "question": "Quelle boisson normande est faite avec des pommes ?",
+      "choices": [],
+      "answer": "Le cidre",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "À table !",
+      "question": "Quelle céréale utilise-t-on pour le risotto ?",
+      "choices": [],
+      "answer": "Le riz",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "À table !",
+      "question": "Combien d'œufs dans une douzaine ?",
+      "choices": [],
+      "answer": "12",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "À table !",
+      "question": "Quel insecte produit le miel ?",
+      "choices": [],
+      "answer": "L'abeille",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "À table !",
+      "question": "Le gaspacho se mange chaud ou froid ?",
+      "choices": [],
+      "answer": "Froid",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "À table !",
+      "question": "Quel gâteau breton est fait de pâte, de beurre et de sucre ?",
+      "choices": [],
+      "answer": "Le kouign-amann",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "À table !",
+      "question": "Quelle épice est la plus chère du monde ?",
+      "choices": [],
+      "answer": "Le safran",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "À table !",
+      "question": "Quelle herbe est la base du pesto ?",
+      "choices": [],
+      "answer": "Le basilic",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "À table !",
+      "question": "Quel fruit sec trouve-t-on dans le nougat de Montélimar ?",
+      "choices": [],
+      "answer": "L'amande",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "À table !",
+      "question": "Quel fruit jaune et courbé faut-il éplucher ?",
+      "choices": [],
+      "answer": "La banane",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "À table !",
+      "question": "De quel pays vient la pizza ?",
+      "choices": [],
+      "answer": "L'Italie",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Combien de minutes dans une heure ?",
+      "choices": [],
+      "answer": "60",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "De quelle couleur est une tomate mûre ?",
+      "choices": [],
+      "answer": "Rouge",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Combien font 12 + 12 ?",
+      "choices": [],
+      "answer": "24",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Quelle est la capitale de l'Espagne ?",
+      "choices": [],
+      "answer": "Madrid",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Quel animal fait « meuh » ?",
+      "choices": [],
+      "answer": "La vache",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Quel est le féminin de « cuisinier » ?",
+      "choices": [],
+      "answer": "Cuisinière",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Quel est ton plat préféré ?",
+      "choices": [],
+      "answer": "",
+      "points": 1,
+      "note": "Pas de réponse attendue : toute réponse donnée sans hésiter est bonne."
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Combien de pattes a une poule ?",
+      "choices": [],
+      "answer": "2",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Chocolatine ou pain au chocolat ?",
+      "choices": [],
+      "answer": "",
+      "points": 1,
+      "note": "Toute réponse donnée sans hésiter est bonne (mais c'est pain au chocolat)."
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Si une frite pouvait parler, que dirait-elle ?",
+      "choices": [],
+      "answer": "",
+      "points": 1,
+      "note": "Pas de réponse attendue : toute réponse donnée sans hésiter est bonne."
+    }
+  ]
+}

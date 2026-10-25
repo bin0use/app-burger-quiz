@@ -1,0 +1,706 @@
+{
+  "name": "Spécial années 90",
+  "questions": [
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Quel objet électronique fallait-il nourrir et nettoyer sous peine de le voir mourir ?",
+      "choices": [
+        "Le Tamagotchi",
+        "Le Tam-Tam",
+        "La Game Boy",
+        "Ton petit frère"
+      ],
+      "answer": "Le Tamagotchi",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Quel groupe chantait « Wannabe » en 1996 ?",
+      "choices": [
+        "Les Spice Girls",
+        "All Saints",
+        "Les L5",
+        "Les Musclés"
+      ],
+      "answer": "Les Spice Girls",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Dans « Friends », comment s'appelle le café où se retrouve la bande ?",
+      "choices": [
+        "Central Perk",
+        "Starbucks",
+        "Le Café de Flore",
+        "Chez Joey, mais il ne partage pas la nourriture"
+      ],
+      "answer": "Central Perk",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Quelle console est sortie en Europe en 1995 ?",
+      "choices": [
+        "La PlayStation",
+        "La Dreamcast",
+        "La Switch",
+        "La Wii-ti"
+      ],
+      "answer": "La PlayStation",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Qui a remporté la Coupe du monde de football 1998 ?",
+      "choices": [
+        "La France",
+        "Le Brésil",
+        "La Croatie",
+        "L'équipe d'Olive et Tom"
+      ],
+      "answer": "La France",
+      "points": 1,
+      "note": "Et un, et deux, et trois zéro !"
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Dans « Titanic », sur quoi flotte Rose alors qu'il y avait clairement de la place pour deux ?",
+      "choices": [
+        "Une porte",
+        "Un piano",
+        "Céline Dion",
+        "Un canot de sauvetage vide"
+      ],
+      "answer": "Une porte",
+      "points": 1,
+      "note": "Le débat reste ouvert."
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Hélène et les garçons, Friends ou les deux ?",
+      "question": "Il y a un personnage qui s'appelle Joey",
+      "choices": [
+        "Hélène et les garçons",
+        "Friends",
+        "Les deux"
+      ],
+      "answer": "Friends",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Hélène et les garçons, Friends ou les deux ?",
+      "question": "La bande se retrouve dans un café",
+      "choices": [
+        "Hélène et les garçons",
+        "Friends",
+        "Les deux"
+      ],
+      "answer": "Les deux",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Hélène et les garçons, Friends ou les deux ?",
+      "question": "Produit par AB Productions",
+      "choices": [
+        "Hélène et les garçons",
+        "Friends",
+        "Les deux"
+      ],
+      "answer": "Hélène et les garçons",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Hélène et les garçons, Friends ou les deux ?",
+      "question": "Il y a des rires enregistrés",
+      "choices": [
+        "Hélène et les garçons",
+        "Friends",
+        "Les deux"
+      ],
+      "answer": "Les deux",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Hélène et les garçons, Friends ou les deux ?",
+      "question": "Ça se passe à New York",
+      "choices": [
+        "Hélène et les garçons",
+        "Friends",
+        "Les deux"
+      ],
+      "answer": "Friends",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Hélène et les garçons, Friends ou les deux ?",
+      "question": "Les garçons ont un groupe de musique",
+      "choices": [
+        "Hélène et les garçons",
+        "Friends",
+        "Les deux"
+      ],
+      "answer": "Hélène et les garçons",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Hélène et les garçons, Friends ou les deux ?",
+      "question": "Il y a six personnages principaux",
+      "choices": [
+        "Hélène et les garçons",
+        "Friends",
+        "Les deux"
+      ],
+      "answer": "Friends",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Hélène et les garçons, Friends ou les deux ?",
+      "question": "Il y a un personnage qui s'appelle José",
+      "choices": [
+        "Hélène et les garçons",
+        "Friends",
+        "Les deux"
+      ],
+      "answer": "Hélène et les garçons",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Hélène et les garçons, Friends ou les deux ?",
+      "question": "A eu droit à une série dérivée",
+      "choices": [
+        "Hélène et les garçons",
+        "Friends",
+        "Les deux"
+      ],
+      "answer": "Les deux",
+      "points": 1,
+      "note": "Joey pour Friends, Le Miracle de l'amour pour Hélène."
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Hélène et les garçons, Friends ou les deux ?",
+      "question": "A duré 10 saisons",
+      "choices": [
+        "Hélène et les garçons",
+        "Friends",
+        "Les deux"
+      ],
+      "answer": "Friends",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les tubes de l'été",
+      "question": "Quel groupe chante « Macarena » ?",
+      "choices": [
+        "Los del Río",
+        "Los Lobos",
+        "Gipsy Kings",
+        "Los Pollos Hermanos"
+      ],
+      "answer": "Los del Río",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les tubes de l'été",
+      "question": "« Barbie Girl » est chanté par :",
+      "choices": [
+        "Aqua",
+        "Vengaboys",
+        "Eiffel 65",
+        "Ken, en solo"
+      ],
+      "answer": "Aqua",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les tubes de l'été",
+      "question": "Quel titre d'Eiffel 65 parle d'un monde entièrement bleu ?",
+      "choices": [
+        "Blue (Da Ba Dee)",
+        "Blue Monday",
+        "Bleu, blanc, rouge",
+        "La Schtroumpf Party"
+      ],
+      "answer": "Blue (Da Ba Dee)",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les tubes de l'été",
+      "question": "Qui chantait « Tic Tic Tac » en 1996 ?",
+      "choices": [
+        "Carrapicho",
+        "Ricky Martin",
+        "Lou Bega",
+        "Le crocodile de Peter Pan"
+      ],
+      "answer": "Carrapicho",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les tubes de l'été",
+      "question": "« Mambo No. 5 », c'est :",
+      "choices": [
+        "Lou Bega",
+        "Ricky Martin",
+        "Enrique Iglesias",
+        "Le numéro du livreur de pizza"
+      ],
+      "answer": "Lou Bega",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le Club Dorothée",
+      "question": "Dans « Les Chevaliers du Zodiaque », de quelle constellation est le chevalier Seiya ?",
+      "choices": [
+        "Pégase",
+        "Dragon",
+        "Cygne",
+        "La Grande Ourse, comme sa mère"
+      ],
+      "answer": "Pégase",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le Club Dorothée",
+      "question": "Comment s'appelle la chatte de « Sailor Moon » ?",
+      "choices": [
+        "Luna",
+        "Artémis",
+        "Diana",
+        "Garfield"
+      ],
+      "answer": "Luna",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le Club Dorothée",
+      "question": "Dans « Dragon Ball », combien de boules de cristal faut-il réunir ?",
+      "choices": [
+        "7",
+        "5",
+        "9",
+        "12, et une pour la route"
+      ],
+      "answer": "7",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le Club Dorothée",
+      "question": "Quel est le nom japonais de Nicky Larson ?",
+      "choices": [
+        "Ryô Saeba",
+        "Kenshirô",
+        "Ryû",
+        "Jean-Michel"
+      ],
+      "answer": "Ryô Saeba",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le Club Dorothée",
+      "question": "Dans « Olive et Tom », à quel poste joue Thomas Price ?",
+      "choices": [
+        "Gardien de but",
+        "Attaquant",
+        "Arbitre",
+        "Il court sur un terrain qui n'en finit pas"
+      ],
+      "answer": "Gardien de but",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le traité de Maastricht",
+      "question": "En quelle année le traité de Maastricht a-t-il été signé ?",
+      "choices": [
+        "1992",
+        "1991",
+        "1993",
+        "1990"
+      ],
+      "answer": "1992",
+      "points": 1,
+      "note": "Le menu piège : bon courage à ceux qui l'ont choisi."
+    },
+    {
+      "round": "menus",
+      "theme": "Le traité de Maastricht",
+      "question": "Quel score a fait le « oui » au référendum français sur Maastricht ?",
+      "choices": [
+        "51,04 %",
+        "53,2 %",
+        "49,8 %",
+        "55,6 %"
+      ],
+      "answer": "51,04 %",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le traité de Maastricht",
+      "question": "Combien de pays ont signé le traité de Maastricht ?",
+      "choices": [
+        "12",
+        "15",
+        "10",
+        "9"
+      ],
+      "answer": "12",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le traité de Maastricht",
+      "question": "Dans quel pays se trouve la ville de Maastricht ?",
+      "choices": [
+        "Pays-Bas",
+        "Belgique",
+        "Luxembourg",
+        "Allemagne"
+      ],
+      "answer": "Pays-Bas",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le traité de Maastricht",
+      "question": "Un des critères de Maastricht limite le déficit public à :",
+      "choices": [
+        "3 % du PIB",
+        "1 % du PIB",
+        "5 % du PIB",
+        "60 % du PIB"
+      ],
+      "answer": "3 % du PIB",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La technologie d'avant",
+      "question": "Combien de minutes de musique tenait un CD audio standard ?",
+      "choices": [
+        "74",
+        "60",
+        "90",
+        "120"
+      ],
+      "answer": "74",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La technologie d'avant",
+      "question": "Quel moteur de recherche est apparu en 1998 ?",
+      "choices": [
+        "Google",
+        "Yahoo!",
+        "AltaVista",
+        "Lycos"
+      ],
+      "answer": "Google",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La technologie d'avant",
+      "question": "Quelle était la capacité d'une disquette 3,5 pouces haute densité ?",
+      "choices": [
+        "1,44 Mo",
+        "720 Ko",
+        "100 Mo",
+        "2 Go, de quoi stocker toute ta vie"
+      ],
+      "answer": "1,44 Mo",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La technologie d'avant",
+      "question": "Quel téléphone Nokia est réputé indestructible ?",
+      "choices": [
+        "Le 3310",
+        "Le 8210",
+        "Le 6600",
+        "Le Nokia Brique"
+      ],
+      "answer": "Le 3310",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "La technologie d'avant",
+      "question": "Quel jeu était préinstallé sur le Nokia 3310 ?",
+      "choices": [
+        "Snake",
+        "Tetris",
+        "Pac-Man",
+        "Candy Crush"
+      ],
+      "answer": "Snake",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les années 90 en express",
+      "question": "Quel film de 1993 met en scène Jean Reno et Christian Clavier voyageant dans le temps ?",
+      "choices": [],
+      "answer": "Les Visiteurs",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les années 90 en express",
+      "question": "Quel groupe toulousain chante « Tomber la chemise » ?",
+      "choices": [],
+      "answer": "Zebda",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les années 90 en express",
+      "question": "Comment s'appelle le chien de l'inspecteur Gadget ?",
+      "choices": [],
+      "answer": "Finot",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les années 90 en express",
+      "question": "Quelle était la mascotte de la Coupe du monde 1998 ?",
+      "choices": [],
+      "answer": "Footix",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les années 90 en express",
+      "question": "Quel film de 1994 dit « La vie, c'est comme une boîte de chocolats » ?",
+      "choices": [],
+      "answer": "Forrest Gump",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les années 90 en express",
+      "question": "Quels agents du FBI enquêtent sur le paranormal dans « X-Files » ?",
+      "choices": [],
+      "answer": "Mulder et Scully",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les années 90 en express",
+      "question": "Comment s'appelle le phacochère du « Roi Lion » ?",
+      "choices": [],
+      "answer": "Pumbaa",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les années 90 en express",
+      "question": "Qui est élu président de la République en 1995 ?",
+      "choices": [],
+      "answer": "Jacques Chirac",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les années 90 en express",
+      "question": "Comment s'appelle le hérisson bleu de Sega ?",
+      "choices": [],
+      "answer": "Sonic",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les années 90 en express",
+      "question": "Quel boys band chante « Everybody (Backstreet's Back) » ?",
+      "choices": [],
+      "answer": "Les Backstreet Boys",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les années 90 en express",
+      "question": "En quelle année est publié le premier « Harry Potter » ?",
+      "choices": [],
+      "answer": "1997",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les années 90 en express",
+      "question": "Quelle princesse britannique est morte à Paris en 1997 ?",
+      "choices": [],
+      "answer": "Diana",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Les années 90 en express",
+      "question": "Quel est le prénom de la sœur aînée de Bart Simpson ?",
+      "choices": [],
+      "answer": "Lisa",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Combien de jours dans une année bissextile ?",
+      "choices": [],
+      "answer": "366",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "De quelle couleur est le cheval blanc d'Henri IV ?",
+      "choices": [],
+      "answer": "Blanc",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Combien font 7 × 8 ?",
+      "choices": [],
+      "answer": "56",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Quel animal fait « coin-coin » ?",
+      "choices": [],
+      "answer": "Le canard",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Quelle est la capitale de l'Italie ?",
+      "choices": [],
+      "answer": "Rome",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Qui chante « Allumer le feu » ?",
+      "choices": [],
+      "answer": "Johnny Hallyday",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "De quelle couleur est un Schtroumpf ?",
+      "choices": [],
+      "answer": "Bleu",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Qui est arrivé en premier : l'œuf ou la poule ?",
+      "choices": [],
+      "answer": "",
+      "points": 1,
+      "note": "Pas de réponse attendue : toute réponse donnée sans hésiter est bonne."
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Combien de pattes a une araignée ?",
+      "choices": [],
+      "answer": "8",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Tu préfères le Minitel ou le fax ?",
+      "choices": [],
+      "answer": "",
+      "points": 1,
+      "note": "Pas de réponse attendue : toute réponse donnée sans hésiter est bonne."
+    }
+  ]
+}
