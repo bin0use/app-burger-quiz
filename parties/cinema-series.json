@@ -1,0 +1,706 @@
+{
+  "name": "Cinéma & séries",
+  "questions": [
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Dans « Le Roi Lion », comment s'appelle le père de Simba ?",
+      "choices": [
+        "Mufasa",
+        "Scar",
+        "Rafiki",
+        "Pumbaa senior"
+      ],
+      "answer": "Mufasa",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Quel acteur joue Jack Sparrow ?",
+      "choices": [
+        "Johnny Depp",
+        "Orlando Bloom",
+        "Brad Pitt",
+        "Johnny Hallyday"
+      ],
+      "answer": "Johnny Depp",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Quel est le rêve de Rémy, le rat de « Ratatouille » ?",
+      "choices": [
+        "Devenir cuisinier",
+        "Devenir plombier",
+        "Devenir dératiseur",
+        "Ouvrir un fast-food de fromage"
+      ],
+      "answer": "Devenir cuisinier",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Combien de films compte la saga « Harry Potter » ?",
+      "choices": [
+        "8",
+        "7",
+        "9",
+        "9 ¾"
+      ],
+      "answer": "8",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Dans « Game of Thrones », quelle est la devise des Stark ?",
+      "choices": [
+        "« L'hiver vient »",
+        "« Un Lannister paie toujours ses dettes »",
+        "« Feu et sang »",
+        "« Le soleil reviendra mardi »"
+      ],
+      "answer": "« L'hiver vient »",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "nuggets",
+      "theme": "",
+      "question": "Quel est le cri de Buzz l'Éclair dans « Toy Story » ?",
+      "choices": [
+        "« Vers l'infini et au-delà ! »",
+        "« À l'abordage ! »",
+        "« Je s'appelle Groot »",
+        "« Hasta la vista, baby »"
+      ],
+      "answer": "« Vers l'infini et au-delà ! »",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Kaamelott, Astérix ou les deux ?",
+      "question": "Il y a un roi Arthur",
+      "choices": [
+        "Kaamelott",
+        "Astérix",
+        "Les deux"
+      ],
+      "answer": "Kaamelott",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Kaamelott, Astérix ou les deux ?",
+      "question": "Il y a des Romains",
+      "choices": [
+        "Kaamelott",
+        "Astérix",
+        "Les deux"
+      ],
+      "answer": "Les deux",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Kaamelott, Astérix ou les deux ?",
+      "question": "Alain Chabat y a joué",
+      "choices": [
+        "Kaamelott",
+        "Astérix",
+        "Les deux"
+      ],
+      "answer": "Les deux",
+      "points": 1,
+      "note": "Le duc d'Aquitaine dans Kaamelott, César dans Mission Cléopâtre."
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Kaamelott, Astérix ou les deux ?",
+      "question": "Il y a une potion magique",
+      "choices": [
+        "Kaamelott",
+        "Astérix",
+        "Les deux"
+      ],
+      "answer": "Astérix",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Kaamelott, Astérix ou les deux ?",
+      "question": "Créé par Alexandre Astier",
+      "choices": [
+        "Kaamelott",
+        "Astérix",
+        "Les deux"
+      ],
+      "answer": "Kaamelott",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Kaamelott, Astérix ou les deux ?",
+      "question": "Il y a un barde qui chante mal",
+      "choices": [
+        "Kaamelott",
+        "Astérix",
+        "Les deux"
+      ],
+      "answer": "Astérix",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Kaamelott, Astérix ou les deux ?",
+      "question": "Ça se passe en Bretagne",
+      "choices": [
+        "Kaamelott",
+        "Astérix",
+        "Les deux"
+      ],
+      "answer": "Les deux",
+      "points": 1,
+      "note": "La (Grande-)Bretagne d'Arthur, l'Armorique d'Astérix."
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Kaamelott, Astérix ou les deux ?",
+      "question": "Il y a la quête du Graal",
+      "choices": [
+        "Kaamelott",
+        "Astérix",
+        "Les deux"
+      ],
+      "answer": "Kaamelott",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Kaamelott, Astérix ou les deux ?",
+      "question": "Il y a un chien qui s'appelle Idéfix",
+      "choices": [
+        "Kaamelott",
+        "Astérix",
+        "Les deux"
+      ],
+      "answer": "Astérix",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "sel-ou-poivre",
+      "theme": "Kaamelott, Astérix ou les deux ?",
+      "question": "On y dit « C'est pas faux »",
+      "choices": [
+        "Kaamelott",
+        "Astérix",
+        "Les deux"
+      ],
+      "answer": "Kaamelott",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les répliques cultes",
+      "question": "« T'as d'beaux yeux, tu sais. »",
+      "choices": [
+        "Quai des brumes",
+        "La Grande Vadrouille",
+        "Les Tontons flingueurs",
+        "Le Fabuleux Destin d'Amélie Poulain"
+      ],
+      "answer": "Quai des brumes",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les répliques cultes",
+      "question": "« Comment est votre blanquette ? »",
+      "choices": [
+        "OSS 117 : Le Caire, nid d'espions",
+        "Le Dîner de cons",
+        "La Cité de la peur",
+        "Ratatouille"
+      ],
+      "answer": "OSS 117 : Le Caire, nid d'espions",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les répliques cultes",
+      "question": "« Houston, on a un problème. »",
+      "choices": [
+        "Apollo 13",
+        "Armageddon",
+        "Gravity",
+        "Toy Story"
+      ],
+      "answer": "Apollo 13",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les répliques cultes",
+      "question": "« Il s'appelle Juste Leblanc. »",
+      "choices": [
+        "Le Dîner de cons",
+        "Les Visiteurs",
+        "Bienvenue chez les Ch'tis",
+        "Le Père Noël est une ordure"
+      ],
+      "answer": "Le Dîner de cons",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les répliques cultes",
+      "question": "« Hasta la vista, baby. »",
+      "choices": [
+        "Terminator 2",
+        "Rambo",
+        "Speed",
+        "Dora l'exploratrice"
+      ],
+      "answer": "Terminator 2",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les séries télé",
+      "question": "Dans « Breaking Bad », quel est le métier de Walter White au début ?",
+      "choices": [
+        "Professeur de chimie",
+        "Pharmacien",
+        "Policier",
+        "Vendeur de camping-cars"
+      ],
+      "answer": "Professeur de chimie",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les séries télé",
+      "question": "Dans quelle ville se déroule « Stranger Things » ?",
+      "choices": [
+        "Hawkins",
+        "Springfield",
+        "Twin Peaks",
+        "Sunnydale"
+      ],
+      "answer": "Hawkins",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les séries télé",
+      "question": "Combien de saisons compte « Game of Thrones » ?",
+      "choices": [
+        "8",
+        "6",
+        "10",
+        "Une de trop, selon certains"
+      ],
+      "answer": "8",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les séries télé",
+      "question": "Dans « La Casa de Papel », les braqueurs portent un masque de :",
+      "choices": [
+        "Salvador Dalí",
+        "Picasso",
+        "Guy Fawkes",
+        "Mickey"
+      ],
+      "answer": "Salvador Dalí",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Les séries télé",
+      "question": "Dans « The Office » (US), comment s'appelle l'entreprise de papier ?",
+      "choices": [
+        "Dunder Mifflin",
+        "Wernham Hogg",
+        "Vance Refrigeration",
+        "Clairefontaine"
+      ],
+      "answer": "Dunder Mifflin",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le cinéma muet soviétique",
+      "question": "Qui a réalisé « Le Cuirassé Potemkine » (1925) ?",
+      "choices": [
+        "Sergueï Eisenstein",
+        "Dziga Vertov",
+        "Lev Koulechov",
+        "Vsevolod Poudovkine"
+      ],
+      "answer": "Sergueï Eisenstein",
+      "points": 1,
+      "note": "Le menu piège : à proposer en dernier, évidemment."
+    },
+    {
+      "round": "menus",
+      "theme": "Le cinéma muet soviétique",
+      "question": "Dans quelle ville se trouve l'escalier du « Cuirassé Potemkine » ?",
+      "choices": [
+        "Odessa",
+        "Saint-Pétersbourg",
+        "Sébastopol",
+        "Moscou"
+      ],
+      "answer": "Odessa",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le cinéma muet soviétique",
+      "question": "Qui a réalisé « L'Homme à la caméra » (1929) ?",
+      "choices": [
+        "Dziga Vertov",
+        "Sergueï Eisenstein",
+        "Alexandre Dovjenko",
+        "Lev Koulechov"
+      ],
+      "answer": "Dziga Vertov",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le cinéma muet soviétique",
+      "question": "L'« effet Koulechov » montre l'importance :",
+      "choices": [
+        "Du montage",
+        "Du son",
+        "De la couleur",
+        "Des costumes"
+      ],
+      "answer": "Du montage",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Le cinéma muet soviétique",
+      "question": "Qui a réalisé « La Mère » (1926) ?",
+      "choices": [
+        "Vsevolod Poudovkine",
+        "Sergueï Eisenstein",
+        "Dziga Vertov",
+        "Alexandre Dovjenko"
+      ],
+      "answer": "Vsevolod Poudovkine",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Disney et Pixar",
+      "question": "Comment s'appelle le bonhomme de neige de « La Reine des neiges » ?",
+      "choices": [
+        "Olaf",
+        "Sven",
+        "Kristoff",
+        "Frosty"
+      ],
+      "answer": "Olaf",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Disney et Pixar",
+      "question": "Dans « Le Monde de Nemo », quel poisson a des trous de mémoire ?",
+      "choices": [
+        "Dory",
+        "Marin",
+        "Gill",
+        "Bruce"
+      ],
+      "answer": "Dory",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Disney et Pixar",
+      "question": "Dans « Là-haut », comment s'envole la maison ?",
+      "choices": [
+        "Avec des ballons",
+        "Avec une fusée",
+        "Avec des hélices",
+        "Avec un dossier de subvention"
+      ],
+      "answer": "Avec des ballons",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Disney et Pixar",
+      "question": "Comment s'appelle le grillon de « Pinocchio » ?",
+      "choices": [
+        "Jiminy Cricket",
+        "Timon",
+        "Flik",
+        "Cricri d'amour"
+      ],
+      "answer": "Jiminy Cricket",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "menus",
+      "theme": "Disney et Pixar",
+      "question": "Dans « Aladdin », comment s'appelle le singe ?",
+      "choices": [
+        "Abu",
+        "Iago",
+        "Rajah",
+        "Kong"
+      ],
+      "answer": "Abu",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Moteur, action !",
+      "question": "Quel réalisateur a fait « E.T. » et « Jurassic Park » ?",
+      "choices": [],
+      "answer": "Steven Spielberg",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Moteur, action !",
+      "question": "Quel magicien crie « Vous ne passerez pas ! » ?",
+      "choices": [],
+      "answer": "Gandalf",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Moteur, action !",
+      "question": "Dans quel film un requin terrorise la plage d'Amity ?",
+      "choices": [],
+      "answer": "Les Dents de la mer",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Moteur, action !",
+      "question": "Quel super-héros s'appelle Tony Stark ?",
+      "choices": [],
+      "answer": "Iron Man",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Moteur, action !",
+      "question": "Qui joue Jean-Claude Dusse dans « Les Bronzés » ?",
+      "choices": [],
+      "answer": "Michel Blanc",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Moteur, action !",
+      "question": "Combien de nains accompagnent Blanche-Neige ?",
+      "choices": [],
+      "answer": "7",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Moteur, action !",
+      "question": "Quel ogre vert vit dans un marais ?",
+      "choices": [],
+      "answer": "Shrek",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Moteur, action !",
+      "question": "Comment s'appelle le personnage de Leonardo DiCaprio dans « Titanic » ?",
+      "choices": [],
+      "answer": "Jack",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Moteur, action !",
+      "question": "Quel méchant respire bruyamment derrière un masque noir ?",
+      "choices": [],
+      "answer": "Dark Vador",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Moteur, action !",
+      "question": "De quelle saga Marty McFly est-il le héros ?",
+      "choices": [],
+      "answer": "Retour vers le futur",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Moteur, action !",
+      "question": "Qui joue Obélix dans « Mission Cléopâtre » ?",
+      "choices": [],
+      "answer": "Gérard Depardieu",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Moteur, action !",
+      "question": "Comment s'appelle le robot doré de « Star Wars » ?",
+      "choices": [],
+      "answer": "C-3PO",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "addition",
+      "theme": "Moteur, action !",
+      "question": "Dans quelle ville se déroule « Bienvenue chez les Ch'tis » ?",
+      "choices": [],
+      "answer": "Bergues",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Combien de jours dans une semaine ?",
+      "choices": [],
+      "answer": "7",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "De quelle couleur est Hulk ?",
+      "choices": [],
+      "answer": "Vert",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Comment s'appelle la souris de Disney ?",
+      "choices": [],
+      "answer": "Mickey",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Combien font 9 × 9 ?",
+      "choices": [],
+      "answer": "81",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Comment s'appelle ton voisin de gauche ?",
+      "choices": [],
+      "answer": "",
+      "points": 1,
+      "note": "Pas de réponse attendue : toute réponse donnée sans hésiter est bonne."
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Quelle est la capitale du Royaume-Uni ?",
+      "choices": [],
+      "answer": "Londres",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Combien d'yeux a un cyclope ?",
+      "choices": [],
+      "answer": "Un",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Si tu étais un film, tu serais lequel ?",
+      "choices": [],
+      "answer": "",
+      "points": 1,
+      "note": "Pas de réponse attendue : toute réponse donnée sans hésiter est bonne."
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Quel est le contraire de « chaud » ?",
+      "choices": [],
+      "answer": "Froid",
+      "points": 1,
+      "note": ""
+    },
+    {
+      "round": "burger-de-la-mort",
+      "theme": "",
+      "question": "Pop-corn sucré ou salé ?",
+      "choices": [],
+      "answer": "",
+      "points": 1,
+      "note": "Pas de réponse attendue : toute réponse donnée sans hésiter est bonne."
+    }
+  ]
+}

@@ -62,7 +62,15 @@
                 </li>
                 <% }) %>
               </ul>
-              <ol class="list-group mt-3" id="question-list"></ol>
+              <div class="d-flex flex-wrap align-items-center mt-3" id="selection-toolbar">
+                <div class="custom-control custom-checkbox mr-3">
+                  <input type="checkbox" class="custom-control-input" id="input-select-all" />
+                  <label class="custom-control-label" for="input-select-all">Tout sélectionner</label>
+                </div>
+                <small class="text-muted mr-3" id="selection-count"></small>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="button-transfer" disabled>Copier / déplacer vers une autre partie…</button>
+              </div>
+              <ol class="list-group mt-2" id="question-list"></ol>
               <p class="text-muted mt-3" id="question-list-empty">Aucune question dans cette manche.</p>
               <button type="button" class="btn btn-success mt-2" id="button-new-question">Ajouter une question</button>
             </div>
@@ -161,6 +169,39 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
           <button type="submit" class="btn btn-primary" id="button-save-question">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de copie / déplacement de questions vers une autre partie -->
+  <div class="modal fade" id="modal-transfer" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <form class="modal-content" id="form-transfer">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modal-transfer-title">Copier / déplacer</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="input-transfer-target">Vers la partie</label>
+            <select class="form-control" id="input-transfer-target" required></select>
+          </div>
+          <div class="custom-control custom-radio">
+            <input type="radio" class="custom-control-input" name="transfer-mode" id="input-transfer-copy" value="copy" checked />
+            <label class="custom-control-label" for="input-transfer-copy">Copier <small class="text-muted">(les questions restent aussi dans cette partie)</small></label>
+          </div>
+          <div class="custom-control custom-radio">
+            <input type="radio" class="custom-control-input" name="transfer-mode" id="input-transfer-move" value="move" />
+            <label class="custom-control-label" for="input-transfer-move">Déplacer <small class="text-muted">(les questions sont retirées de cette partie)</small></label>
+          </div>
+          <small class="form-text text-muted">Les questions sont ajoutées à la fin de leur manche, avec leur thème, leurs sons et vidéos.</small>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Valider</button>
         </div>
       </form>
     </div>
