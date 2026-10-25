@@ -659,7 +659,7 @@ module.exports = function (io, options) {
             answerRevealed = revealed;
         }
         // Victoire automatique annulée : plus aucune équipe n'a gagné
-        if (victoryAuto && Math.max(teamMayo.points, teamKetchup.points) < victoryPoints) {
+        if (victoryAuto && maxTeamPoints() < victoryPoints) {
             victoryVisible = false;
             victoryAuto = false;
             emitVictory();
@@ -674,11 +674,18 @@ module.exports = function (io, options) {
         emitAdminState();
     }
 
+    const maxTeamPoints = function () {
+        return Math.max(teamMayo.points, teamKetchup.points);
+    }
+
     /**
      * Une équipe atteint les points de la victoire : l'écran de victoire s'affiche
+     * Seulement au passage des points de la victoire, pour que l'animateur puisse le masquer
+     * et continuer (ex. Burger de la mort avec une équipe déjà à 25 points)
+     * @param {number} before Meilleur score avant l'action
      */
-    const checkVictory = function () {
-        if (victoryVisible || Math.max(teamMayo.points, teamKetchup.points) < victoryPoints)
+    const checkVictory = function (before) {
+        if (victoryVisible || before >= victoryPoints || maxTeamPoints() < victoryPoints)
             return;
         victoryVisible = true;
         victoryAuto = true;
@@ -696,6 +703,7 @@ module.exports = function (io, options) {
         if (!team && !deathRound)
             return;
         pushHistory();
+        const pointsBefore = maxTeamPoints();
         const question = currentQuestion();
         if (team) {
             const before = teams[team].points;
@@ -719,7 +727,7 @@ module.exports = function (io, options) {
         emitQuestionState();
         if (victoryVisible)
             emitVictory();
-        checkVictory();
+        checkVictory(pointsBefore);
         emitAdminState();
     }
 
@@ -914,6 +922,7 @@ module.exports = function (io, options) {
     const receiveOrderModifyPoints = function (messageReceive, messageForClient, team) {
         pushHistory();
         const before = team.points;
+        const pointsBefore = maxTeamPoints();
         if (messageReceive === messages.messageAdd) {
             team.incrementPoints();
         } else if (messageReceive === messages.messageRemove) {
@@ -927,7 +936,7 @@ module.exports = function (io, options) {
         io.emit(messageForClient, team.points);
         if (victoryVisible)
             emitVictory();
-        checkVictory();
+        checkVictory(pointsBefore);
         emitAdminState();
     }
 

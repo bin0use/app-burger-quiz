@@ -394,6 +394,33 @@ test('écran de victoire automatique à 25 points', async function (t) {
     assert.strictEqual((await victory)[0].visible, false);
 });
 
+test('écran de victoire masqué : ne revient pas à chaque bonne réponse', async function (t) {
+    const game = await setup(t, []);
+    for (let index = 0; index < 25; index++) {
+        const ketchup = waitFor(game.screen, messages.messageToClientKetchup);
+        game.admin.emit(messages.messageKetchupTeam, messages.messageAdd);
+        await ketchup;
+    }
+    const hidden = waitForMatch(game.screen, messages.messageToClientReceiveVictory, function (value) { return !value.visible; });
+    game.admin.emit(messages.messageToggleVictory);
+    await hidden;
+    await game.goToRound(5);
+    let shown = false;
+    game.screen.on(messages.messageToClientReceiveVictory, function (state) { shown = shown || state.visible; });
+    for (let index = 1; index <= 2; index++) {
+        const death = waitFor(game.screen, messages.messageToClientReceiveDeathBurger);
+        game.admin.emit(messages.messageGoodAnswer);
+        await death;
+    }
+    await game.unlock();
+    await game.buzz('team-ketchup');
+    const death = waitFor(game.screen, messages.messageToClientReceiveDeathBurger);
+    game.admin.emit(messages.messageGoodAnswer);
+    await death;
+    await pause(50);
+    assert.strictEqual(shown, false);
+});
+
 test('écran de victoire et lancement de la partie', async function (t) {
     const game = await setup(t, []);
     const mayo = waitFor(game.screen, messages.messageToClientMayo);
