@@ -6,43 +6,11 @@ body {
     overflow-y: auto;	
 }
 
-#modal-buzz {
-    height: 100%;
-    display: none;
-}
-
 .lock-buzz-button {
     opacity: 0.4;
     filter: alpha(opacity=40);
     /* msie */
     background-color: #000;
-}
-
-#game-background {
-    padding: 1%;
-}
-
-#modal-transition {
-    display: none;
-}
-
-.point-ketchup {
-    background: #C71000;
-    width: 140px;
-    height: 140px;
-}
-
-.point-mayo {
-    background: #E0C800;
-    width: 140px;
-    height: 140px;
-}
-
-.point-mayo,
-.point-ketchup>p {
-    font-size: 112px;
-    color: white;
-    font-family: 'Cabin Sketch', cursive;
 }
 
 .base-button {

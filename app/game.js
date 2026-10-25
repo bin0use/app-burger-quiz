@@ -44,6 +44,18 @@ const timerMaxSeconds = 600;
 const buzzTimerMaxSeconds = 60;
 
 /**
+ * Statistiques vides : points par manche ({ clé de manche: { team-mayo, team-ketchup } }) et premiers buzz
+ */
+const emptyStats = function () {
+    return { rounds: {}, buzzes: { 'team-mayo': 0, 'team-ketchup': 0 } };
+}
+
+/**
+ * Clé des points marqués avant la première transition
+ */
+const beforeRoundsKey = 'avant-les-manches';
+
+/**
  * @param {*} io Le serveur socket.io
  * @param {*} options.stateFile Fichier de sauvegarde de la partie (optionnel)
  * @param {*} options.partyStore Stockage des parties et questions (optionnel)
@@ -100,6 +112,18 @@ module.exports = function (io, options) {
     let currentMenu = null;
     let playedMenus = [];
     /**
+     * Les menus : équipe ayant choisi chaque menu ({ nom du menu: équipe })
+     */
+    let menuTeams = {};
+    /**
+     * Carton de manche affiché sur l'écran de jeu après la transition (numéro, nom, règles)
+     */
+    let roundCardVisible = false;
+    /**
+     * Statistiques pour l'écran de victoire : points par manche et premiers buzz par équipe
+     */
+    let stats = emptyStats();
+    /**
      * Bonnes réponses d'affilée au Burger de la mort
      */
     let deathCount = 0;
@@ -146,7 +170,48 @@ module.exports = function (io, options) {
             playedMenus = state.playedMenus.filter(function (menu) { return typeof menu === 'string'; });
         if (typeof state.currentMenu === 'string' && isMenusRound() && menuNames().indexOf(state.currentMenu) !== -1)
             currentMenu = state.currentMenu;
+        if (state.menuTeams && typeof state.menuTeams === 'object') {
+            Object.keys(state.menuTeams).forEach(function (name) {
+                if (validTeamNames.indexOf(state.menuTeams[name]) !== -1)
+                    menuTeams[name] = state.menuTeams[name];
+            });
+        }
+        if (state.stats && state.stats.rounds && state.stats.buzzes)
+            stats = restoreStats(state.stats);
         clampQuestionIndex();
+    }
+
+    /**
+     * Statistiques sauvegardées : seuls les nombres entiers des équipes connues sont gardés
+     */
+    const restoreStats = function (saved) {
+        const restored = emptyStats();
+        const count = function (value) { return Number.isInteger(value) ? value : 0; };
+        Object.keys(saved.rounds).forEach(function (key) {
+            const round = saved.rounds[key] || {};
+            restored.rounds[key] = { 'team-mayo': count(round['team-mayo']), 'team-ketchup': count(round['team-ketchup']) };
+        });
+        validTeamNames.forEach(function (team) {
+            restored.buzzes[team] = count(saved.buzzes[team]);
+        });
+        return restored;
+    }
+
+    const copyStats = function () {
+        return JSON.parse(JSON.stringify(stats));
+    }
+
+    /**
+     * Points gagnés (ou perdus) par une équipe : comptés dans la manche en cours
+     */
+    const recordPoints = function (teamName, delta) {
+        if (!delta)
+            return;
+        const transition = transitionsList[transitionIndex];
+        const key = transition ? transition.round : beforeRoundsKey;
+        if (!stats.rounds[key])
+            stats.rounds[key] = { 'team-mayo': 0, 'team-ketchup': 0 };
+        stats.rounds[key][teamName] += delta;
     }
 
     const saveState = function () {
@@ -158,7 +223,9 @@ module.exports = function (io, options) {
             questionIndex: questionIndex,
             deathCount: deathCount,
             currentMenu: currentMenu,
-            playedMenus: playedMenus
+            playedMenus: playedMenus,
+            menuTeams: menuTeams,
+            stats: stats
         });
     }
 
@@ -245,7 +312,8 @@ module.exports = function (io, options) {
         return {
             current: currentMenu,
             list: menuNames().map(function (name) {
-                return { name: name, played: playedMenus.indexOf(name) !== -1 };
+                const count = roundQuestions().filter(function (question) { return (question.theme || '') === name; }).length;
+                return { name: name, played: playedMenus.indexOf(name) !== -1, team: menuTeams[name] || null, count: count };
             })
         };
     }
@@ -386,7 +454,47 @@ module.exports = function (io, options) {
             winner = 'team-mayo';
         else if (teamKetchup.points > teamMayo.points)
             winner = 'team-ketchup';
-        return { visible: victoryVisible, winner: winner, mayo: teamMayo.points, ketchup: teamKetchup.points };
+        // Récapitulatif : points par manche jouée (et avant la première manche s'il y en a)
+        const rounds = [];
+        const pushRound = function (key, label) {
+            const round = stats.rounds[key];
+            if (round)
+                rounds.push({ label: label, mayo: round['team-mayo'], ketchup: round['team-ketchup'] });
+        };
+        pushRound(beforeRoundsKey, 'Avant les manches');
+        transitionsList.forEach(function (transition) { pushRound(transition.round, transition.label); });
+        return {
+            visible: victoryVisible,
+            winner: winner,
+            mayo: teamMayo.points,
+            ketchup: teamKetchup.points,
+            rounds: rounds,
+            buzzes: { mayo: stats.buzzes['team-mayo'], ketchup: stats.buzzes['team-ketchup'] }
+        };
+    }
+
+    /**
+     * Carton de manche : numéro, nom et règles de la manche en cours
+     */
+    const roundCardState = function () {
+        const transition = transitionsList[transitionIndex];
+        if (!transition)
+            return { visible: false };
+        return { visible: roundCardVisible, number: transitionIndex + 1, label: transition.label, rules: transition.rules };
+    }
+
+    const emitRoundCard = function (target) {
+        (target || io).emit(messages.messageToClientReceiveRoundCard, roundCardState());
+    }
+
+    /**
+     * L'animateur passe au jeu : le carton de manche disparait
+     */
+    const hideRoundCard = function () {
+        if (!roundCardVisible)
+            return;
+        roundCardVisible = false;
+        emitRoundCard();
     }
 
     const emitVictory = function (target) {
@@ -516,7 +624,9 @@ module.exports = function (io, options) {
             answerRevealed: answerRevealed,
             questionIndex: questionIndex,
             currentMenu: currentMenu,
-            playedMenus: playedMenus.slice()
+            playedMenus: playedMenus.slice(),
+            menuTeams: Object.assign({}, menuTeams),
+            stats: copyStats()
         });
         if (history.length > historySize)
             history.shift();
@@ -536,10 +646,12 @@ module.exports = function (io, options) {
         lockedOutTeams = previous.lockedOutTeams;
         deathCount = previous.deathCount;
         answerRevealed = previous.answerRevealed;
+        stats = previous.stats;
         // Choix d'un menu annulé : retour au menu (ou à la liste des menus) d'avant
         if (previous.currentMenu !== currentMenu || previous.playedMenus.join('\n') !== playedMenus.join('\n')) {
             currentMenu = previous.currentMenu;
             playedMenus = previous.playedMenus;
+            menuTeams = previous.menuTeams;
             questionIndex = previous.questionIndex;
             clampQuestionIndex();
             const revealed = answerRevealed;
@@ -586,7 +698,9 @@ module.exports = function (io, options) {
         pushHistory();
         const question = currentQuestion();
         if (team) {
+            const before = teams[team].points;
             teams[team].addPoints(question ? question.points || 1 : 1);
+            recordPoints(team, teams[team].points - before);
             io.emit(pointsMessages[team], teams[team].points);
         }
         if (question && question.answer)
@@ -676,11 +790,14 @@ module.exports = function (io, options) {
         deathCount = 0;
         currentMenu = null;
         playedMenus = [];
+        menuTeams = {};
+        roundCardVisible = true;
         resetScreenQuestion();
         resetBuzzer();
         resetTimer();
         saveState();
         io.emit(messages.messageToClientNextTransition, transition.filename);
+        emitRoundCard();
         io.emit(messages.messageToClientReceiveStateTransition, transitionState());
         emitQuestionState();
         emitDeathBurger();
@@ -695,6 +812,7 @@ module.exports = function (io, options) {
             return;
         questionIndex = index;
         lockMenuOnLastQuestion();
+        hideRoundCard();
         resetScreenQuestion();
         resetBuzzer();
         stopBuzzTimer();
@@ -717,13 +835,16 @@ module.exports = function (io, options) {
      * Les menus : l'équipe choisit un menu, ses questions s'affichent
      * Un menu verrouillé ne peut pas être choisi
      */
-    const selectMenu = function (name) {
+    const selectMenu = function (name, team) {
         if (!isMenusRound() || currentMenu !== null || typeof name !== 'string')
             return;
         if (menuNames().indexOf(name) === -1 || playedMenus.indexOf(name) !== -1)
             return;
         pushHistory();
         currentMenu = name;
+        if (validTeamNames.indexOf(team) !== -1)
+            menuTeams[name] = team;
+        hideRoundCard();
         questionIndex = 0;
         lockMenuOnLastQuestion();
         resetScreenQuestion();
@@ -742,10 +863,13 @@ module.exports = function (io, options) {
             return;
         pushHistory();
         const index = playedMenus.indexOf(name);
-        if (index === -1)
+        if (index === -1) {
             playedMenus.push(name);
-        else
+        } else {
+            // Menu remis en jeu : il n'est plus attribué à une équipe
             playedMenus.splice(index, 1);
+            delete menuTeams[name];
+        }
         saveState();
         emitQuestionState();
         emitAdminState();
@@ -789,6 +913,7 @@ module.exports = function (io, options) {
      */
     const receiveOrderModifyPoints = function (messageReceive, messageForClient, team) {
         pushHistory();
+        const before = team.points;
         if (messageReceive === messages.messageAdd) {
             team.incrementPoints();
         } else if (messageReceive === messages.messageRemove) {
@@ -797,6 +922,7 @@ module.exports = function (io, options) {
             history.pop();
             return;
         }
+        recordPoints(team === teamMayo ? 'team-mayo' : 'team-ketchup', team.points - before);
         saveState();
         io.emit(messageForClient, team.points);
         if (victoryVisible)
@@ -827,6 +953,7 @@ module.exports = function (io, options) {
             emitTimer(socket);
             emitDeathBurger(socket);
             emitVictory(socket);
+            emitRoundCard(socket);
             if (gameStarted)
                 socket.emit(messages.messageToClientStartGame);
         });
@@ -871,6 +998,7 @@ module.exports = function (io, options) {
             firstBuzzTeam = null;
             lockedOutTeams = [];
             stopBuzzTimer();
+            hideRoundCard();
             io.emit(messages.messageToClientUnLockBuzz);
             emitBuzzerState();
             emitAdminState();
@@ -889,6 +1017,9 @@ module.exports = function (io, options) {
             deathCount = 0;
             currentMenu = null;
             playedMenus = [];
+            menuTeams = {};
+            stats = emptyStats();
+            roundCardVisible = false;
             history = [];
             victoryVisible = false;
             victoryAuto = false;
@@ -901,6 +1032,7 @@ module.exports = function (io, options) {
             emitQuestionState();
             emitDeathBurger();
             emitVictory();
+            emitRoundCard();
             emitAdminState();
         });
         /**
@@ -924,6 +1056,8 @@ module.exports = function (io, options) {
             firstBuzzTeam = teamName;
             firstBuzzAt = Date.now();
             buzzGapSent = false;
+            stats.buzzes[teamName]++;
+            saveState();
             io.emit(messages.messageToClientLockBuzz);
             io.emit(messages.messageToClientReceiveBuzz, teamName);
             emitBuzzerState();
@@ -955,6 +1089,7 @@ module.exports = function (io, options) {
             socket.emit(messages.messageToClientReceiveStateAdmin, adminState());
             emitTimer(socket);
             emitDeathBurger(socket);
+            emitRoundCard(socket);
         });
         onAdminMessage(socket, messages.messageSelectParty, function (partyId) {
             if (partyId !== null && !partyStore.get(partyId))
@@ -963,6 +1098,7 @@ module.exports = function (io, options) {
             questionIndex = 0;
             currentMenu = null;
             playedMenus = [];
+            menuTeams = {};
             resetScreenQuestion();
             saveState();
             emitQuestionState();
@@ -983,8 +1119,16 @@ module.exports = function (io, options) {
         /**
          * Affiche / masque la question sur l'écran de jeu, révèle la réponse
          */
+        onAdminMessage(socket, messages.messageToggleRoundCard, function () {
+            if (!transitionsList[transitionIndex])
+                return;
+            roundCardVisible = !roundCardVisible;
+            emitRoundCard();
+        });
         onAdminMessage(socket, messages.messageToggleScreenQuestion, function () {
             screenQuestionVisible = !screenQuestionVisible;
+            if (screenQuestionVisible)
+                hideRoundCard();
             emitQuestionState();
         });
         onAdminMessage(socket, messages.messageToggleRevealAnswer, function () {

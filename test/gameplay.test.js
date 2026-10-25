@@ -262,9 +262,10 @@ test('Les menus : noms des menus, puis questions du menu choisi', async function
         { round: 'menus', theme: 'Menu Cinéma', question: 'C2', answer: 'R3' },
         { round: 'menus', theme: 'Menu Cuisine', question: 'K1', answer: 'R4' }
     ]);
-    const menus = function (played) {
+    const counts = { 'Menu Cinéma': 2, 'Menu Sport': 1, 'Menu Cuisine': 1 };
+    const menus = function (played, teams) {
         return ['Menu Cinéma', 'Menu Sport', 'Menu Cuisine'].map(function (name) {
-            return { name: name, played: played.indexOf(name) !== -1 };
+            return { name: name, played: played.indexOf(name) !== -1, team: (teams || {})[name] || null, count: counts[name] };
         });
     }
     let state = waitForMatch(game.admin, messages.messageToClientReceiveStateQuestion, function (value) {
@@ -282,7 +283,7 @@ test('Les menus : noms des menus, puis questions du menu choisi', async function
     // La première équipe choisit le menu Cinéma : seulement ses questions
     state = waitFor(game.admin, messages.messageToClientReceiveStateQuestion);
     screen = waitFor(game.screen, messages.messageToClientReceiveScreenQuestion);
-    game.admin.emit(messages.messageSelectMenu, 'Menu Cinéma');
+    game.admin.emit(messages.messageSelectMenu, 'Menu Cinéma', 'team-ketchup');
     let current = (await state)[0];
     assert.strictEqual(current.total, 2);
     assert.strictEqual(current.question.question, 'C1');
@@ -297,7 +298,7 @@ test('Les menus : noms des menus, puis questions du menu choisi', async function
         return value && value.menus;
     });
     game.admin.emit(messages.messageBackToMenus);
-    assert.deepStrictEqual(await screen, { round: 'Les menus', menus: menus(['Menu Cinéma']) });
+    assert.deepStrictEqual(await screen, { round: 'Les menus', menus: menus(['Menu Cinéma'], { 'Menu Cinéma': 'team-ketchup' }) });
     game.admin.emit(messages.messageSelectMenu, 'Menu Cinéma');
     game.screen.emit(messages.messageSelectMenu, 'Menu Sport');
     await pause(100);
@@ -305,15 +306,18 @@ test('Les menus : noms des menus, puis questions du menu choisi', async function
     assert.strictEqual((await waitFor(game.admin, messages.messageToClientReceiveStateQuestion))[0].menus.current, null);
 
     state = waitFor(game.admin, messages.messageToClientReceiveStateQuestion);
-    game.admin.emit(messages.messageSelectMenu, 'Menu Sport');
+    game.admin.emit(messages.messageSelectMenu, 'Menu Sport', 'team-mayo');
     current = (await state)[0];
-    assert.deepStrictEqual(current.menus, { current: 'Menu Sport', list: menus(['Menu Cinéma', 'Menu Sport']) });
+    assert.deepStrictEqual(current.menus, {
+        current: 'Menu Sport',
+        list: menus(['Menu Cinéma', 'Menu Sport'], { 'Menu Cinéma': 'team-ketchup', 'Menu Sport': 'team-mayo' })
+    });
     assert.strictEqual(current.question.question, 'S1');
 
     // Annuler le choix : retour à la liste, le menu redevient disponible
     state = waitFor(game.admin, messages.messageToClientReceiveStateQuestion);
     game.admin.emit(messages.messageUndo);
-    assert.deepStrictEqual((await state)[0].menus, { current: null, list: menus(['Menu Cinéma']) });
+    assert.deepStrictEqual((await state)[0].menus, { current: null, list: menus(['Menu Cinéma'], { 'Menu Cinéma': 'team-ketchup' }) });
 });
 
 test('Les menus : verrouillés à la dernière question ou à la main', async function (t) {
@@ -327,7 +331,11 @@ test('Les menus : verrouillés à la dernière question ou à la main', async fu
     const send = async function (message, value) {
         const state = waitFor(game.admin, messages.messageToClientReceiveStateQuestion);
         game.admin.emit(message, value);
-        return (await state)[0].menus;
+        const menus = (await state)[0].menus;
+        return {
+            current: menus.current,
+            list: menus.list.map(function (menu) { return { name: menu.name, played: menu.played }; })
+        };
     }
     // Retour aux menus avant la dernière question : le menu reste disponible
     await send(messages.messageSelectMenu, 'A');
@@ -376,7 +384,10 @@ test('écran de victoire automatique à 25 points', async function (t) {
     }
     let victory = waitFor(game.screen, messages.messageToClientReceiveVictory);
     game.admin.emit(messages.messageKetchupTeam, messages.messageAdd);
-    assert.deepStrictEqual(await victory, [{ visible: true, winner: 'team-ketchup', mayo: 0, ketchup: 25 }]);
+    assert.deepStrictEqual(await victory, [{
+        visible: true, winner: 'team-ketchup', mayo: 0, ketchup: 25,
+        rounds: [{ label: 'Avant les manches', mayo: 0, ketchup: 25 }], buzzes: { mayo: 0, ketchup: 0 }
+    }]);
     // Annuler le point : l'écran de victoire disparait
     victory = waitFor(game.screen, messages.messageToClientReceiveVictory);
     game.admin.emit(messages.messageUndo);
@@ -390,7 +401,10 @@ test('écran de victoire et lancement de la partie', async function (t) {
     await mayo;
     const victory = waitFor(game.screen, messages.messageToClientReceiveVictory);
     game.admin.emit(messages.messageToggleVictory);
-    assert.deepStrictEqual(await victory, [{ visible: true, winner: 'team-mayo', mayo: 1, ketchup: 0 }]);
+    assert.deepStrictEqual(await victory, [{
+        visible: true, winner: 'team-mayo', mayo: 1, ketchup: 0,
+        rounds: [{ label: 'Avant les manches', mayo: 1, ketchup: 0 }], buzzes: { mayo: 0, ketchup: 0 }
+    }]);
 
     const started = waitFor(game.screen, messages.messageToClientStartGame);
     game.admin.emit(messages.messageStartGame);
@@ -435,4 +449,61 @@ test('nouvelle manche ou nouvelle question : le buzz précédent ne compte plus'
     state = waitFor(game.screen, messages.messageToClientReceiveStateBuzzer);
     game.admin.emit(messages.messageNextTransition);
     assert.deepStrictEqual(await state, [true, null, []]);
+});
+
+test('récapitulatif de la partie : points par manche et premiers au buzzer', async function (t) {
+    const game = await setup(t, [
+        { round: 'nuggets', question: 'N1', answer: 'R1', points: 2 },
+        { round: 'sel-ou-poivre', question: 'S1', answer: 'Sel' }
+    ]);
+    await game.goToRound(1);
+    await game.unlock();
+    await game.buzz('team-mayo');
+    let mayo = waitFor(game.screen, messages.messageToClientMayo);
+    game.admin.emit(messages.messageGoodAnswer);
+    await mayo;
+    await game.goToRound(1);
+    await game.unlock();
+    await game.buzz('team-ketchup');
+    const ketchup = waitFor(game.screen, messages.messageToClientKetchup);
+    game.admin.emit(messages.messageGoodAnswer);
+    await ketchup;
+    mayo = waitFor(game.screen, messages.messageToClientMayo);
+    game.admin.emit(messages.messageMayoTeam, messages.messageRemove);
+    await mayo;
+
+    const victory = waitFor(game.screen, messages.messageToClientReceiveVictory);
+    game.admin.emit(messages.messageToggleVictory);
+    const state = (await victory)[0];
+    assert.deepStrictEqual(state.rounds, [
+        { label: 'Nuggets', mayo: 2, ketchup: 0 },
+        { label: 'Sel ou Poivre', mayo: -1, ketchup: 1 }
+    ]);
+    assert.deepStrictEqual(state.buzzes, { mayo: 1, ketchup: 1 });
+});
+
+test('carton de manche après chaque transition', async function (t) {
+    const game = await setup(t, [{ round: 'nuggets', question: 'N1' }, { round: 'nuggets', question: 'N2' }]);
+    let card = waitForMatch(game.screen, messages.messageToClientReceiveRoundCard, function (value) { return value.visible; });
+    await game.goToRound(1);
+    const shown = await card;
+    assert.strictEqual(shown.number, 1);
+    assert.strictEqual(shown.label, 'Nuggets');
+    assert.ok(shown.rules);
+    // Masqué à la main, réaffiché, puis automatiquement quand le jeu reprend
+    card = waitFor(game.screen, messages.messageToClientReceiveRoundCard);
+    game.admin.emit(messages.messageToggleRoundCard);
+    assert.strictEqual((await card)[0].visible, false);
+    card = waitFor(game.screen, messages.messageToClientReceiveRoundCard);
+    game.admin.emit(messages.messageToggleRoundCard);
+    assert.strictEqual((await card)[0].visible, true);
+    card = waitFor(game.screen, messages.messageToClientReceiveRoundCard);
+    game.admin.emit(messages.messageNextQuestion);
+    assert.strictEqual((await card)[0].visible, false);
+    // Un joueur ne peut pas l'afficher
+    game.screen.emit(messages.messageToggleRoundCard);
+    await pause(100);
+    card = waitFor(game.screen, messages.messageToClientReceiveRoundCard);
+    game.screen.emit(messages.messageClientNeedStateGame);
+    assert.strictEqual((await card)[0].visible, false);
 });

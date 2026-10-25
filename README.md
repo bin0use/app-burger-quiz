@@ -148,6 +148,21 @@ Depuis la télécommande, le lien **Gérer les parties et questions** (http://lo
 
 Choisissez ensuite la partie dans la télécommande : à chaque transition, la première question de la manche s'affiche avec sa réponse, et les boutons **Précédente / Suivante** (ou les flèches `←` / `→`) permettent de naviguer. Comme dans l'émission, les questions des **Nuggets** et des **menus** s'affichent aussi sur l'écran de jeu (question, nom du menu et propositions). Pour **Sel ou Poivre**, rien ne s'affiche par défaut : **Afficher à l'écran** (`E`) montre seulement le thème et les propositions (« Johnny, Eddy ou les deux ? »), vous lisez la question. Pour **Les menus**, l'écran affiche d'abord les noms des menus (le thème des questions) : choisissez dans la télécommande le menu pris par l'équipe pour afficher ses questions, puis **Retour aux menus**. Un menu joué jusqu'à sa dernière question est verrouillé : il est barré et ne peut plus être pris par l'autre équipe. Le bouton 🔒 à côté de chaque menu le verrouille ou le déverrouille à la main (**Annuler** revient aussi sur un choix par erreur). Pour le **Burger de la mort**, la télécommande affiche la liste de toutes les questions et réponses (cliquer sur une question y va directement). Dès qu'une équipe atteint **25 points**, l'écran de victoire s'affiche automatiquement. Depuis la télécommande, **Masquer / Afficher à l'écran** (`E`) et **Révéler la réponse à l'écran** (`R`) : la bonne proposition est mise en avant, ou la réponse s'affiche sous la question. Tant qu'elle n'est pas révélée, la réponse n'est envoyée qu'aux télécommandes authentifiées, jamais aux buzzers ni à l'écran de jeu.
 
+### L'écran de jeu
+
+L'écran de jeu est dessiné en 16:9 et s'adapte à n'importe quelle TV ou vidéoprojecteur (`F` ou double-clic pour le plein écran) :
+
+* un **bandeau** en haut avec les logos, noms et scores des équipes et la manche en cours ;
+* les **plateaux** des deux équipes (burger, boisson, sauces, frites) se remplissent point par point, chaque élément gagné rebondit et brille aux couleurs de l'équipe ;
+* la **question** s'affiche en bas de l'écran (les plateaux restent visibles), sa taille de texte s'adapte à sa longueur et les propositions arrivent une à une ;
+* quand la réponse est révélée, un **roulement** passe sur les propositions avant d'allumer la bonne ;
+* au **buzz**, l'écran passe aux couleurs de l'équipe avec son logo, puis une bordure à ses couleurs reste tant qu'elle a la main ; une mauvaise réponse affiche une grande croix ;
+* le **chrono** est un anneau qui se vide, orange à mi-temps, rouge et clignotant sur les 5 dernières secondes ;
+* après chaque transition, un **carton de manche** (numéro, nom et règles) s'affiche ; il disparait dès que le jeu reprend (question suivante, déblocage des buzzers…) ou avec `C` sur la télécommande ;
+* **Les menus** s'affichent comme des cartes de restaurant (nombre de questions, tampon « Choisi par … ») : choisissez dans la télécommande l'équipe qui choisit (proposée automatiquement) avant le menu ;
+* au **Burger de la mort**, une tour se construit étage par étage au centre de l'écran et s'effondre à la moindre erreur ;
+* l'**écran de victoire** récapitule les points par manche et le nombre de fois où chaque équipe a buzzé en premier.
+
 Quand la question en cours a un son ou une vidéo, quelle que soit la manche, la télécommande affiche les boutons **▶ Son / Vidéo de la question**, **▶ Son / Vidéo de la réponse** et **Stop** (`J`, `Maj+J`, `S`) : le média est joué sur l'écran de jeu (les vidéos en plein écran). Comme dans l'émission, un buzz coupe le son ou la vidéo en cours ; changer de question ou de manche l'arrête aussi. Les fichiers sont stockés dans `MEDIA_DIR` et supprimés une fois qu'aucune question ne les utilise. L'export d'une partie ne contient que la référence des médias : réimportée sur un autre serveur, la partie perd ses sons et vidéos.
 
 Sur les téléphones, le buzzer vibre, empêche la mise en veille de l'écran et indique l'état de la partie (en attente, à vous, la main passe à l'autre équipe, connexion perdue…).

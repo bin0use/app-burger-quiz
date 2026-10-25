@@ -32,6 +32,7 @@
         messageToggleMenuLock: 'event-toggle-menu-lock',
         messageBackToMenus: 'event-back-to-menus',
         messageToggleScreenQuestion: 'event-toggle-screen-question',
+        messageToggleRoundCard: 'event-toggle-round-card',
         messageToggleRevealAnswer: 'event-toggle-reveal-answer',
         messagePlayMedia: 'event-play-media',
         messageStopMedia: 'event-stop-media',
@@ -78,6 +79,7 @@
         messageToClientTimerEnded: 'receive-timer-ended',
         messageToClientReceiveDeathBurger: 'receive-death-burger',
         messageToClientReceiveVictory: 'receive-victory',
+        messageToClientReceiveRoundCard: 'receive-round-card',
         messageToClientStartGame: 'receive-start-game',
         messageToClientReceiveStateAdmin: 'receive-state-admin',
     });

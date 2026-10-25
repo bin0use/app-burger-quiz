@@ -59,6 +59,8 @@ const $menusChoice = $('#menus-choice');
 const $menusList = $('#menus-list');
 const $menusBack = $('#menus-back');
 const $buttonBackToMenus = $('#button-back-to-menus');
+const $menusTeam = $('#menus-team');
+const $buttonToggleRoundCard = $('#button-toggle-round-card');
 const $deathBurgerQuestions = $('#death-burger-questions');
 const $deathBurgerQuestionsList = $('#death-burger-questions-list');
 
@@ -72,6 +74,12 @@ let buzzTeam = null;
 let deathBurgerActive = false;
 let timer = { visible: false, running: false, remaining: 0, endsAt: 0 };
 let currentRoundKey = null;
+/**
+ * Les menus : équipe qui choisit (proposée automatiquement, modifiable)
+ */
+let menusTeam = null;
+let menusTeamChosen = false;
+let points = { 'team-mayo': 0, 'team-ketchup': 0 };
 
 /**
  * Actions de la télécommande (utilisées par les boutons et les raccourcis clavier)
@@ -107,7 +115,11 @@ const actions = {
     playQuestionMedia: function () { socket.emit(messages.messagePlayMedia, 'questionMedia'); },
     playAnswerMedia: function () { socket.emit(messages.messagePlayMedia, 'answerMedia'); },
     stopMedia: function () { socket.emit(messages.messageStopMedia); },
-    backToMenus: function () { socket.emit(messages.messageBackToMenus); }
+    backToMenus: function () { socket.emit(messages.messageBackToMenus); },
+    toggleRoundCard: function () {
+        if (!$buttonToggleRoundCard.prop('disabled'))
+            socket.emit(messages.messageToggleRoundCard);
+    }
 };
 
 /**
@@ -128,6 +140,7 @@ const shortcuts = {
     'p': [actions.previousTransition],
     'arrowright': [actions.nextQuestion],
     'arrowleft': [actions.previousQuestion],
+    'c': [actions.toggleRoundCard],
     'e': [actions.toggleScreenQuestion],
     'r': [actions.toggleRevealAnswer],
     'j': [actions.playQuestionMedia, actions.playAnswerMedia],
@@ -166,8 +179,14 @@ const initEvents = function () {
     $buttonStopMedia.on('click', actions.stopMedia);
     $buttonBackToMenus.on('click', actions.backToMenus);
     $menusList.on('click', '.button-select-menu', function () {
-        socket.emit(messages.messageSelectMenu, $(this).data('menu'));
+        socket.emit(messages.messageSelectMenu, $(this).data('menu'), menusTeam);
+        menusTeamChosen = false;
     });
+    $menusTeam.on('click', 'button', function () {
+        menusTeamChosen = true;
+        displayMenusTeam($(this).data('team'));
+    });
+    $buttonToggleRoundCard.on('click', actions.toggleRoundCard);
     $menusList.on('click', '.button-lock-menu', function () {
         socket.emit(messages.messageToggleMenuLock, $(this).data('menu'));
     });
@@ -328,6 +347,14 @@ const displayMediaButton = function ($button, media, target) {
  */
 const displayMenus = function (menus) {
     const choosing = !!menus && menus.current === null;
+    // Equipe qui choisit : l'autre équipe que celle du dernier menu, sinon celle qui a le moins de points
+    if (choosing && !menusTeamChosen) {
+        const chosen = menus.list.filter(function (menu) { return menu.team; });
+        if (chosen.length)
+            displayMenusTeam(chosen[chosen.length - 1].team === 'team-mayo' ? 'team-ketchup' : 'team-mayo');
+        else
+            displayMenusTeam(points['team-mayo'] < points['team-ketchup'] ? 'team-mayo' : 'team-ketchup');
+    }
     $menusChoice.prop('hidden', !choosing || !menus.list.length);
     $menusBack.prop('hidden', !menus || menus.current === null);
     $menusList.empty();
@@ -338,7 +365,8 @@ const displayMenus = function (menus) {
             .addClass(menu.played ? 'btn-outline-secondary' : 'btn-primary')
             .prop('disabled', menu.played)
             .data('menu', menu.name)
-            .text((menu.name || 'Menu ' + (index + 1)) + (menu.played ? ' (verrouillé)' : ''));
+            .text((menu.name || 'Menu ' + (index + 1)) + ' (' + menu.count + ')'
+                + (menu.team ? ' — ' + teamLabels[menu.team] : '') + (menu.played ? ' (verrouillé)' : ''));
         const $lock = $('<button type="button" class="btn btn-lg button-lock-menu"></button>')
             .addClass(menu.played ? 'btn-secondary' : 'btn-outline-primary')
             .data('menu', menu.name)
@@ -346,6 +374,28 @@ const displayMenus = function (menus) {
             .html(menu.played ? '&#128275;' : '&#128274;');
         $menusList.append($('<div class="btn-group mr-2 mb-2"></div>').append($select, $lock));
     });
+}
+
+/**
+ * Les menus : équipe qui choisit le prochain menu
+ */
+const displayMenusTeam = function (team) {
+    menusTeam = team;
+    $menusTeam.find('button').each(function () {
+        const active = $(this).data('team') === team;
+        $(this).toggleClass('active', active)
+            .toggleClass('btn-danger', active && team === 'team-ketchup')
+            .toggleClass('btn-warning', active && team === 'team-mayo');
+    });
+}
+
+/**
+ * Carton de manche à l'écran
+ * @param {*} state { visible, number, label, rules }
+ */
+const displayRoundCard = function (state) {
+    $buttonToggleRoundCard.prop('disabled', !state.label)
+        .text(state.visible ? 'Masquer le carton de manche' : 'Afficher le carton de manche');
 }
 
 /**
@@ -451,6 +501,12 @@ const listenGameState = function () {
     socket.on(messages.messageToClientReceiveTimer, displayTimer);
     socket.on(messages.messageToClientReceiveStateTransition, displayTransitionState);
     socket.on(messages.messageToClientReceiveStateQuestion, displayQuestionState);
+    socket.on(messages.messageToClientReceiveRoundCard, displayRoundCard);
+    socket.on(messages.messageToClientMayo, function (value) { points['team-mayo'] = value; });
+    socket.on(messages.messageToClientKetchup, function (value) { points['team-ketchup'] = value; });
+    socket.on(messages.messageToClientReceivePoints, function (mayo, ketchup) {
+        points = { 'team-mayo': mayo, 'team-ketchup': ketchup };
+    });
     socket.on('disconnect', function () {
         displayConnectionState(false);
     });
@@ -461,6 +517,7 @@ const listenGameState = function () {
         socket.emit(messages.messageClientNeedStateTransition);
         socket.emit(messages.messageClientNeedStateQuestion);
         socket.emit(messages.messageClientNeedStateAdmin);
+        socket.emit(messages.messageClientsNeedPointsInformations);
     });
     setInterval(renderTimer, 250);
 }
