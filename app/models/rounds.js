@@ -8,14 +8,29 @@ const deathBurgerRound = 'burger-de-la-mort';
 /**
  * Liste des transitions (une par manche) dans l'ordre de la partie
  * Comme dans l'émission, les questions des Nuggets et des menus s'affichent à l'écran,
- * et pour Sel ou Poivre seulement le thème et les propositions
+ * et pour Sel ou Poivre seulement le thème et les propositions (masqués par défaut)
+ * Les menus : l'écran affiche d'abord les noms des menus, puis les questions du menu choisi
  */
 const transitionsList = [
-    new Transition('nuggets-transition.mp4', 'Nuggets', 1, 'nuggets', { screenMode: 'question' }),
-    new Transition('selt-pepper-transition.mp4', 'Sel ou Poivre', 2, 'sel-ou-poivre', { screenMode: 'choices' }),
-    new Transition('menus-transition.mp4', 'Les menus', 3, 'menus', { screenMode: 'question' }),
-    new Transition('addition-transition.mp4', "L'addition", 4, 'addition', { timerSeconds: 60 }),
-    new Transition('death-burger-transition.mp4', 'Burger de la mort', 5, deathBurgerRound),
+    new Transition('nuggets-transition.mp4', 'Nuggets', 1, 'nuggets', {
+        screenMode: 'question',
+        rules: 'Quatre propositions, une seule bonne réponse : buzzez dès que vous la tenez !'
+    }),
+    new Transition('selt-pepper-transition.mp4', 'Sel ou Poivre', 2, 'sel-ou-poivre', {
+        screenMode: 'choices', screenHidden: true,
+        rules: 'Pour chaque proposition : l\'un, l\'autre… ou les deux ?'
+    }),
+    new Transition('menus-transition.mp4', 'Les menus', 3, 'menus', {
+        screenMode: 'question', menus: true,
+        rules: 'Chaque équipe choisit un menu et répond à toutes ses questions.'
+    }),
+    new Transition('addition-transition.mp4', "L'addition", 4, 'addition', {
+        timerSeconds: 60,
+        rules: 'Un maximum de questions en un temps record : buzzez vite !'
+    }),
+    new Transition('death-burger-transition.mp4', 'Burger de la mort', 5, deathBurgerRound, {
+        rules: '10 bonnes réponses d\'affilée pour gagner. Une erreur, et tout est à refaire !'
+    }),
 ].sort(function (a, b) {
     return a.order - b.order;
 });

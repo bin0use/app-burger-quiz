@@ -55,6 +55,14 @@ const $mediaControls = $('#media-controls');
 const $buttonPlayQuestionMedia = $('#button-play-question-media');
 const $buttonPlayAnswerMedia = $('#button-play-answer-media');
 const $buttonStopMedia = $('#button-stop-media');
+const $menusChoice = $('#menus-choice');
+const $menusList = $('#menus-list');
+const $menusBack = $('#menus-back');
+const $buttonBackToMenus = $('#button-back-to-menus');
+const $menusTeam = $('#menus-team');
+const $buttonToggleRoundCard = $('#button-toggle-round-card');
+const $deathBurgerQuestions = $('#death-burger-questions');
+const $deathBurgerQuestionsList = $('#death-burger-questions-list');
 
 const $buzzerStatus = $('#buzzer-status');
 const $connectionStatus = $('#connection-status');
@@ -66,6 +74,12 @@ let buzzTeam = null;
 let deathBurgerActive = false;
 let timer = { visible: false, running: false, remaining: 0, endsAt: 0 };
 let currentRoundKey = null;
+/**
+ * Les menus : équipe qui choisit (proposée automatiquement, modifiable)
+ */
+let menusTeam = null;
+let menusTeamChosen = false;
+let points = { 'team-mayo': 0, 'team-ketchup': 0 };
 
 /**
  * Actions de la télécommande (utilisées par les boutons et les raccourcis clavier)
@@ -100,7 +114,12 @@ const actions = {
     toggleRevealAnswer: function () { socket.emit(messages.messageToggleRevealAnswer); },
     playQuestionMedia: function () { socket.emit(messages.messagePlayMedia, 'questionMedia'); },
     playAnswerMedia: function () { socket.emit(messages.messagePlayMedia, 'answerMedia'); },
-    stopMedia: function () { socket.emit(messages.messageStopMedia); }
+    stopMedia: function () { socket.emit(messages.messageStopMedia); },
+    backToMenus: function () { socket.emit(messages.messageBackToMenus); },
+    toggleRoundCard: function () {
+        if (!$buttonToggleRoundCard.prop('disabled'))
+            socket.emit(messages.messageToggleRoundCard);
+    }
 };
 
 /**
@@ -121,6 +140,7 @@ const shortcuts = {
     'p': [actions.previousTransition],
     'arrowright': [actions.nextQuestion],
     'arrowleft': [actions.previousQuestion],
+    'c': [actions.toggleRoundCard],
     'e': [actions.toggleScreenQuestion],
     'r': [actions.toggleRevealAnswer],
     'j': [actions.playQuestionMedia, actions.playAnswerMedia],
@@ -157,6 +177,22 @@ const initEvents = function () {
     $buttonPlayQuestionMedia.on('click', actions.playQuestionMedia);
     $buttonPlayAnswerMedia.on('click', actions.playAnswerMedia);
     $buttonStopMedia.on('click', actions.stopMedia);
+    $buttonBackToMenus.on('click', actions.backToMenus);
+    $menusList.on('click', '.button-select-menu', function () {
+        socket.emit(messages.messageSelectMenu, $(this).data('menu'), menusTeam);
+        menusTeamChosen = false;
+    });
+    $menusTeam.on('click', 'button', function () {
+        menusTeamChosen = true;
+        displayMenusTeam($(this).data('team'));
+    });
+    $buttonToggleRoundCard.on('click', actions.toggleRoundCard);
+    $menusList.on('click', '.button-lock-menu', function () {
+        socket.emit(messages.messageToggleMenuLock, $(this).data('menu'));
+    });
+    $deathBurgerQuestionsList.on('click', 'li', function () {
+        socket.emit(messages.messageGoToQuestion, $(this).data('index'));
+    });
     $selectParty.on('change', function () {
         socket.emit(messages.messageSelectParty, $selectParty.val() || null);
     });
@@ -305,8 +341,87 @@ const displayMediaButton = function ($button, media, target) {
 }
 
 /**
+ * Les menus : boutons de choix du menu (ceux verrouillés sont désactivés)
+ * Et de verrouillage / déverrouillage à la main
+ * @param {*} menus { current, list: [{ name, played }] } ou null hors de la manche
+ */
+const displayMenus = function (menus) {
+    const choosing = !!menus && menus.current === null;
+    // Equipe qui choisit : l'autre équipe que celle du dernier menu, sinon celle qui a le moins de points
+    if (choosing && !menusTeamChosen) {
+        const chosen = menus.list.filter(function (menu) { return menu.team; });
+        if (chosen.length)
+            displayMenusTeam(chosen[chosen.length - 1].team === 'team-mayo' ? 'team-ketchup' : 'team-mayo');
+        else
+            displayMenusTeam(points['team-mayo'] < points['team-ketchup'] ? 'team-mayo' : 'team-ketchup');
+    }
+    $menusChoice.prop('hidden', !choosing || !menus.list.length);
+    $menusBack.prop('hidden', !menus || menus.current === null);
+    $menusList.empty();
+    if (!choosing)
+        return;
+    menus.list.forEach(function (menu, index) {
+        const $select = $('<button type="button" class="btn btn-lg button-select-menu"></button>')
+            .addClass(menu.played ? 'btn-outline-secondary' : 'btn-primary')
+            .prop('disabled', menu.played)
+            .data('menu', menu.name)
+            .text((menu.name || 'Menu ' + (index + 1)) + ' (' + menu.count + ')'
+                + (menu.team ? ' — ' + teamLabels[menu.team] : '') + (menu.played ? ' (verrouillé)' : ''));
+        const $lock = $('<button type="button" class="btn btn-lg button-lock-menu"></button>')
+            .addClass(menu.played ? 'btn-secondary' : 'btn-outline-primary')
+            .data('menu', menu.name)
+            .attr('title', menu.played ? 'Déverrouiller le menu' : 'Verrouiller le menu')
+            .html(menu.played ? '&#128275;' : '&#128274;');
+        $menusList.append($('<div class="btn-group mr-2 mb-2"></div>').append($select, $lock));
+    });
+}
+
+/**
+ * Les menus : équipe qui choisit le prochain menu
+ */
+const displayMenusTeam = function (team) {
+    menusTeam = team;
+    $menusTeam.find('button').each(function () {
+        const active = $(this).data('team') === team;
+        $(this).toggleClass('active', active)
+            .toggleClass('btn-danger', active && team === 'team-ketchup')
+            .toggleClass('btn-warning', active && team === 'team-mayo');
+    });
+}
+
+/**
+ * Carton de manche à l'écran
+ * @param {*} state { visible, number, label, rules }
+ */
+const displayRoundCard = function (state) {
+    $buttonToggleRoundCard.prop('disabled', !state.label)
+        .text(state.visible ? 'Masquer le carton de manche' : 'Afficher le carton de manche');
+}
+
+/**
+ * Burger de la mort : toutes les questions et réponses, la question en cours en avant
+ * @param {*} list [{ question, answer }] ou null hors de la manche
+ * @param {*} index L'index de la question en cours
+ */
+const displayDeathBurgerQuestions = function (list, index) {
+    $deathBurgerQuestions.prop('hidden', !list || !list.length);
+    $deathBurgerQuestionsList.empty();
+    (list || []).forEach(function (item, position) {
+        $deathBurgerQuestionsList.append($('<li class="list-group-item list-group-item-action py-1"></li>')
+            .toggleClass('active', position === index)
+            .data('index', position)
+            .append($('<span></span>').text((position + 1) + '. ' + item.question))
+            .append($('<strong class="ml-2"></strong>').text(item.answer ? '→ ' + item.answer : '')));
+    });
+    // La question en cours reste visible dans la liste (sans faire défiler la page)
+    const current = $deathBurgerQuestionsList.children('.active').get(0);
+    if (current)
+        $deathBurgerQuestionsList.scrollTop(current.offsetTop - $deathBurgerQuestionsList.height() / 2);
+}
+
+/**
  * Affiche la partie sélectionnée et la question en cours (avec sa réponse)
- * @param {*} state { parties, activePartyId, round, index, total, question }
+ * @param {*} state { parties, activePartyId, round, index, total, question, menus }
  */
 const displayQuestionState = function (state) {
     $selectParty.find('option:not([value=""])').remove();
@@ -322,6 +437,10 @@ const displayQuestionState = function (state) {
         status = 'Choisissez une partie pour afficher les questions';
     else if (!state.round)
         status = 'Lancez une transition pour commencer la manche';
+    else if (state.menus && state.menus.current === null)
+        status = state.menus.list.length ? state.round + ' : choisissez un menu' : state.round + ' : aucune question';
+    else if (state.menus)
+        status = state.round + ' — ' + (state.menus.current || 'Menu') + ' : question ' + (state.index + 1) + ' / ' + state.total;
     else if (!state.total)
         status = state.round + ' : aucune question';
     else
@@ -345,8 +464,11 @@ const displayQuestionState = function (state) {
         $questionChoices.append($('<li></li>').text(choice));
     });
 
-    // Nuggets, Sel ou Poivre et menus : la question (ou ses propositions) s'affiche aussi sur l'écran de jeu
-    $screenControls.prop('hidden', !question || !state.questionsOnScreen);
+    displayMenus(state.menus);
+    displayDeathBurgerQuestions(state.list, state.index);
+    // Nuggets, Sel ou Poivre et menus : la question (ou ses propositions, ou les noms des menus) s'affiche aussi sur l'écran de jeu
+    const choosingMenu = !!(state.menus && state.menus.current === null && state.menus.list.length);
+    $screenControls.prop('hidden', !(question || choosingMenu) || !state.questionsOnScreen);
     $buttonToggleScreenQuestion.text(state.screenVisible ? "Masquer de l'écran" : "Afficher à l'écran");
     $buttonToggleRevealAnswer.text(state.answerRevealed ? "Cacher la réponse à l'écran" : "Révéler la réponse à l'écran")
         .prop('disabled', !state.screenVisible || !question || !question.answer);
@@ -379,6 +501,12 @@ const listenGameState = function () {
     socket.on(messages.messageToClientReceiveTimer, displayTimer);
     socket.on(messages.messageToClientReceiveStateTransition, displayTransitionState);
     socket.on(messages.messageToClientReceiveStateQuestion, displayQuestionState);
+    socket.on(messages.messageToClientReceiveRoundCard, displayRoundCard);
+    socket.on(messages.messageToClientMayo, function (value) { points['team-mayo'] = value; });
+    socket.on(messages.messageToClientKetchup, function (value) { points['team-ketchup'] = value; });
+    socket.on(messages.messageToClientReceivePoints, function (mayo, ketchup) {
+        points = { 'team-mayo': mayo, 'team-ketchup': ketchup };
+    });
     socket.on('disconnect', function () {
         displayConnectionState(false);
     });
@@ -389,6 +517,7 @@ const listenGameState = function () {
         socket.emit(messages.messageClientNeedStateTransition);
         socket.emit(messages.messageClientNeedStateQuestion);
         socket.emit(messages.messageClientNeedStateAdmin);
+        socket.emit(messages.messageClientsNeedPointsInformations);
     });
     setInterval(renderTimer, 250);
 }

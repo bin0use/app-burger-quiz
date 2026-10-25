@@ -6,11 +6,6 @@ body {
     overflow-y: auto;	
 }
 
-#modal-buzz {
-    height: 100%;
-    display: none;
-}
-
 .lock-buzz-button {
     opacity: 0.4;
     filter: alpha(opacity=40);
@@ -18,37 +13,10 @@ body {
     background-color: #000;
 }
 
-#game-background {
-    padding: 1%;
-}
-
-#modal-transition {
-    display: none;
-}
-
-.point-ketchup {
-    background: #C71000;
-    width: 140px;
-    height: 140px;
-}
-
-.point-mayo {
-    background: #E0C800;
-    width: 140px;
-    height: 140px;
-}
-
-.point-mayo,
-.point-ketchup>p {
-    font-size: 112px;
-    color: white;
-    font-family: 'Cabin Sketch', cursive;
-}
-
 .base-button {
     font-size: 112px;
     color: white;
-    font-family: 'Cabin Sketch', cursive;
+    font-family: var(--font-display);
     border-radius: 4px;
     border: none;
     text-align: top;
@@ -140,7 +108,7 @@ body {
 .buzzer-message {
     margin-top: 1rem;
     text-align: center;
-    font-family: 'Cabin Sketch', cursive;
+    font-family: var(--font-display);
     font-size: 2rem;
     color: #fff;
 }
@@ -203,6 +171,14 @@ body.buzzed-first .container-buzzer .lock-buzz-button {
 }
 
 /* Télécommande : question et réponse lisibles de loin */
+/* Burger de la mort : liste de toutes les questions */
+.admin-question-list {
+    position: relative;
+    max-height: 22em;
+    overflow-y: auto;
+    cursor: pointer;
+}
+
 .admin-question-text {
     font-size: 2rem;
     font-weight: 600;
@@ -215,7 +191,9 @@ body.buzzed-first .container-buzzer .lock-buzz-button {
 }
 
 .admin-timer {
-    font-family: 'Cabin Sketch', cursive;
+    font-family: var(--font-text);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
     font-size: 2.5rem;
     min-width: 3.5em;
 }
