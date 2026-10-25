@@ -16,6 +16,7 @@ const $screenQuestionPoints = $('#screen-question-points');
 const $screenQuestionText = $('#screen-question-text');
 const $screenQuestionChoices = $('#screen-question-choices');
 const $screenQuestionAnswer = $('#screen-question-answer');
+const $screenQuestionMenus = $('#screen-question-menus');
 
 const $modalMedia = $('#modal-media');
 const videoMedia = document.getElementById('video-media');
@@ -437,13 +438,39 @@ const playMedia = function (media) {
 }
 
 /**
+ * Les menus : noms des menus à choisir, ceux déjà joués sont barrés
+ * @param {*} menus [{ name, played }]
+ */
+const displayScreenMenus = function (menus) {
+    $screenQuestionMenus.empty();
+    menus.forEach(function (menu, index) {
+        $screenQuestionMenus.append($('<div class="screen-question-menu"></div>')
+            .toggleClass('played', menu.played)
+            .text(menu.name || 'Menu ' + (index + 1)));
+    });
+}
+
+/**
  * Affiche la question en cours (Nuggets, menus, propositions de Sel ou Poivre) ou la masque
- * @param {*} question { round, theme, question, choices, answer } (answer seulement une fois révélée), null pour masquer
+ * @param {*} question { round, theme, question, choices, answer } (answer seulement une fois révélée),
+ *  { round, menus } pour choisir un menu, null pour masquer
  */
 const displayScreenQuestion = function (question) {
     $screenQuestion.prop('hidden', !question);
     if (!question)
         return;
+    const isMenus = Array.isArray(question.menus);
+    $screenQuestionMenus.prop('hidden', !isMenus);
+    if (isMenus) {
+        $screenQuestionRound.text(question.round);
+        $screenQuestionText.text('');
+        $screenQuestionPoints.prop('hidden', true);
+        $screenQuestionChoices.empty().removeClass('revealed');
+        $screenQuestionAnswer.prop('hidden', true).text('');
+        displayScreenMenus(question.menus);
+        return;
+    }
+    $screenQuestionMenus.empty();
     $screenQuestionRound.text(question.theme ? question.round + ' — ' + question.theme : question.round);
     $screenQuestionText.text(question.question);
     $screenQuestionPoints.prop('hidden', !(question.points > 1)).text(question.points + ' miams');

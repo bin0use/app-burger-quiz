@@ -168,6 +168,36 @@
     display: none;
 }
 
+/* Les menus : noms des menus à choisir, ceux déjà joués sont barrés */
+.screen-question-menus {
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+    margin-top: 3vh;
+}
+
+.screen-question-menus[hidden] {
+    display: none;
+}
+
+.screen-question-menu {
+    padding: 1.5vh 1.5vw;
+    font-size: 5vh;
+    background: #C71000;
+    border: 3px solid #fff;
+    border-radius: 8px;
+    transition: opacity 0.4s;
+}
+
+.screen-question-menu:nth-child(even) {
+    background: #B39F00;
+}
+
+.screen-question-menu.played {
+    opacity: 0.3;
+    text-decoration: line-through;
+}
+
 /**************************/
 /*   MODE TV              */
 /**************************/

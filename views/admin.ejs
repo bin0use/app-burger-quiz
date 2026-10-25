@@ -83,6 +83,13 @@
               <button type="button" class="btn btn-outline-secondary" id="button-next-question" disabled>Suivante &rarr;</button>
             </div>
           </div>
+          <div id="menus-choice" hidden>
+            <p class="mb-2">Quel menu choisit l'équipe ? <small class="text-muted">(un menu déjà joué ne peut plus être choisi)</small></p>
+            <div class="d-flex flex-wrap" id="menus-list"></div>
+          </div>
+          <div class="mb-2" id="menus-back" hidden>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="button-back-to-menus">&larr; Retour aux menus</button>
+          </div>
           <div id="question-content" hidden>
             <div class="d-flex align-items-center">
               <small class="text-muted d-block flex-grow-1" id="question-theme"></small>
@@ -97,10 +104,10 @@
               <button type="button" class="btn btn-outline-info mr-2 mb-1" id="button-play-answer-media"></button>
               <button type="button" class="btn btn-outline-secondary mb-1" id="button-stop-media">&#9632; Stop</button>
             </div>
-            <div class="mt-3" id="screen-controls" hidden>
-              <button type="button" class="btn btn-outline-primary mr-2 mb-1" id="button-toggle-screen-question">Masquer de l'écran</button>
-              <button type="button" class="btn btn-outline-success mb-1" id="button-toggle-reveal-answer">Révéler la réponse à l'écran</button>
-            </div>
+          </div>
+          <div class="mt-3" id="screen-controls" hidden>
+            <button type="button" class="btn btn-outline-primary mr-2 mb-1" id="button-toggle-screen-question">Masquer de l'écran</button>
+            <button type="button" class="btn btn-outline-success mb-1" id="button-toggle-reveal-answer">Révéler la réponse à l'écran</button>
           </div>
         </div>
       </div>

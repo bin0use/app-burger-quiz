@@ -27,6 +27,8 @@
         messageSelectParty: 'event-select-party',
         messageNextQuestion: 'event-next-question',
         messagePreviousQuestion: 'event-previous-question',
+        messageSelectMenu: 'event-select-menu',
+        messageBackToMenus: 'event-back-to-menus',
         messageToggleScreenQuestion: 'event-toggle-screen-question',
         messageToggleRevealAnswer: 'event-toggle-reveal-answer',
         messagePlayMedia: 'event-play-media',

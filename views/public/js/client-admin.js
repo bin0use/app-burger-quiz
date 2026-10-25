@@ -55,6 +55,10 @@ const $mediaControls = $('#media-controls');
 const $buttonPlayQuestionMedia = $('#button-play-question-media');
 const $buttonPlayAnswerMedia = $('#button-play-answer-media');
 const $buttonStopMedia = $('#button-stop-media');
+const $menusChoice = $('#menus-choice');
+const $menusList = $('#menus-list');
+const $menusBack = $('#menus-back');
+const $buttonBackToMenus = $('#button-back-to-menus');
 
 const $buzzerStatus = $('#buzzer-status');
 const $connectionStatus = $('#connection-status');
@@ -100,7 +104,8 @@ const actions = {
     toggleRevealAnswer: function () { socket.emit(messages.messageToggleRevealAnswer); },
     playQuestionMedia: function () { socket.emit(messages.messagePlayMedia, 'questionMedia'); },
     playAnswerMedia: function () { socket.emit(messages.messagePlayMedia, 'answerMedia'); },
-    stopMedia: function () { socket.emit(messages.messageStopMedia); }
+    stopMedia: function () { socket.emit(messages.messageStopMedia); },
+    backToMenus: function () { socket.emit(messages.messageBackToMenus); }
 };
 
 /**
@@ -157,6 +162,10 @@ const initEvents = function () {
     $buttonPlayQuestionMedia.on('click', actions.playQuestionMedia);
     $buttonPlayAnswerMedia.on('click', actions.playAnswerMedia);
     $buttonStopMedia.on('click', actions.stopMedia);
+    $buttonBackToMenus.on('click', actions.backToMenus);
+    $menusList.on('click', 'button', function () {
+        socket.emit(messages.messageSelectMenu, $(this).data('menu'));
+    });
     $selectParty.on('change', function () {
         socket.emit(messages.messageSelectParty, $selectParty.val() || null);
     });
@@ -305,8 +314,28 @@ const displayMediaButton = function ($button, media, target) {
 }
 
 /**
+ * Les menus : boutons de choix du menu (ceux déjà joués sont désactivés)
+ * @param {*} menus { current, list: [{ name, played }] } ou null hors de la manche
+ */
+const displayMenus = function (menus) {
+    const choosing = !!menus && menus.current === null;
+    $menusChoice.prop('hidden', !choosing || !menus.list.length);
+    $menusBack.prop('hidden', !menus || menus.current === null);
+    $menusList.empty();
+    if (!choosing)
+        return;
+    menus.list.forEach(function (menu, index) {
+        $menusList.append($('<button type="button" class="btn btn-lg mr-2 mb-2"></button>')
+            .addClass(menu.played ? 'btn-outline-secondary' : 'btn-primary')
+            .prop('disabled', menu.played)
+            .data('menu', menu.name)
+            .text((menu.name || 'Menu ' + (index + 1)) + (menu.played ? ' (déjà joué)' : '')));
+    });
+}
+
+/**
  * Affiche la partie sélectionnée et la question en cours (avec sa réponse)
- * @param {*} state { parties, activePartyId, round, index, total, question }
+ * @param {*} state { parties, activePartyId, round, index, total, question, menus }
  */
 const displayQuestionState = function (state) {
     $selectParty.find('option:not([value=""])').remove();
@@ -322,6 +351,10 @@ const displayQuestionState = function (state) {
         status = 'Choisissez une partie pour afficher les questions';
     else if (!state.round)
         status = 'Lancez une transition pour commencer la manche';
+    else if (state.menus && state.menus.current === null)
+        status = state.menus.list.length ? state.round + ' : choisissez un menu' : state.round + ' : aucune question';
+    else if (state.menus)
+        status = state.round + ' — ' + (state.menus.current || 'Menu') + ' : question ' + (state.index + 1) + ' / ' + state.total;
     else if (!state.total)
         status = state.round + ' : aucune question';
     else
@@ -345,8 +378,10 @@ const displayQuestionState = function (state) {
         $questionChoices.append($('<li></li>').text(choice));
     });
 
-    // Nuggets, Sel ou Poivre et menus : la question (ou ses propositions) s'affiche aussi sur l'écran de jeu
-    $screenControls.prop('hidden', !question || !state.questionsOnScreen);
+    displayMenus(state.menus);
+    // Nuggets, Sel ou Poivre et menus : la question (ou ses propositions, ou les noms des menus) s'affiche aussi sur l'écran de jeu
+    const choosingMenu = !!(state.menus && state.menus.current === null && state.menus.list.length);
+    $screenControls.prop('hidden', !(question || choosingMenu) || !state.questionsOnScreen);
     $buttonToggleScreenQuestion.text(state.screenVisible ? "Masquer de l'écran" : "Afficher à l'écran");
     $buttonToggleRevealAnswer.text(state.answerRevealed ? "Cacher la réponse à l'écran" : "Révéler la réponse à l'écran")
         .prop('disabled', !state.screenVisible || !question || !question.answer);

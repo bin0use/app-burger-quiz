@@ -231,15 +231,89 @@ test('compteur du Burger de la mort', async function (t) {
     assert.deepStrictEqual(await game.points(), [0, 0]);
 });
 
-test('Sel ou Poivre : thème et propositions à l\'écran', async function (t) {
+test('Sel ou Poivre : masqué par défaut, puis thème et propositions à l\'écran', async function (t) {
     const game = await setup(t, [
-        { round: 'sel-ou-poivre', theme: 'Johnny ou Eddy', question: 'A chanté Allumer le feu', choices: ['Johnny', 'Eddy', 'Les deux'], answer: 'Johnny' }
+        { round: 'sel-ou-poivre', theme: 'Johnny ou Eddy', question: 'A chanté Allumer le feu', choices: ['Johnny', 'Eddy', 'Les deux'], answer: 'Johnny' },
+        { round: 'sel-ou-poivre', theme: 'Johnny ou Eddy', question: 'A chanté Couleur menthe à l\'eau', choices: ['Johnny', 'Eddy', 'Les deux'], answer: 'Eddy' }
     ]);
-    const screen = waitForMatch(game.screen, messages.messageToClientReceiveScreenQuestion, Boolean);
+    const state = waitForMatch(game.admin, messages.messageToClientReceiveStateQuestion, function (value) {
+        return value.round === 'Sel ou Poivre';
+    });
     await game.goToRound(2);
+    assert.strictEqual((await state).screenVisible, false);
+    game.screen.emit(messages.messageClientNeedScreenQuestion);
+    assert.deepStrictEqual(await waitFor(game.screen, messages.messageToClientReceiveScreenQuestion), [null]);
+
+    let screen = waitForMatch(game.screen, messages.messageToClientReceiveScreenQuestion, Boolean);
+    game.admin.emit(messages.messageToggleScreenQuestion);
     assert.deepStrictEqual(await screen, {
         round: 'Sel ou Poivre', theme: 'Johnny ou Eddy', question: '', choices: ['Johnny', 'Eddy', 'Les deux'], points: 1, answer: null
     });
+    // Question suivante : de nouveau masquée
+    screen = waitFor(game.screen, messages.messageToClientReceiveScreenQuestion);
+    game.admin.emit(messages.messageNextQuestion);
+    assert.deepStrictEqual(await screen, [null]);
+});
+
+test('Les menus : noms des menus, puis questions du menu choisi', async function (t) {
+    const game = await setup(t, [
+        { round: 'menus', theme: 'Menu Cinéma', question: 'C1', answer: 'R1' },
+        { round: 'menus', theme: 'Menu Sport', question: 'S1', answer: 'R2' },
+        { round: 'menus', theme: 'Menu Cinéma', question: 'C2', answer: 'R3' },
+        { round: 'menus', theme: 'Menu Cuisine', question: 'K1', answer: 'R4' }
+    ]);
+    const menus = function (played) {
+        return ['Menu Cinéma', 'Menu Sport', 'Menu Cuisine'].map(function (name) {
+            return { name: name, played: played.indexOf(name) !== -1 };
+        });
+    }
+    let state = waitForMatch(game.admin, messages.messageToClientReceiveStateQuestion, function (value) {
+        return value.round === 'Les menus';
+    });
+    let screen = waitForMatch(game.screen, messages.messageToClientReceiveScreenQuestion, function (value) {
+        return value && value.round === 'Les menus';
+    });
+    await game.goToRound(3);
+    // L'écran affiche d'abord les noms des menus, aucune question
+    assert.deepStrictEqual(await screen, { round: 'Les menus', menus: menus([]) });
+    assert.deepStrictEqual((await state).menus, { current: null, list: menus([]) });
+    assert.strictEqual((await state).question, null);
+
+    // La première équipe choisit le menu Cinéma : seulement ses questions
+    state = waitFor(game.admin, messages.messageToClientReceiveStateQuestion);
+    screen = waitFor(game.screen, messages.messageToClientReceiveScreenQuestion);
+    game.admin.emit(messages.messageSelectMenu, 'Menu Cinéma');
+    let current = (await state)[0];
+    assert.strictEqual(current.total, 2);
+    assert.strictEqual(current.question.question, 'C1');
+    assert.strictEqual((await screen)[0].question, 'C1');
+    assert.strictEqual((await screen)[0].theme, 'Menu Cinéma');
+    state = waitFor(game.admin, messages.messageToClientReceiveStateQuestion);
+    game.admin.emit(messages.messageNextQuestion);
+    assert.strictEqual((await state)[0].question.question, 'C2');
+
+    // Retour aux menus : le menu Cinéma ne peut plus être choisi par l'autre équipe
+    screen = waitForMatch(game.screen, messages.messageToClientReceiveScreenQuestion, function (value) {
+        return value && value.menus;
+    });
+    game.admin.emit(messages.messageBackToMenus);
+    assert.deepStrictEqual(await screen, { round: 'Les menus', menus: menus(['Menu Cinéma']) });
+    game.admin.emit(messages.messageSelectMenu, 'Menu Cinéma');
+    game.screen.emit(messages.messageSelectMenu, 'Menu Sport');
+    await pause(100);
+    game.admin.emit(messages.messageClientNeedStateQuestion);
+    assert.strictEqual((await waitFor(game.admin, messages.messageToClientReceiveStateQuestion))[0].menus.current, null);
+
+    state = waitFor(game.admin, messages.messageToClientReceiveStateQuestion);
+    game.admin.emit(messages.messageSelectMenu, 'Menu Sport');
+    current = (await state)[0];
+    assert.deepStrictEqual(current.menus, { current: 'Menu Sport', list: menus(['Menu Cinéma', 'Menu Sport']) });
+    assert.strictEqual(current.question.question, 'S1');
+
+    // Annuler le choix : retour à la liste, le menu redevient disponible
+    state = waitFor(game.admin, messages.messageToClientReceiveStateQuestion);
+    game.admin.emit(messages.messageUndo);
+    assert.deepStrictEqual((await state)[0].menus, { current: null, list: menus(['Menu Cinéma']) });
 });
 
 test('écran de victoire et lancement de la partie', async function (t) {

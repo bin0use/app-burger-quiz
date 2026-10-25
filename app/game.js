@@ -87,6 +87,12 @@ module.exports = function (io, options) {
     let screenQuestionVisible = true;
     let answerRevealed = false;
     /**
+     * Les menus : menu choisi (null : l'écran affiche la liste des menus)
+     * Et menus déjà choisis (ils ne peuvent plus l'être par l'autre équipe)
+     */
+    let currentMenu = null;
+    let playedMenus = [];
+    /**
      * Bonnes réponses d'affilée au Burger de la mort
      */
     let deathCount = 0;
@@ -128,6 +134,10 @@ module.exports = function (io, options) {
             questionIndex = state.questionIndex;
         if (Number.isInteger(state.deathCount) && state.deathCount >= 0 && state.deathCount <= deathBurgerTotal)
             deathCount = state.deathCount;
+        if (Array.isArray(state.playedMenus))
+            playedMenus = state.playedMenus.filter(function (menu) { return typeof menu === 'string'; });
+        if (typeof state.currentMenu === 'string' && playedMenus.indexOf(state.currentMenu) !== -1)
+            currentMenu = state.currentMenu;
         clampQuestionIndex();
     }
 
@@ -138,7 +148,9 @@ module.exports = function (io, options) {
             transitionIndex: transitionIndex,
             activePartyId: activePartyId,
             questionIndex: questionIndex,
-            deathCount: deathCount
+            deathCount: deathCount,
+            currentMenu: currentMenu,
+            playedMenus: playedMenus
         });
     }
 
@@ -176,13 +188,58 @@ module.exports = function (io, options) {
     }
 
     /**
-     * Questions de la manche en cours pour la partie active
+     * Toutes les questions de la manche en cours pour la partie active
      */
-    const currentRoundQuestions = function () {
+    const roundQuestions = function () {
         const transition = transitionsList[transitionIndex];
         if (!activePartyId || !transition)
             return [];
         return partyStore.questionsOfRound(activePartyId, transition.round);
+    }
+
+    const isMenusRound = function () {
+        const transition = transitionsList[transitionIndex];
+        return !!(transition && transition.menus);
+    }
+
+    /**
+     * Noms des menus de la manche (thèmes des questions, dans l'ordre)
+     */
+    const menuNames = function () {
+        const names = [];
+        roundQuestions().forEach(function (question) {
+            const name = question.theme || '';
+            if (names.indexOf(name) === -1)
+                names.push(name);
+        });
+        return names;
+    }
+
+    /**
+     * Questions jouables de la manche en cours
+     * Les menus : seulement celles du menu choisi (aucune tant qu'il n'est pas choisi)
+     */
+    const currentRoundQuestions = function () {
+        const questions = roundQuestions();
+        if (!isMenusRound())
+            return questions;
+        if (currentMenu === null)
+            return [];
+        return questions.filter(function (question) { return (question.theme || '') === currentMenu; });
+    }
+
+    /**
+     * Les menus : liste des menus (déjà joué ou non) et menu choisi, null hors de la manche
+     */
+    const menusState = function () {
+        if (!isMenusRound())
+            return null;
+        return {
+            current: currentMenu,
+            list: menuNames().map(function (name) {
+                return { name: name, played: playedMenus.indexOf(name) !== -1 };
+            })
+        };
     }
 
     /**
@@ -213,6 +270,7 @@ module.exports = function (io, options) {
             total: questions.length,
             // Questions créées avant le barème et les notes : 1 point, pas de note
             question: question ? Object.assign({ points: 1, note: '' }, question) : null,
+            menus: menusState(),
             questionsOnScreen: !!(transition && transition.questionsOnScreen),
             screenMode: transition ? transition.screenMode : null,
             screenVisible: screenQuestionVisible,
@@ -226,6 +284,13 @@ module.exports = function (io, options) {
      */
     const screenQuestion = function () {
         const transition = transitionsList[transitionIndex];
+        // Les menus : tant qu'aucun menu n'est choisi, l'écran affiche leurs noms
+        const menus = menusState();
+        if (menus && menus.current === null) {
+            if (!screenQuestionVisible || !menus.list.length)
+                return null;
+            return { round: transition.label, menus: menus.list };
+        }
         const question = currentRoundQuestions()[questionIndex];
         if (!question || !transition.questionsOnScreen || !screenQuestionVisible)
             return null;
@@ -254,10 +319,12 @@ module.exports = function (io, options) {
     }
 
     /**
-     * Nouvelle question : affichée à l'écran, réponse cachée, son ou vidéo arrêté
+     * Nouvelle question : affichée à l'écran (sauf manche masquée par défaut, ex : Sel ou Poivre),
+     * réponse cachée, son ou vidéo arrêté
      */
     const resetScreenQuestion = function () {
-        screenQuestionVisible = true;
+        const transition = transitionsList[transitionIndex];
+        screenQuestionVisible = !(transition && transition.screenHidden);
         answerRevealed = false;
         io.emit(messages.messageToClientStopMedia);
     }
@@ -434,7 +501,10 @@ module.exports = function (io, options) {
             firstBuzzTeam: firstBuzzTeam,
             lockedOutTeams: lockedOutTeams.slice(),
             deathCount: deathCount,
-            answerRevealed: answerRevealed
+            answerRevealed: answerRevealed,
+            questionIndex: questionIndex,
+            currentMenu: currentMenu,
+            playedMenus: playedMenus.slice()
         });
         if (history.length > historySize)
             history.shift();
@@ -454,6 +524,16 @@ module.exports = function (io, options) {
         lockedOutTeams = previous.lockedOutTeams;
         deathCount = previous.deathCount;
         answerRevealed = previous.answerRevealed;
+        // Choix d'un menu annulé : retour au menu (ou à la liste des menus) d'avant
+        if (previous.currentMenu !== currentMenu || previous.playedMenus.length !== playedMenus.length) {
+            currentMenu = previous.currentMenu;
+            playedMenus = previous.playedMenus;
+            questionIndex = previous.questionIndex;
+            clampQuestionIndex();
+            const revealed = answerRevealed;
+            resetScreenQuestion();
+            answerRevealed = revealed;
+        }
         saveState();
         emitPoints();
         emitBuzzerState();
@@ -564,6 +644,8 @@ module.exports = function (io, options) {
         // Nouvelle manche : on repart de la première question
         questionIndex = 0;
         deathCount = 0;
+        currentMenu = null;
+        playedMenus = [];
         resetScreenQuestion();
         resetBuzzer();
         resetTimer();
@@ -590,11 +672,51 @@ module.exports = function (io, options) {
     }
 
     /**
+     * Les menus : l'équipe choisit un menu, ses questions s'affichent
+     * Un menu déjà choisi ne peut plus l'être (par l'autre équipe)
+     */
+    const selectMenu = function (name) {
+        if (!isMenusRound() || currentMenu !== null || typeof name !== 'string')
+            return;
+        if (menuNames().indexOf(name) === -1 || playedMenus.indexOf(name) !== -1)
+            return;
+        pushHistory();
+        currentMenu = name;
+        playedMenus.push(name);
+        questionIndex = 0;
+        resetScreenQuestion();
+        resetBuzzer();
+        stopBuzzTimer();
+        saveState();
+        emitQuestionState();
+        emitAdminState();
+    }
+
+    /**
+     * Les menus : retour à la liste des menus (le menu joué reste indisponible)
+     */
+    const backToMenus = function () {
+        if (!isMenusRound() || currentMenu === null)
+            return;
+        currentMenu = null;
+        questionIndex = 0;
+        resetScreenQuestion();
+        resetBuzzer();
+        stopBuzzTimer();
+        saveState();
+        emitQuestionState();
+    }
+
+    /**
      * Les parties ont été modifiées depuis la page de gestion
      */
     partyStore.onChange(function () {
         if (activePartyId && !partyStore.get(activePartyId)) {
             activePartyId = null;
+            questionIndex = 0;
+        }
+        if (currentMenu !== null && menuNames().indexOf(currentMenu) === -1) {
+            currentMenu = null;
             questionIndex = 0;
         }
         clampQuestionIndex();
@@ -705,6 +827,8 @@ module.exports = function (io, options) {
             transitionIndex = -1;
             questionIndex = 0;
             deathCount = 0;
+            currentMenu = null;
+            playedMenus = [];
             history = [];
             victoryVisible = false;
             resetScreenQuestion();
@@ -776,6 +900,8 @@ module.exports = function (io, options) {
                 return;
             activePartyId = partyId;
             questionIndex = 0;
+            currentMenu = null;
+            playedMenus = [];
             resetScreenQuestion();
             saveState();
             emitQuestionState();
@@ -786,6 +912,8 @@ module.exports = function (io, options) {
         onAdminMessage(socket, messages.messagePreviousQuestion, function () {
             moveQuestion(-1);
         });
+        onAdminMessage(socket, messages.messageSelectMenu, selectMenu);
+        onAdminMessage(socket, messages.messageBackToMenus, backToMenus);
         /**
          * Affiche / masque la question sur l'écran de jeu, révèle la réponse
          */
