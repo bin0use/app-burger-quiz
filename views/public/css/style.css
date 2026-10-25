@@ -203,6 +203,14 @@ body.buzzed-first .container-buzzer .lock-buzz-button {
 }
 
 /* Télécommande : question et réponse lisibles de loin */
+/* Burger de la mort : liste de toutes les questions */
+.admin-question-list {
+    position: relative;
+    max-height: 22em;
+    overflow-y: auto;
+    cursor: pointer;
+}
+
 .admin-question-text {
     font-size: 2rem;
     font-weight: 600;

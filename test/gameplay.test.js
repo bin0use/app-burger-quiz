@@ -316,6 +316,73 @@ test('Les menus : noms des menus, puis questions du menu choisi', async function
     assert.deepStrictEqual((await state)[0].menus, { current: null, list: menus(['Menu Cinéma']) });
 });
 
+test('Les menus : verrouillés à la dernière question ou à la main', async function (t) {
+    const game = await setup(t, [
+        { round: 'menus', theme: 'A', question: 'A1' },
+        { round: 'menus', theme: 'A', question: 'A2' },
+        { round: 'menus', theme: 'B', question: 'B1' },
+        { round: 'menus', theme: 'B', question: 'B2' }
+    ]);
+    await game.goToRound(3);
+    const send = async function (message, value) {
+        const state = waitFor(game.admin, messages.messageToClientReceiveStateQuestion);
+        game.admin.emit(message, value);
+        return (await state)[0].menus;
+    }
+    // Retour aux menus avant la dernière question : le menu reste disponible
+    await send(messages.messageSelectMenu, 'A');
+    assert.deepStrictEqual((await send(messages.messageBackToMenus)).list, [{ name: 'A', played: false }, { name: 'B', played: false }]);
+    // Dernière question atteinte : verrouillé
+    await send(messages.messageSelectMenu, 'A');
+    assert.deepStrictEqual((await send(messages.messageNextQuestion)).list, [{ name: 'A', played: true }, { name: 'B', played: false }]);
+    await send(messages.messageBackToMenus);
+    // Déverrouillage / verrouillage à la main par l'admin seulement
+    assert.deepStrictEqual((await send(messages.messageToggleMenuLock, 'A')).list, [{ name: 'A', played: false }, { name: 'B', played: false }]);
+    assert.deepStrictEqual((await send(messages.messageToggleMenuLock, 'B')).list, [{ name: 'A', played: false }, { name: 'B', played: true }]);
+    // Un joueur ne peut pas verrouiller, un menu verrouillé ne peut pas être choisi
+    game.screen.emit(messages.messageToggleMenuLock, 'A');
+    game.admin.emit(messages.messageSelectMenu, 'B');
+    await pause(100);
+    assert.deepStrictEqual(await send(messages.messageClientNeedStateQuestion), {
+        current: null, list: [{ name: 'A', played: false }, { name: 'B', played: true }]
+    });
+    assert.strictEqual((await send(messages.messageSelectMenu, 'A')).current, 'A');
+});
+
+test('Burger de la mort : liste de toutes les questions', async function (t) {
+    const game = await setup(t, [
+        { round: 'burger-de-la-mort', question: 'D1', answer: 'R1' },
+        { round: 'burger-de-la-mort', question: 'D2', answer: 'R2' },
+        { round: 'burger-de-la-mort', question: 'D3' }
+    ]);
+    let state = waitForMatch(game.admin, messages.messageToClientReceiveStateQuestion, function (value) {
+        return value.list;
+    });
+    await game.goToRound(5);
+    assert.deepStrictEqual((await state).list, [
+        { question: 'D1', answer: 'R1' }, { question: 'D2', answer: 'R2' }, { question: 'D3', answer: '' }
+    ]);
+    state = waitFor(game.admin, messages.messageToClientReceiveStateQuestion);
+    game.admin.emit(messages.messageGoToQuestion, 2);
+    assert.strictEqual((await state)[0].question.question, 'D3');
+});
+
+test('écran de victoire automatique à 25 points', async function (t) {
+    const game = await setup(t, []);
+    for (let index = 0; index < 24; index++) {
+        const ketchup = waitFor(game.screen, messages.messageToClientKetchup);
+        game.admin.emit(messages.messageKetchupTeam, messages.messageAdd);
+        await ketchup;
+    }
+    let victory = waitFor(game.screen, messages.messageToClientReceiveVictory);
+    game.admin.emit(messages.messageKetchupTeam, messages.messageAdd);
+    assert.deepStrictEqual(await victory, [{ visible: true, winner: 'team-ketchup', mayo: 0, ketchup: 25 }]);
+    // Annuler le point : l'écran de victoire disparait
+    victory = waitFor(game.screen, messages.messageToClientReceiveVictory);
+    game.admin.emit(messages.messageUndo);
+    assert.strictEqual((await victory)[0].visible, false);
+});
+
 test('écran de victoire et lancement de la partie', async function (t) {
     const game = await setup(t, []);
     const mayo = waitFor(game.screen, messages.messageToClientMayo);

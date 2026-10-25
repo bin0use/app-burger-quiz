@@ -21,6 +21,12 @@ const adminRoom = 'admins';
 const deathBurgerTotal = 10;
 
 /**
+ * Points pour gagner la partie : l'écran de victoire s'affiche automatiquement
+ * (le burger de l'écran de jeu est alors complet)
+ */
+const victoryPoints = 25;
+
+/**
  * Nombre d'actions mémorisées pour « Annuler »
  */
 const historySize = 30;
@@ -88,7 +94,8 @@ module.exports = function (io, options) {
     let answerRevealed = false;
     /**
      * Les menus : menu choisi (null : l'écran affiche la liste des menus)
-     * Et menus déjà choisis (ils ne peuvent plus l'être par l'autre équipe)
+     * Et menus verrouillés : joués jusqu'à la dernière question (ou verrouillés par l'admin),
+     * ils ne peuvent plus être choisis par l'autre équipe
      */
     let currentMenu = null;
     let playedMenus = [];
@@ -113,6 +120,7 @@ module.exports = function (io, options) {
      * Ecran de victoire affiché, partie lancée depuis la télécommande
      */
     let victoryVisible = false;
+    let victoryAuto = false;
     let gameStarted = false;
 
     /**
@@ -136,7 +144,7 @@ module.exports = function (io, options) {
             deathCount = state.deathCount;
         if (Array.isArray(state.playedMenus))
             playedMenus = state.playedMenus.filter(function (menu) { return typeof menu === 'string'; });
-        if (typeof state.currentMenu === 'string' && playedMenus.indexOf(state.currentMenu) !== -1)
+        if (typeof state.currentMenu === 'string' && isMenusRound() && menuNames().indexOf(state.currentMenu) !== -1)
             currentMenu = state.currentMenu;
         clampQuestionIndex();
     }
@@ -271,6 +279,10 @@ module.exports = function (io, options) {
             // Questions créées avant le barème et les notes : 1 point, pas de note
             question: question ? Object.assign({ points: 1, note: '' }, question) : null,
             menus: menusState(),
+            // Burger de la mort : toutes les questions, pour suivre facilement
+            list: isDeathBurgerRound() ? questions.map(function (item) {
+                return { question: item.question, answer: item.answer || '' };
+            }) : null,
             questionsOnScreen: !!(transition && transition.questionsOnScreen),
             screenMode: transition ? transition.screenMode : null,
             screenVisible: screenQuestionVisible,
@@ -525,7 +537,7 @@ module.exports = function (io, options) {
         deathCount = previous.deathCount;
         answerRevealed = previous.answerRevealed;
         // Choix d'un menu annulé : retour au menu (ou à la liste des menus) d'avant
-        if (previous.currentMenu !== currentMenu || previous.playedMenus.length !== playedMenus.length) {
+        if (previous.currentMenu !== currentMenu || previous.playedMenus.join('\n') !== playedMenus.join('\n')) {
             currentMenu = previous.currentMenu;
             playedMenus = previous.playedMenus;
             questionIndex = previous.questionIndex;
@@ -533,6 +545,12 @@ module.exports = function (io, options) {
             const revealed = answerRevealed;
             resetScreenQuestion();
             answerRevealed = revealed;
+        }
+        // Victoire automatique annulée : plus aucune équipe n'a gagné
+        if (victoryAuto && Math.max(teamMayo.points, teamKetchup.points) < victoryPoints) {
+            victoryVisible = false;
+            victoryAuto = false;
+            emitVictory();
         }
         saveState();
         emitPoints();
@@ -542,6 +560,17 @@ module.exports = function (io, options) {
         if (victoryVisible)
             emitVictory();
         emitAdminState();
+    }
+
+    /**
+     * Une équipe atteint les points de la victoire : l'écran de victoire s'affiche
+     */
+    const checkVictory = function () {
+        if (victoryVisible || Math.max(teamMayo.points, teamKetchup.points) < victoryPoints)
+            return;
+        victoryVisible = true;
+        victoryAuto = true;
+        emitVictory();
     }
 
     /**
@@ -576,6 +605,7 @@ module.exports = function (io, options) {
         emitQuestionState();
         if (victoryVisible)
             emitVictory();
+        checkVictory();
         emitAdminState();
     }
 
@@ -664,6 +694,7 @@ module.exports = function (io, options) {
         if (index < 0 || index >= currentRoundQuestions().length)
             return;
         questionIndex = index;
+        lockMenuOnLastQuestion();
         resetScreenQuestion();
         resetBuzzer();
         stopBuzzTimer();
@@ -672,8 +703,19 @@ module.exports = function (io, options) {
     }
 
     /**
+     * Les menus : la dernière question du menu est atteinte, il est verrouillé
+     * (l'autre équipe ne pourra plus le choisir)
+     */
+    const lockMenuOnLastQuestion = function () {
+        if (currentMenu === null || playedMenus.indexOf(currentMenu) !== -1)
+            return;
+        if (questionIndex >= currentRoundQuestions().length - 1)
+            playedMenus.push(currentMenu);
+    }
+
+    /**
      * Les menus : l'équipe choisit un menu, ses questions s'affichent
-     * Un menu déjà choisi ne peut plus l'être (par l'autre équipe)
+     * Un menu verrouillé ne peut pas être choisi
      */
     const selectMenu = function (name) {
         if (!isMenusRound() || currentMenu !== null || typeof name !== 'string')
@@ -682,8 +724,8 @@ module.exports = function (io, options) {
             return;
         pushHistory();
         currentMenu = name;
-        playedMenus.push(name);
         questionIndex = 0;
+        lockMenuOnLastQuestion();
         resetScreenQuestion();
         resetBuzzer();
         stopBuzzTimer();
@@ -693,7 +735,24 @@ module.exports = function (io, options) {
     }
 
     /**
-     * Les menus : retour à la liste des menus (le menu joué reste indisponible)
+     * Les menus : verrouille / déverrouille un menu à la main
+     */
+    const toggleMenuLock = function (name) {
+        if (!isMenusRound() || typeof name !== 'string' || menuNames().indexOf(name) === -1)
+            return;
+        pushHistory();
+        const index = playedMenus.indexOf(name);
+        if (index === -1)
+            playedMenus.push(name);
+        else
+            playedMenus.splice(index, 1);
+        saveState();
+        emitQuestionState();
+        emitAdminState();
+    }
+
+    /**
+     * Les menus : retour à la liste des menus (un menu joué jusqu'au bout reste verrouillé)
      */
     const backToMenus = function () {
         if (!isMenusRound() || currentMenu === null)
@@ -742,6 +801,7 @@ module.exports = function (io, options) {
         io.emit(messageForClient, team.points);
         if (victoryVisible)
             emitVictory();
+        checkVictory();
         emitAdminState();
     }
 
@@ -831,6 +891,7 @@ module.exports = function (io, options) {
             playedMenus = [];
             history = [];
             victoryVisible = false;
+            victoryAuto = false;
             resetScreenQuestion();
             resetTimer();
             saveState();
@@ -912,7 +973,12 @@ module.exports = function (io, options) {
         onAdminMessage(socket, messages.messagePreviousQuestion, function () {
             moveQuestion(-1);
         });
+        onAdminMessage(socket, messages.messageGoToQuestion, function (index) {
+            if (Number.isInteger(index) && index !== questionIndex)
+                moveQuestion(index - questionIndex);
+        });
         onAdminMessage(socket, messages.messageSelectMenu, selectMenu);
+        onAdminMessage(socket, messages.messageToggleMenuLock, toggleMenuLock);
         onAdminMessage(socket, messages.messageBackToMenus, backToMenus);
         /**
          * Affiche / masque la question sur l'écran de jeu, révèle la réponse
@@ -955,6 +1021,7 @@ module.exports = function (io, options) {
          */
         onAdminMessage(socket, messages.messageToggleVictory, function () {
             victoryVisible = !victoryVisible;
+            victoryAuto = false;
             emitVictory();
             emitAdminState();
         });
@@ -971,3 +1038,4 @@ module.exports = function (io, options) {
 module.exports.validTeamNames = validTeamNames;
 module.exports.transitionsList = transitionsList;
 module.exports.deathBurgerTotal = deathBurgerTotal;
+module.exports.victoryPoints = victoryPoints;

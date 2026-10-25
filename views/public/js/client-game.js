@@ -438,7 +438,7 @@ const playMedia = function (media) {
 }
 
 /**
- * Les menus : noms des menus à choisir, ceux déjà joués sont barrés
+ * Les menus : noms des menus à choisir, ceux verrouillés sont barrés
  * @param {*} menus [{ name, played }]
  */
 const displayScreenMenus = function (menus) {

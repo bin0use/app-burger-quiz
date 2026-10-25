@@ -59,6 +59,8 @@ const $menusChoice = $('#menus-choice');
 const $menusList = $('#menus-list');
 const $menusBack = $('#menus-back');
 const $buttonBackToMenus = $('#button-back-to-menus');
+const $deathBurgerQuestions = $('#death-burger-questions');
+const $deathBurgerQuestionsList = $('#death-burger-questions-list');
 
 const $buzzerStatus = $('#buzzer-status');
 const $connectionStatus = $('#connection-status');
@@ -163,8 +165,14 @@ const initEvents = function () {
     $buttonPlayAnswerMedia.on('click', actions.playAnswerMedia);
     $buttonStopMedia.on('click', actions.stopMedia);
     $buttonBackToMenus.on('click', actions.backToMenus);
-    $menusList.on('click', 'button', function () {
+    $menusList.on('click', '.button-select-menu', function () {
         socket.emit(messages.messageSelectMenu, $(this).data('menu'));
+    });
+    $menusList.on('click', '.button-lock-menu', function () {
+        socket.emit(messages.messageToggleMenuLock, $(this).data('menu'));
+    });
+    $deathBurgerQuestionsList.on('click', 'li', function () {
+        socket.emit(messages.messageGoToQuestion, $(this).data('index'));
     });
     $selectParty.on('change', function () {
         socket.emit(messages.messageSelectParty, $selectParty.val() || null);
@@ -314,7 +322,8 @@ const displayMediaButton = function ($button, media, target) {
 }
 
 /**
- * Les menus : boutons de choix du menu (ceux déjà joués sont désactivés)
+ * Les menus : boutons de choix du menu (ceux verrouillés sont désactivés)
+ * Et de verrouillage / déverrouillage à la main
  * @param {*} menus { current, list: [{ name, played }] } ou null hors de la manche
  */
 const displayMenus = function (menus) {
@@ -325,12 +334,39 @@ const displayMenus = function (menus) {
     if (!choosing)
         return;
     menus.list.forEach(function (menu, index) {
-        $menusList.append($('<button type="button" class="btn btn-lg mr-2 mb-2"></button>')
+        const $select = $('<button type="button" class="btn btn-lg button-select-menu"></button>')
             .addClass(menu.played ? 'btn-outline-secondary' : 'btn-primary')
             .prop('disabled', menu.played)
             .data('menu', menu.name)
-            .text((menu.name || 'Menu ' + (index + 1)) + (menu.played ? ' (déjà joué)' : '')));
+            .text((menu.name || 'Menu ' + (index + 1)) + (menu.played ? ' (verrouillé)' : ''));
+        const $lock = $('<button type="button" class="btn btn-lg button-lock-menu"></button>')
+            .addClass(menu.played ? 'btn-secondary' : 'btn-outline-primary')
+            .data('menu', menu.name)
+            .attr('title', menu.played ? 'Déverrouiller le menu' : 'Verrouiller le menu')
+            .html(menu.played ? '&#128275;' : '&#128274;');
+        $menusList.append($('<div class="btn-group mr-2 mb-2"></div>').append($select, $lock));
     });
+}
+
+/**
+ * Burger de la mort : toutes les questions et réponses, la question en cours en avant
+ * @param {*} list [{ question, answer }] ou null hors de la manche
+ * @param {*} index L'index de la question en cours
+ */
+const displayDeathBurgerQuestions = function (list, index) {
+    $deathBurgerQuestions.prop('hidden', !list || !list.length);
+    $deathBurgerQuestionsList.empty();
+    (list || []).forEach(function (item, position) {
+        $deathBurgerQuestionsList.append($('<li class="list-group-item list-group-item-action py-1"></li>')
+            .toggleClass('active', position === index)
+            .data('index', position)
+            .append($('<span></span>').text((position + 1) + '. ' + item.question))
+            .append($('<strong class="ml-2"></strong>').text(item.answer ? '→ ' + item.answer : '')));
+    });
+    // La question en cours reste visible dans la liste (sans faire défiler la page)
+    const current = $deathBurgerQuestionsList.children('.active').get(0);
+    if (current)
+        $deathBurgerQuestionsList.scrollTop(current.offsetTop - $deathBurgerQuestionsList.height() / 2);
 }
 
 /**
@@ -379,6 +415,7 @@ const displayQuestionState = function (state) {
     });
 
     displayMenus(state.menus);
+    displayDeathBurgerQuestions(state.list, state.index);
     // Nuggets, Sel ou Poivre et menus : la question (ou ses propositions, ou les noms des menus) s'affiche aussi sur l'écran de jeu
     const choosingMenu = !!(state.menus && state.menus.current === null && state.menus.list.length);
     $screenControls.prop('hidden', !(question || choosingMenu) || !state.questionsOnScreen);
