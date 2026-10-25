@@ -63,6 +63,9 @@
       <div class="row justify-content-center mt-2">
         <small id="transition-status" class="text-muted"></small>
       </div>
+      <div class="row justify-content-center mt-2">
+        <button type="button" class="btn btn-outline-dark" id="button-toggle-round-card" disabled title="Carton de manche à l'écran (C)">Afficher le carton de manche</button>
+      </div>
       <div class="alert alert-dark text-center mt-3 mb-0" id="death-burger-panel" hidden>
         <strong>Burger de la mort</strong> : <span class="h4" id="death-burger-count">0 / 10</span>
         <div class="small">&#10004; fait avancer le compteur, X le remet à zéro.</div>
@@ -83,6 +86,18 @@
               <button type="button" class="btn btn-outline-secondary" id="button-next-question" disabled>Suivante &rarr;</button>
             </div>
           </div>
+          <div id="menus-choice" hidden>
+            <div class="d-flex align-items-center mb-2" id="menus-team">
+              <span class="mr-2">Équipe qui choisit :</span>
+              <button type="button" class="btn btn-outline-danger mr-1" data-team="team-ketchup">Ketchup</button>
+              <button type="button" class="btn btn-outline-warning" data-team="team-mayo">Mayo</button>
+            </div>
+            <p class="mb-2">Quel menu choisit l'équipe ? <small class="text-muted">(un menu joué jusqu'à la dernière question est verrouillé, &#128274; pour le verrouiller / déverrouiller)</small></p>
+            <div class="d-flex flex-wrap" id="menus-list"></div>
+          </div>
+          <div class="mb-2" id="menus-back" hidden>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="button-back-to-menus">&larr; Retour aux menus</button>
+          </div>
           <div id="question-content" hidden>
             <div class="d-flex align-items-center">
               <small class="text-muted d-block flex-grow-1" id="question-theme"></small>
@@ -97,10 +112,14 @@
               <button type="button" class="btn btn-outline-info mr-2 mb-1" id="button-play-answer-media"></button>
               <button type="button" class="btn btn-outline-secondary mb-1" id="button-stop-media">&#9632; Stop</button>
             </div>
-            <div class="mt-3" id="screen-controls" hidden>
-              <button type="button" class="btn btn-outline-primary mr-2 mb-1" id="button-toggle-screen-question">Masquer de l'écran</button>
-              <button type="button" class="btn btn-outline-success mb-1" id="button-toggle-reveal-answer">Révéler la réponse à l'écran</button>
-            </div>
+          </div>
+          <div class="mt-3" id="death-burger-questions" hidden>
+            <strong>Toutes les questions</strong> <small class="text-muted">(cliquez pour aller à une question)</small>
+            <ol class="list-group mt-1 admin-question-list" id="death-burger-questions-list"></ol>
+          </div>
+          <div class="mt-3" id="screen-controls" hidden>
+            <button type="button" class="btn btn-outline-primary mr-2 mb-1" id="button-toggle-screen-question">Masquer de l'écran</button>
+            <button type="button" class="btn btn-outline-success mb-1" id="button-toggle-reveal-answer">Révéler la réponse à l'écran</button>
           </div>
         </div>
       </div>
@@ -143,6 +162,7 @@
           <kbd>D</kbd> débloquer, <kbd>B</kbd> bloquer,
           <kbd>N</kbd> transition suivante, <kbd>P</kbd> précédente,
           <kbd>&rarr;</kbd> / <kbd>&larr;</kbd> question suivante / précédente,
+          <kbd>C</kbd> carton de manche,
           <kbd>E</kbd> afficher / masquer la question à l'écran, <kbd>R</kbd> révéler la réponse,
           <kbd>J</kbd> / <kbd>Maj+J</kbd> jouer le son / la vidéo de la question / de la réponse, <kbd>S</kbd> l'arrêter,
           <kbd>T</kbd> lancer / mettre en pause le chrono, <kbd>Maj+T</kbd> le masquer,

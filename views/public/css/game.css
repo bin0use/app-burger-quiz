@@ -1,293 +1,608 @@
-.qr-code-container {
-    position: absolute;
-    z-index: 90;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #000;
+/**
+ * Ecran de jeu (TV / vidéoprojecteur)
+ * Tout est dessiné sur une scène 16:9 de 1920 x 1080 mise à l'échelle de l'écran (client-game.js) :
+ * les tailles sont donc en pixels de la scène
+ */
 
+:root {
+    --ketchup: #C71000;
+    --ketchup-light: #FF4B3A;
+    --mayo: #E0C800;
+    --mayo-light: #FFE94D;
+    /* Propositions et menus : brun « pain du burger », le rouge et le jaune sont réservés aux équipes */
+    --bun: #A0612F;
+    --bun-dark: #5C3416;
+    --good: #1E8F3A;
+    --good-light: #7CE38B;
+    --panel: rgba(12, 8, 4, 0.92);
+    --ease-pop: cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+
+html,
+body {
+    margin: 0;
     height: 100%;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;  
-}
-
-.qr-code-container .children {
-    width: 50%;
-}
-
-.qr-code-container .title {
-    font-size: 40px;
-    font-weight: 600;
-    font-family: 'Cabin Sketch', cursive;
-}
-
-.qr-code-container .title-img-bgq {
- max-width: 250px;
- margin-bottom: 40px;
-}
-
-.qr-code-container .title-ketchup {
-    color: #C71000;
-    margin-right: 15px;
-}
-
-.qr-code-container .title-mayo {
-    color: #D1AF29;
-    margin-right: 15px;
-}
-
-.qr-code-container .title-both {
-    color: #B2733F;
-}
-/**************************/
-/*   QUESTION A L'ECRAN   */
-/**************************/
-
-/* Vidéo d'une question / réponse : par-dessus la question */
-#modal-media {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 60;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow: hidden;
     background: #000;
 }
 
-#modal-media[hidden] {
-    display: none;
-}
-
-#video-media {
-    max-width: 100%;
-    max-height: 100%;
-}
-
-#screen-question {
-    position: fixed;
+#stage {
+    position: absolute;
     top: 50%;
     left: 50%;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
     transform: translate(-50%, -50%);
-    z-index: 50;
-    width: min(70vw, 1100px);
-    padding: 2vh 2.5vw;
-    background: rgba(0, 0, 0, 0.88);
-    border: 4px solid #fff;
-    border-radius: 12px;
+    transform-origin: center;
     color: #fff;
-    font-family: 'Cabin Sketch', cursive;
-    text-align: center;
-    box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+    font-family: var(--font-text);
+    font-weight: 500;
+    background: radial-gradient(ellipse at 50% 45%, #1d140b 0%, #000 70%);
 }
 
-#screen-question[hidden] {
-    display: none;
-}
-
-.screen-question-round {
-    font-size: 2.6vh;
-    color: #E0C800;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-.screen-question-text {
-    margin-top: 1vh;
-    font-size: 4.8vh;
-    line-height: 1.15;
-}
-
-.screen-question-choices {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5vh 1.5vw;
-    margin-top: 2.5vh;
-}
-
-.screen-question-choices:empty {
-    display: none;
-}
-
-.screen-question-choice {
-    display: flex;
-    align-items: center;
-    padding: 1vh 1vw;
-    font-size: 3.6vh;
-    text-align: left;
-    background: #C71000;
-    border: 3px solid transparent;
-    border-radius: 8px;
-    transition: opacity 0.4s, background 0.4s, border-color 0.4s;
-}
-
-.screen-question-choice:nth-child(even) {
-    background: #B39F00;
-}
-
-.screen-question-choice-letter {
-    flex: none;
-    width: 1.6em;
-    font-weight: 700;
-}
-
-/* Réponse révélée : la bonne proposition ressort, les autres s'effacent */
-.screen-question-choices.revealed .screen-question-choice {
-    opacity: 0.35;
-}
-
-.screen-question-choices.revealed .screen-question-choice.good {
-    opacity: 1;
-    background: #1E8F3A;
-    border-color: #fff;
-}
-
-.screen-question-answer {
-    margin-top: 2vh;
-    font-size: 4vh;
-    color: #7CE38B;
-}
-
-.screen-question-points {
-    display: inline-block;
-    margin-top: 0.5vh;
-    padding: 0.2vh 1vw;
-    font-size: 2.4vh;
-    color: #000;
-    background: #E0C800;
-    border-radius: 999px;
-}
-
-.screen-question-points[hidden],
-.screen-question-text:empty {
-    display: none;
-}
-
-/**************************/
-/*   MODE TV              */
-/**************************/
-
-/* Pendant une transition, seule la vidéo est visible */
-body.transition-running #screen-timer,
-body.transition-running #death-burger {
-    display: none;
+[hidden] {
+    display: none !important;
 }
 
 /* Curseur masqué quand la souris ne bouge plus */
-body.game-page.hide-cursor,
-body.game-page.hide-cursor * {
+body.hide-cursor,
+body.hide-cursor * {
     cursor: none !important;
 }
 
 /**************************/
-/*   BUZZ                 */
+/*   BANDEAU DES SCORES   */
 /**************************/
 
-#buzz-first {
-    position: fixed;
+#scoreboard {
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
+    height: 130px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    z-index: 20;
+    background: linear-gradient(#000 0%, rgba(0, 0, 0, 0.6) 100%);
+}
+
+.scoreboard-team {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    height: 100%;
+    padding: 0 36px;
+}
+
+.scoreboard-ketchup {
+    background: linear-gradient(90deg, var(--ketchup) 0%, rgba(199, 16, 0, 0) 100%);
+}
+
+.scoreboard-mayo {
+    justify-content: flex-end;
+    background: linear-gradient(270deg, var(--mayo) 0%, rgba(224, 200, 0, 0) 100%);
+}
+
+.scoreboard-logo {
+    height: 96px;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+}
+
+.scoreboard-name {
+    font-size: 54px;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 2px;
+}
+
+.scoreboard-score {
+    min-width: 130px;
+    padding: 0 20px;
+    font-size: 100px;
+    line-height: 112px;
+    text-align: center;
+    border: 5px solid #fff;
+    border-radius: 18px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+    font-family: var(--font-text);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.scoreboard-ketchup .scoreboard-score {
+    background: var(--ketchup);
+}
+
+.scoreboard-mayo .scoreboard-score {
+    color: #000;
+    background: var(--mayo);
+}
+
+.scoreboard-score.bump {
+    animation: score-bump 0.5s var(--ease-pop);
+}
+
+.scoreboard-round {
+    padding: 0 40px;
+    color: var(--mayo-light);
+    text-transform: uppercase;
+    white-space: nowrap;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 4px;
+    font-size: 54px;
+}
+
+@keyframes score-bump {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+/**************************/
+/*   PLATEAUX             */
+/**************************/
+
+#trays {
+    position: absolute;
+    top: 130px;
+    left: 0;
+    right: 0;
     bottom: 0;
-    z-index: 99;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.tray {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Le contenu d'un plateau est dessiné à taille fixe puis mis à l'échelle */
+.tray-content {
+    display: flex;
+    align-items: flex-end;
+    gap: 34px;
+    transform: scale(1.15);
+    transition: transform 0.6s ease;
+}
+
+/* Question à l'écran : les plateaux rapetissent et remontent, toujours visibles */
+#stage.with-question #trays {
+    bottom: 470px;
+}
+
+#stage.with-question .tray-content {
+    transform: scale(0.82);
+}
+
+/* Burger de la mort : place pour la tour au centre */
+#stage.death-round #trays {
+    grid-template-columns: 1fr 380px 1fr;
+}
+
+#stage.death-round #tray-mayo {
+    grid-column: 3;
+}
+
+#stage.death-round .tray-content {
+    transform: scale(0.85);
+}
+
+#stage.death-round.with-question .tray-content {
+    transform: scale(0.65);
+}
+
+.tray-column {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.9);
-    pointer-events: none;
 }
 
-#buzz-first[hidden] {
+.tray-item {
+    display: block;
+    transition: filter 0.4s;
+}
+
+/* Elément gagné : rebond et lueur aux couleurs de l'équipe */
+.tray-item.gained {
+    animation: item-gained 0.9s var(--ease-pop);
+}
+
+#tray-ketchup .tray-item.gained {
+    --glow: var(--ketchup-light);
+}
+
+#tray-mayo .tray-item.gained {
+    --glow: var(--mayo-light);
+}
+
+@keyframes item-gained {
+    0% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
+    35% { transform: scale(1.3); filter: drop-shadow(0 0 22px var(--glow)) brightness(1.3); }
+    100% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
+}
+
+/* Burger : les étages se chevauchent légèrement */
+.tray-burger .tray-item {
+    width: 230px;
+    margin-top: -14px;
+}
+
+.tray-burger .tray-item:first-child {
+    margin-top: 0;
+}
+
+/* Boisson : paille, couvercle, gobelet */
+.tray-drink .tray-item {
+    width: 200px;
+}
+
+.tray-drink .tray-item[data-points="13"] {
+    margin-bottom: -46px;
+}
+
+.tray-drink .tray-item[data-points="12"] {
+    position: relative;
+    z-index: 1;
+    margin-bottom: -26px;
+}
+
+/* Sauces */
+.tray-sauces {
+    gap: 22px;
+}
+
+.tray-sauces .tray-item {
+    width: 66px;
+}
+
+/* Frites : elles sortent du cornet */
+.tray-fries-row {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+}
+
+.tray-fries-row + .tray-fries-row {
+    margin-top: -10px;
+}
+
+.tray-fries-row .tray-item {
+    width: 40px;
+}
+
+.tray-fries .tray-item[data-points="17"] {
+    position: relative;
+    z-index: 1;
+    width: 190px;
+    margin-top: -40px;
+}
+
+/* Bordure aux couleurs de l'équipe qui a la main */
+#hand-border {
+    position: absolute;
+    inset: 0;
+    z-index: 75;
+    pointer-events: none;
+    border: 0 solid transparent;
+    transition: border-width 0.3s, box-shadow 0.3s;
+}
+
+#stage.hand-team-ketchup #hand-border {
+    border-width: 14px;
+    border-color: var(--ketchup);
+    box-shadow: inset 0 0 60px var(--ketchup-light);
+    animation: hand-pulse 1.4s ease-in-out infinite;
+}
+
+#stage.hand-team-mayo #hand-border {
+    border-width: 14px;
+    border-color: var(--mayo);
+    box-shadow: inset 0 0 60px var(--mayo-light);
+    animation: hand-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes hand-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+}
+
+/**************************/
+/*   QUESTION             */
+/**************************/
+
+#question-panel {
+    position: absolute;
+    left: 50%;
+    bottom: 28px;
+    z-index: 30;
+    box-sizing: border-box;
+    width: 1760px;
+    max-height: 440px;
+    padding: 26px 40px 30px;
+    font-size: 40px;
+    text-align: center;
+    background: var(--panel);
+    border: 5px solid #fff;
+    border-radius: 26px;
+    box-shadow: 0 12px 50px rgba(0, 0, 0, 0.85);
+    transform: translateX(-50%);
+}
+
+#question-panel.enter {
+    animation: panel-enter 0.55s var(--ease-pop);
+}
+
+@keyframes panel-enter {
+    0% { transform: translate(-50%, 120%); opacity: 0; }
+    100% { transform: translate(-50%, 0); opacity: 1; }
+}
+
+.question-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.question-round {
+    color: var(--mayo-light);
+    text-transform: uppercase;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 3px;
+    font-size: 0.85em;
+}
+
+.question-points {
+    padding: 2px 18px;
+    font-size: 0.65em;
+    color: #000;
+    background: var(--mayo);
+    border-radius: 999px;
+}
+
+.question-text {
+    margin-top: 10px;
+    font-size: 1.55em;
+    line-height: 1.15;
+    font-weight: 600;
+}
+
+.question-text:empty {
     display: none;
 }
 
-#buzz-first-logo {
-    height: 55vh;
-    max-width: 90vw;
-    animation: buzz-pop 0.45s cubic-bezier(0.2, 1.6, 0.4, 1);
-    filter: drop-shadow(0 0 30px rgba(0, 0, 0, 0.8));
+.question-choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 22px;
+    margin-top: 22px;
 }
 
-#buzz-first-gap {
-    margin-top: 3vh;
-    min-height: 6vh;
-    font-family: 'Cabin Sketch', cursive;
-    font-size: 5vh;
-    color: #fff;
-    text-shadow: 0 3px 8px #000;
+.question-choices:empty {
+    display: none;
 }
 
-#buzz-first-gap:not(:empty) {
-    animation: fade-up 0.4s ease-out;
+.question-choice {
+    display: flex;
+    align-items: center;
+    padding: 10px 22px;
+    font-size: 1.1em;
+    text-align: left;
+    background: var(--bun);
+    border: 4px solid transparent;
+    border-radius: 14px;
+    transition: opacity 0.4s, background 0.3s, border-color 0.3s, transform 0.3s;
 }
 
-@keyframes buzz-pop {
-    0% { transform: scale(0.2) rotate(-12deg); opacity: 0; }
-    100% { transform: scale(1) rotate(0); opacity: 1; }
+#question-panel.enter .question-choice {
+    animation: choice-enter 0.45s var(--ease-pop) backwards;
 }
 
-@keyframes fade-up {
-    0% { transform: translateY(2vh); opacity: 0; }
-    100% { transform: translateY(0); opacity: 1; }
+@keyframes choice-enter {
+    0% { transform: translateY(40px) scale(0.9); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 
-@keyframes burger-pop {
+.question-choice-letter {
+    flex: none;
+    width: 1.5em;
+    color: var(--mayo-light);
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.15em;
+}
+
+/* Roulement avant la réponse : les propositions s'allument tour à tour */
+.question-choice.spotlight {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+}
+
+.question-choice.spotlight .question-choice-letter {
+    color: #000;
+}
+
+/* Réponse révélée : la bonne proposition ressort, les autres s'effacent */
+.question-choices.revealed .question-choice {
+    opacity: 0.3;
+}
+
+.question-choices.revealed .question-choice.good {
+    opacity: 1;
+    background: var(--good);
+    border-color: #fff;
+    animation: good-answer 0.7s var(--ease-pop);
+    box-shadow: 0 0 40px var(--good-light);
+}
+
+@keyframes good-answer {
     0% { transform: scale(1); }
-    50% { transform: scale(1.25); }
+    40% { transform: scale(1.08); }
     100% { transform: scale(1); }
+}
+
+.question-answer {
+    margin-top: 18px;
+    font-size: 1.3em;
+    color: var(--good-light);
+    animation: good-answer 0.7s var(--ease-pop);
+}
+
+/* Les menus : cartes de restaurant, celles verrouillées sont barrées */
+.question-menus {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 22px;
+    margin-top: 20px;
+}
+
+.question-menu {
+    position: relative;
+    padding: 22px 20px 18px;
+    background: var(--bun);
+    border: 4px solid #fff;
+    border-radius: 18px;
+    box-shadow: inset 0 0 0 6px var(--bun-dark);
+    transition: opacity 0.4s;
+}
+
+#question-panel.enter .question-menu {
+    animation: choice-enter 0.45s var(--ease-pop) backwards;
+}
+
+.question-menu-name {
+    line-height: 1.1;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 1px;
+    font-size: 1.3em;
+}
+
+.question-menu-count {
+    margin-top: 8px;
+    font-size: 0.6em;
+    color: rgba(255, 255, 255, 0.75);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.question-menu.played {
+    opacity: 0.35;
+}
+
+.question-menu.played .question-menu-name {
+    text-decoration: line-through;
+}
+
+/* Tampon « Choisi par … » */
+.question-menu-stamp {
+    position: absolute;
+    top: -16px;
+    right: -10px;
+    padding: 4px 14px;
+    text-transform: uppercase;
+    border: 4px solid #fff;
+    border-radius: 8px;
+    transform: rotate(8deg);
+    animation: stamp 0.4s var(--ease-pop);
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 2px;
+    font-size: 0.7em;
+}
+
+.question-menu-stamp.team-ketchup {
+    background: var(--ketchup);
+}
+
+.question-menu-stamp.team-mayo {
+    color: #000;
+    background: var(--mayo);
+}
+
+@keyframes stamp {
+    0% { transform: rotate(8deg) scale(3); opacity: 0; }
+    100% { transform: rotate(8deg) scale(1); opacity: 1; }
 }
 
 /**************************/
 /*   CHRONO               */
 /**************************/
 
-#screen-timer {
-    position: fixed;
-    top: 2vh;
+#timer {
+    position: absolute;
+    top: 150px;
     left: 50%;
+    z-index: 40;
+    width: 210px;
+    height: 210px;
     transform: translateX(-50%);
-    z-index: 70;
-    min-width: 18vh;
-    padding: 0.5vh 2vw;
-    font-family: 'Cabin Sketch', cursive;
-    font-size: 11vh;
-    line-height: 1.1;
-    text-align: center;
-    color: #fff;
-    background: rgba(0, 0, 0, 0.85);
-    border: 4px solid #fff;
-    border-radius: 16px;
 }
 
-#screen-timer[hidden] {
-    display: none;
+#timer svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
 }
 
-#screen-timer.paused {
-    opacity: 0.6;
+.timer-track {
+    fill: rgba(0, 0, 0, 0.85);
+    stroke: rgba(255, 255, 255, 0.2);
+    stroke-width: 14;
 }
 
-#screen-timer.hurry {
-    color: #FF4B3A;
-    border-color: #FF4B3A;
+.timer-ring {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 14;
+    stroke-linecap: round;
+    transition: stroke 0.4s;
+}
+
+.timer-value {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 92px;
+    font-family: var(--font-text);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+#timer.warning .timer-ring {
+    stroke: #FF9F1C;
+}
+
+#timer.hurry .timer-ring {
+    stroke: var(--ketchup-light);
+}
+
+#timer.hurry {
     animation: timer-pulse 1s infinite;
 }
 
-#screen-timer.ended {
-    color: #fff;
-    background: #C71000;
-    border-color: #fff;
+#timer.paused {
+    opacity: 0.6;
+}
+
+#timer.ended .timer-track {
+    fill: var(--ketchup);
 }
 
 @keyframes timer-pulse {
     0%, 100% { transform: translateX(-50%) scale(1); }
-    50% { transform: translateX(-50%) scale(1.08); }
+    50% { transform: translateX(-50%) scale(1.1); }
 }
 
 /**************************/
@@ -295,74 +610,249 @@ body.game-page.hide-cursor * {
 /**************************/
 
 #death-burger {
-    position: fixed;
+    position: absolute;
+    top: 150px;
+    bottom: 30px;
     left: 50%;
-    bottom: 3vh;
+    z-index: 25;
+    width: 360px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 10px;
+    box-sizing: border-box;
+    background: var(--panel);
+    border: 5px solid #fff;
+    border-radius: 26px;
     transform: translateX(-50%);
-    z-index: 55;
-    padding: 1.5vh 2vw;
-    font-family: 'Cabin Sketch', cursive;
-    text-align: center;
-    color: #fff;
-    background: rgba(0, 0, 0, 0.88);
-    border: 4px solid #fff;
-    border-radius: 16px;
 }
 
-#death-burger[hidden] {
-    display: none;
+#stage.with-question #death-burger {
+    bottom: 490px;
 }
 
 .death-burger-title {
-    font-size: 3.5vh;
-    color: #E0C800;
+    line-height: 1.05;
+    text-align: center;
+    color: var(--mayo-light);
     text-transform: uppercase;
+    font-family: var(--font-display);
+    font-weight: 400;
     letter-spacing: 3px;
+    font-size: 44px;
 }
 
-.death-burger-steps {
+.death-burger-tower {
+    flex: 1;
     display: flex;
-    gap: 1vw;
-    margin-top: 1vh;
-}
-
-.death-burger-step {
-    display: flex;
+    flex-direction: column-reverse;
     align-items: center;
-    justify-content: center;
-    width: 7vh;
-    height: 7vh;
-    font-size: 3.5vh;
-    border: 3px solid #666;
-    border-radius: 50%;
-    color: #666;
-    transition: background 0.3s, color 0.3s, border-color 0.3s;
+    justify-content: flex-start;
+    min-height: 0;
+    margin-top: 10px;
 }
 
-.death-burger-step.done {
-    color: #fff;
-    background: #1E8F3A;
-    border-color: #fff;
-    animation: burger-pop 0.35s ease-out;
+.death-burger-layer {
+    display: block;
+    width: 200px;
+    margin-top: -10px;
+    transition: opacity 0.3s;
 }
 
-#death-burger.reset .death-burger-steps {
-    animation: shake 0.5s;
+#stage.with-question .death-burger-layer {
+    width: 130px;
+    margin-top: -8px;
+}
+
+.death-burger-layer.empty {
+    opacity: 0.5;
+}
+
+/* Chaque bonne réponse : l'étage tombe sur la tour */
+.death-burger-layer.drop {
+    animation: layer-drop 0.5s cubic-bezier(0.3, 1.4, 0.6, 1);
+}
+
+@keyframes layer-drop {
+    0% { transform: translateY(-300px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+/* Erreur : la tour s'effondre */
+#death-burger.collapse .death-burger-layer {
+    animation: layer-fall 0.9s ease-in forwards;
+}
+
+@keyframes layer-fall {
+    0% { transform: translate(0, 0) rotate(0); opacity: 1; }
+    100% { transform: translate(var(--fall-x), 500px) rotate(var(--fall-r)); opacity: 0; }
+}
+
+.death-burger-count {
+    margin-top: 8px;
+    font-size: 64px;
+    font-family: var(--font-text);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
 }
 
 #death-burger.won {
-    background: #1E8F3A;
+    background: var(--good);
+    box-shadow: 0 0 80px var(--good-light);
 }
 
 #death-burger.won .death-burger-title {
     color: #fff;
-    font-size: 6vh;
 }
 
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    20%, 60% { transform: translateX(-2vw); }
-    40%, 80% { transform: translateX(2vw); }
+/**************************/
+/*   CARTON DE MANCHE     */
+/**************************/
+
+#round-card {
+    position: absolute;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle, rgba(92, 52, 22, 0.97) 0%, rgba(0, 0, 0, 0.97) 75%);
+}
+
+.round-card-content {
+    max-width: 1400px;
+    text-align: center;
+    animation: round-card-enter 0.8s var(--ease-pop);
+}
+
+.round-card-number {
+    display: inline-block;
+    padding: 6px 34px;
+    font-size: 54px;
+    color: #000;
+    text-transform: uppercase;
+    background: var(--mayo);
+    border-radius: 999px;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 6px;
+}
+
+.round-card-label {
+    margin-top: 20px;
+    line-height: 1;
+    text-shadow: 0 10px 30px #000;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 6px;
+    font-size: 220px;
+}
+
+.round-card-rules {
+    margin-top: 40px;
+    font-size: 58px;
+    line-height: 1.2;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.round-card-rules:empty {
+    display: none;
+}
+
+@keyframes round-card-enter {
+    0% { transform: scale(0.4) rotate(-6deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+/**************************/
+/*   BUZZ                 */
+/**************************/
+
+#buzz-first {
+    position: absolute;
+    inset: 0;
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    animation: buzz-flash 0.6s ease-out;
+}
+
+#buzz-first.team-ketchup {
+    --team: var(--ketchup);
+    background: radial-gradient(circle, rgba(199, 16, 0, 0.92) 0%, rgba(40, 0, 0, 0.96) 80%);
+}
+
+#buzz-first.team-mayo {
+    --team: var(--mayo);
+    background: radial-gradient(circle, rgba(224, 200, 0, 0.92) 0%, rgba(40, 32, 0, 0.96) 80%);
+}
+
+@keyframes buzz-flash {
+    0% { filter: brightness(3); }
+    100% { filter: brightness(1); }
+}
+
+#buzz-first-logo {
+    height: 560px;
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.7));
+    animation: buzz-slam 0.5s var(--ease-pop);
+}
+
+@keyframes buzz-slam {
+    0% { transform: scale(3) rotate(-20deg); opacity: 0; }
+    60% { transform: scale(0.92) rotate(3deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0); }
+}
+
+#buzz-first-name {
+    margin-top: 10px;
+    text-shadow: 0 6px 18px #000;
+    animation: fade-up 0.5s 0.2s ease-out backwards;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 6px;
+    font-size: 130px;
+}
+
+#buzz-first-gap {
+    min-height: 70px;
+    margin-top: 10px;
+    font-size: 56px;
+    text-shadow: 0 3px 8px #000;
+}
+
+#buzz-first-gap:not(:empty) {
+    animation: fade-up 0.4s ease-out;
+}
+
+@keyframes fade-up {
+    0% { transform: translateY(30px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+/* Mauvaise réponse : grande croix */
+#bad-answer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 85;
+    font-size: 520px;
+    line-height: 1;
+    color: var(--ketchup-light);
+    text-shadow: 0 0 60px #000;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    animation: bad-answer 0.9s ease-out forwards;
+}
+
+@keyframes bad-answer {
+    0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+    25% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    70% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0; }
 }
 
 /**************************/
@@ -370,11 +860,8 @@ body.game-page.hide-cursor * {
 /**************************/
 
 #victory {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    position: absolute;
+    inset: 0;
     z-index: 80;
     display: flex;
     align-items: center;
@@ -383,76 +870,216 @@ body.game-page.hide-cursor * {
     background: radial-gradient(circle, #3a2a10 0%, #000 75%);
 }
 
-#victory[hidden] {
-    display: none;
-}
-
 .victory-content {
     position: relative;
     z-index: 2;
     text-align: center;
-    font-family: 'Cabin Sketch', cursive;
-    color: #fff;
 }
 
 .victory-title {
-    font-size: 10vh;
     line-height: 1.1;
-    text-shadow: 0 4px 12px #000;
+    text-shadow: 0 6px 16px #000;
     animation: fade-up 0.8s ease-out;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 4px;
+    font-size: 130px;
 }
 
 .victory-logo {
-    height: 40vh;
-    margin: 3vh 0;
-    animation: buzz-pop 0.9s cubic-bezier(0.2, 1.6, 0.4, 1);
-}
-
-.victory-logo[hidden] {
-    display: none;
+    height: 300px;
+    margin: 20px 0;
+    animation: buzz-slam 0.9s var(--ease-pop);
 }
 
 .victory-scores {
     display: flex;
     justify-content: center;
-    gap: 3vw;
+    gap: 50px;
 }
 
 .victory-score {
-    min-width: 14vh;
-    padding: 1vh 2vw;
-    font-size: 8vh;
-    border-radius: 12px;
+    min-width: 170px;
+    padding: 6px 30px;
+    font-size: 100px;
+    border: 5px solid #fff;
+    border-radius: 20px;
+    font-family: var(--font-text);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
 }
 
 .victory-score-ketchup {
-    background: #C71000;
+    background: var(--ketchup);
 }
 
 .victory-score-mayo {
-    background: #E0C800;
     color: #000;
+    background: var(--mayo);
+}
+
+.victory-recap {
+    margin: 30px auto 0;
+    font-size: 40px;
+    border-collapse: collapse;
+    animation: fade-up 0.6s 0.6s ease-out backwards;
+}
+
+.victory-recap th,
+.victory-recap td {
+    padding: 4px 30px;
+}
+
+.victory-recap th {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 2px;
+}
+
+.victory-recap td:first-child {
+    text-align: left;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.victory-recap tbody tr + tr td {
+    border-top: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.victory-recap-ketchup {
+    color: var(--ketchup-light);
+}
+
+.victory-recap-mayo {
+    color: var(--mayo-light);
+}
+
+.victory-buzzes {
+    margin-top: 24px;
+    font-size: 40px;
+    color: rgba(255, 255, 255, 0.85);
+    animation: fade-up 0.6s 0.9s ease-out backwards;
 }
 
 #confetti {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     z-index: 1;
     pointer-events: none;
 }
 
 .confetti-piece {
     position: absolute;
-    top: -5vh;
-    width: 1.2vh;
-    height: 2vh;
+    top: -40px;
+    width: 14px;
+    height: 24px;
     animation: confetti-fall linear infinite;
 }
 
 @keyframes confetti-fall {
     0% { transform: translateY(0) rotate(0); }
-    100% { transform: translateY(110vh) rotate(720deg); }
+    100% { transform: translateY(1200px) rotate(720deg); }
+}
+
+/**************************/
+/*   VIDEOS               */
+/**************************/
+
+#media,
+#transition {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+}
+
+#media {
+    z-index: 70;
+}
+
+#transition {
+    z-index: 95;
+}
+
+#media video,
+#transition video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/**************************/
+/*   PREPARATION          */
+/**************************/
+
+#prepare {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle, #2a1c0e 0%, #000 70%);
+    transition: opacity 0.6s;
+}
+
+#prepare.closing {
+    opacity: 0;
+}
+
+.prepare-logo {
+    width: 380px;
+}
+
+.prepare-title {
+    margin: 30px 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 3px;
+    font-size: 84px;
+}
+
+.prepare-ketchup {
+    color: var(--ketchup-light);
+}
+
+.prepare-mayo {
+    color: var(--mayo);
+}
+
+.prepare-both {
+    color: #D9925A;
+}
+
+.prepare-qr {
+    width: 340px;
+    border: 12px solid #fff;
+    border-radius: 18px;
+}
+
+.prepare-help {
+    margin: 16px 0 0;
+    font-size: 36px;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.prepare-button {
+    margin-top: 40px;
+    padding: 16px 50px;
+    color: #fff;
+    background: var(--good);
+    border: 4px solid #fff;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 2px;
+    font-size: 56px;
+}
+
+.prepare-button:hover {
+    transform: scale(1.05);
 }

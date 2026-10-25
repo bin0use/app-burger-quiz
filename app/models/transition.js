@@ -6,7 +6,11 @@
  * @param {*} round la clé de la manche associée (utilisée par les questions)
  * @param {*} options.screenMode ce qui s'affiche sur l'écran de jeu :
  *  'question' (question et propositions), 'choices' (thème et propositions seulement) ou null (rien)
+ * @param {*} options.screenHidden la question n'est pas affichée à l'écran par défaut (l'admin l'affiche)
+ * @param {*} options.menus les questions sont regroupées par thème (menus) : l'écran affiche d'abord les menus,
+ *  puis les questions du menu choisi (un menu déjà joué ne peut plus être choisi)
  * @param {*} options.timerSeconds durée proposée pour le chrono de la manche
+ * @param {*} options.rules les règles de la manche en une phrase (carton de manche à l'écran)
  */
 function Transition(filename, label, order, round, options) {
     options = options || {};
@@ -16,7 +20,10 @@ function Transition(filename, label, order, round, options) {
     this.round = round;
     this.screenMode = options.screenMode || null;
     this.questionsOnScreen = !!this.screenMode;
+    this.screenHidden = !!options.screenHidden;
+    this.menus = !!options.menus;
     this.timerSeconds = options.timerSeconds || 30;
+    this.rules = options.rules || '';
 }
 
 module.exports = Transition;
