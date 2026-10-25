@@ -126,10 +126,6 @@
     transition: opacity 0.4s, background 0.4s, border-color 0.4s;
 }
 
-.screen-question-choice:nth-child(even) {
-    background: #6E3F1C;
-}
-
 .screen-question-choice-letter {
     flex: none;
     width: 1.6em;
@@ -169,7 +165,7 @@
 }
 
 /* Les menus : noms des menus à choisir, ceux verrouillés sont barrés
- * Propositions et menus en brun (pain du burger) : le rouge et le jaune sont réservés aux équipes */
+ * Propositions et menus en brun (pain du burger), sans alternance : le rouge et le jaune sont réservés aux équipes */
 .screen-question-menus {
     display: flex;
     flex-direction: column;
@@ -188,10 +184,6 @@
     border: 3px solid #fff;
     border-radius: 8px;
     transition: opacity 0.4s;
-}
-
-.screen-question-menu:nth-child(even) {
-    background: #6E3F1C;
 }
 
 .screen-question-menu.played {
