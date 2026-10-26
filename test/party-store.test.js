@@ -3,7 +3,8 @@ const assert = require('node:assert');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { createPartyStore, ValidationError } = require('../app/services/party-store');
+const { createPartyStore, ValidationError, mediaFields } = require('../app/services/party-store');
+const { createMediaStore } = require('../app/services/media-store');
 
 test('création, renommage, duplication et suppression de parties', function () {
     const store = createPartyStore(null);
@@ -153,4 +154,26 @@ test("copie et déplacement de questions (un menu…) vers une autre partie", fu
     assert.throws(function () { store.transferQuestions(source.id, ['x'], target.id, 'swap'); }, ValidationError);
     const s1 = store.questionsOfRound(source.id, 'menus')[0];
     assert.throws(function () { store.transferQuestions(source.id, [s1.id], source.id, 'move'); }, ValidationError);
+});
+
+test('les parties fournies s\'importent avec leurs sons et vidéos', function () {
+    const partiesDir = path.join(__dirname, '../parties');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bq-'));
+    const mediaStore = createMediaStore(dir, path.join(partiesDir, 'media'));
+    const store = createPartyStore(null, { mediaExists: mediaStore.restore });
+    fs.readdirSync(partiesDir).filter(function (file) { return file.endsWith('.json'); }).forEach(function (file) {
+        const data = JSON.parse(fs.readFileSync(path.join(partiesDir, file), 'utf8'));
+        const party = store.importParty(data);
+        assert.strictEqual(party.questions.length, data.questions.length, file);
+        party.questions.forEach(function (question, index) {
+            if (question.choices.length)
+                assert.ok(question.choices.indexOf(question.answer) !== -1, file + ' : ' + question.question);
+            mediaFields.forEach(function (field) {
+                assert.deepStrictEqual(question[field], data.questions[index][field] || null, file + ' : ' + question.question);
+                if (question[field])
+                    assert.strictEqual(mediaStore.exists(question[field].file), true);
+            });
+        });
+    });
+    fs.rmSync(dir, { recursive: true });
 });

@@ -61,10 +61,15 @@ const isValidFileName = function (file) {
 /**
  * Se charge de stocker les sons et vidéos des questions dans un dossier
  * @param {*} dir Le dossier (si absent, un dossier temporaire est utilisé)
+ * @param {*} libraryDir Dossier des médias fournis avec l'application (optionnel)
  */
-const createMediaStore = function (dir) {
+const createMediaStore = function (dir, libraryDir) {
     dir = dir || fs.mkdtempSync(path.join(os.tmpdir(), 'bq-media-'));
     fs.mkdirSync(dir, { recursive: true });
+
+    const exists = function (file) {
+        return isValidFileName(file) && fs.existsSync(path.join(dir, file));
+    }
 
     return {
         dir: dir,
@@ -81,8 +86,18 @@ const createMediaStore = function (dir) {
             fs.writeFileSync(path.join(dir, file), buffer);
             return { file: file, type: format[0] };
         },
-        exists: function (file) {
-            return isValidFileName(file) && fs.existsSync(path.join(dir, file));
+        exists: exists,
+        /**
+         * Copie un média fourni avec l'application (ex : réserve importée) s'il manque
+         * @returns true si le fichier est (désormais) disponible
+         */
+        restore: function (file) {
+            if (exists(file))
+                return true;
+            if (!libraryDir || !isValidFileName(file) || !fs.existsSync(path.join(libraryDir, file)))
+                return false;
+            fs.copyFileSync(path.join(libraryDir, file), path.join(dir, file));
+            return true;
         },
         /**
          * Supprime les fichiers qui ne sont plus utilisés par aucune question
