@@ -45,8 +45,8 @@ const createServer = function (options) {
   app.use(express.urlencoded({
     extended: true
   }));
-  // Corps JSON de l'API de gestion des parties (import compris)
-  app.use(express.json({ limit: '1mb' }));
+  // Corps JSON de l'API de gestion des parties (import compris : la réserve de thèmes pèse plus de 500 ko)
+  app.use(express.json({ limit: '5mb' }));
 
   // Secret de session : à définir via SESSION_SECRET, sinon généré à chaque démarrage
   const sessionMiddleware = session({
