@@ -17,6 +17,7 @@ const { createMediaStore } = require('./services/media-store');
  * @param {*} options.sessionSecret Secret de signature des sessions (optionnel)
  * @param {*} options.partiesFile Fichier de stockage des parties et questions (optionnel)
  * @param {*} options.mediaDir Dossier des sons et vidéos des questions (optionnel, dossier temporaire sinon)
+ * @param {*} options.mediaLibraryDir Dossier des médias fournis avec les parties prêtes à importer (optionnel)
  */
 const createServer = function (options) {
   options = options || {};
@@ -65,13 +66,14 @@ const createServer = function (options) {
   require('../config/passport')(passport);
 
   // Sons et vidéos des questions, servis aux écrans de jeu
-  const mediaStore = createMediaStore(options.mediaDir);
+  const mediaStore = createMediaStore(options.mediaDir, options.mediaLibraryDir);
   app.use('/media', express.static(mediaStore.dir), function (req, res) {
     res.status(404).end();
   });
 
   // Parties et questions, partagées entre l'API admin et le jeu
-  const partyStore = createPartyStore(options.partiesFile, { mediaExists: mediaStore.exists });
+  // Un média absent est repris des médias fournis avec les parties (réserve importée)
+  const partyStore = createPartyStore(options.partiesFile, { mediaExists: mediaStore.restore });
 
   // Les médias qui ne servent plus à aucune question sont supprimés
   const pruneMedia = function () {

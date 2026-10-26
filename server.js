@@ -21,6 +21,7 @@ const { httpServer } = createServer({
   stateFile: stateFile,
   partiesFile: partiesFile,
   mediaDir: mediaDir,
+  mediaLibraryDir: path.join(confServer.rootDir, 'parties/media'),
   sessionSecret: process.env.SESSION_SECRET
 });
 
